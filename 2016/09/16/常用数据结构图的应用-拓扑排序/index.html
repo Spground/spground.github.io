@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="图,拓扑排序," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="常用数据结构图–拓扑排序图 在数学中，一个图（Graph）是表示物件与物件之间的关系的数学对象，是图论的基本研究对象。  图是十分重要的数据结构，常常被应用于实际生活的应用之中。生活中常见的问题例如交通路线图、任务指定分配、工期计算、航空网络等，都可以使用图相关的理论来建立模型。 下面是《数据结构与算法分析》对图的若干定义  一个图（Graph）G = （V, E）由顶点（vertex）集和边（E">
+<meta name="keywords" content="图,拓扑排序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用数据结构图--拓扑排序">
+<meta property="og:url" content="http://yoursite.com/2016/09/16/常用数据结构图的应用-拓扑排序/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="常用数据结构图–拓扑排序图 在数学中，一个图（Graph）是表示物件与物件之间的关系的数学对象，是图论的基本研究对象。  图是十分重要的数据结构，常常被应用于实际生活的应用之中。生活中常见的问题例如交通路线图、任务指定分配、工期计算、航空网络等，都可以使用图相关的理论来建立模型。 下面是《数据结构与算法分析》对图的若干定义  一个图（Graph）G = （V, E）由顶点（vertex）集和边（E">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-22T02:10:47.754Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常用数据结构图--拓扑排序">
+<meta name="twitter:description" content="常用数据结构图–拓扑排序图 在数学中，一个图（Graph）是表示物件与物件之间的关系的数学对象，是图论的基本研究对象。  图是十分重要的数据结构，常常被应用于实际生活的应用之中。生活中常见的问题例如交通路线图、任务指定分配、工期计算、航空网络等，都可以使用图相关的理论来建立模型。 下面是《数据结构与算法分析》对图的若干定义  一个图（Graph）G = （V, E）由顶点（vertex）集和边（E">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/09/16/常用数据结构图的应用-拓扑排序/"/>
+
+
+
+
+
+  <title>常用数据结构图--拓扑排序 | Spground Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?94833242a29050288cdb99fe024295fd";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Spground Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/09/16/常用数据结构图的应用-拓扑排序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Spground">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/default_avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">常用数据结构图--拓扑排序</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-16T23:24:00+08:00">
+                2016-09-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据结构与算法/" itemprop="url" rel="index">
+                    <span itemprop="name">数据结构与算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/09/16/常用数据结构图的应用-拓扑排序/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/16/常用数据结构图的应用-拓扑排序/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="常用数据结构图–拓扑排序"><a href="#常用数据结构图–拓扑排序" class="headerlink" title="常用数据结构图–拓扑排序"></a>常用数据结构图–拓扑排序</h2><h2 id="图"><a href="#图" class="headerlink" title="图"></a>图</h2><blockquote>
+<p>在数学中，一个图（Graph）是表示物件与物件之间的关系的数学对象，是图论的基本研究对象。</p>
+</blockquote>
+<p>图是十分重要的数据结构，常常被应用于实际生活的应用之中。生活中常见的问题例如交通路线图、任务指定分配、工期计算、航空网络等，都可以使用图相关的理论来建立模型。</p>
+<p>下面是《数据结构与算法分析》对图的若干定义</p>
+<blockquote>
+<p>一个图（Graph）G = （V, E）由顶点（vertex）集和边（Edge）集E组成。每一条边就是一个点对（v，w），其中v，w属于集合V。有时也把边Edge叫做弧（arc）。如果点对是有序的，那么图就叫做是有序的（directed）。有向的图有时候叫做有向图。顶点v和w邻接（adjacent）当且仅当（v，w）属于E。在一个具有边（v，w）从而具有边（w，v）的无向图中，w和v邻接且v和w也邻接。有时候边还具有第三种成分，叫做权（weight）或值（cost）。</p>
+</blockquote>
+<h2 id="图的存储"><a href="#图的存储" class="headerlink" title="图的存储"></a>图的存储</h2><p>一种简单存储图的方式时采用一个被称为邻接矩阵的二维数组<code>a[i][j]</code>，数组的大小为<code>n * n</code>，<code>n</code> 为图的顶点个数。其中如果顶点i到顶点j连通，那么<code>a[i][j] = 1</code>，否则<code>a[i][j] = 0</code>。这种存储方式的优点是简单直观，实现方便。缺点也很明显，所需要的存储空间巨大。  </p>
+<p>当含有n个顶点的图G中大多数顶点都不是连通，那么意味中<code>n * n</code> 邻接矩阵中有大量的元素为0，即此时邻接矩阵是稀疏矩阵。</p>
+<p>另一种常见的存储方式称为邻接表（adjacent list），这种方式是申请一个大小为<code>n</code> 的数组<code>head</code>，数组元素<code>head[i]</code>，存放着由顶点i的所有邻接顶底组成的链表的头地址。此种存储方式的优点显而易见，相比于前一种方式，存储空间的大小明显减小。但是缺点是不直观，编码有难度。</p>
+<h2 id="拓扑排序"><a href="#拓扑排序" class="headerlink" title="拓扑排序"></a>拓扑排序</h2><p>拓扑排序是对又向无圈图的顶点的一种排序，它使得如果存在一条从<code>Vi</code> 到<code>Vj</code> 的路径，那么在排序中<code>Vj</code> 必须出现在 <code>Vi</code> 的后面。</p>
+<p>一种简单的求拓扑排序的算法先是找出任意一个入度为0的顶点。然后我们输出该顶点，并将它和它的边一起冲图中删除。然后，将其邻接的顶点的入度减去1。然后重复上述过程，直达图被完全删除。</p>
+<p>不难看出，此种算法首先是外层循环 <code>n</code> 次，其次是内部循环中在选取入度为0 的顶点时候，会内部循环<code>n</code>次。因此总的时间复杂度会达到<code>n * n</code>。</p>
+<p>另一种较好的改进方法是，将所有入度为0的顶点压入某个栈，然后每一次输出顶底元素A后，再将A的所有邻接顶点的入度减去1，如果某个邻接顶点的入度此时为0，那么将其继续入栈。重复上诉操作指导栈空。</p>
+<p>可以看出，对每一个入度为0的顶点入栈的操作执行了<code>n</code> 次，<code>n</code> 为顶点数。对出栈的元素A，将其邻接顶点的入度减1，然后入栈的操作，最多执行了 <code>m</code> 次， <code>m</code> 为图边的条数。因此总的时间复杂度就会是线性的 <code>O(n)</code></p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> value;</span><br><span class="line">    <span class="keyword">int</span> indegree;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化邻接表</span></span><br><span class="line"><span class="function">struct Node* <span class="title">initAdjList</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">headers</span>;</span></span><br><span class="line">    headers = (struct Node*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(struct Node) * n);</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i; i &lt; n; i++) &#123;</span><br><span class="line">        headers[i].next = <span class="literal">NULL</span>;</span><br><span class="line">        headers[i].value = <span class="number">0</span>;</span><br><span class="line">        headers[i].indegree = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> headers;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addAdj</span><span class="params">(struct Node* header, <span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">p</span> = &amp;<span class="title">header</span>[<span class="title">m</span>];</span></span><br><span class="line">    p-&gt;value++;</span><br><span class="line">    <span class="keyword">while</span>(p-&gt;next != <span class="literal">NULL</span>)</span><br><span class="line">        p = p-&gt;next;</span><br><span class="line">    p-&gt;next = (struct Node*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(struct Node));</span><br><span class="line">    p-&gt;next-&gt;value = n;</span><br><span class="line">    p-&gt;next-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//打印邻接表</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printAdjList</span><span class="params">(struct Node* header, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">p</span> = &amp;<span class="title">header</span>[<span class="title">i</span>];</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Number of %d' adj : %d\t"</span>, i, p-&gt;value);</span><br><span class="line">        <span class="keyword">while</span>(p-&gt;next!= <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%d ---&gt;%d\t"</span>, i, p-&gt;next-&gt;value);</span><br><span class="line">            p = p-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//拓扑排序</span></span><br><span class="line"><span class="function"><span class="keyword">int</span>* <span class="title">topSort</span><span class="params">(struct Node* headers, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>* zeroStack = (<span class="keyword">int</span>*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * n);</span><br><span class="line">    <span class="keyword">int</span>* result = (<span class="keyword">int</span>*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * n);</span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> pIndex = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(i &lt; n) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">p</span> = &amp;<span class="title">headers</span>[<span class="title">i</span>];</span></span><br><span class="line">        <span class="comment">//入度为0，直接进栈</span></span><br><span class="line">        <span class="keyword">if</span>(p-&gt;indegree == <span class="number">0</span>)</span><br><span class="line">            zeroStack[++pIndex] = i;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">//从top里面出栈一个Node Index</span></span><br><span class="line">        <span class="keyword">int</span> zeroIndex = zeroStack[pIndex--];</span><br><span class="line">        result[count++]  = zeroIndex;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">zeroNode</span> = &amp;<span class="title">headers</span>[<span class="title">zeroIndex</span>];</span></span><br><span class="line">        <span class="comment">//将zeroNode的连接点，对应的头结点的值减一</span></span><br><span class="line">        <span class="keyword">while</span>(zeroNode-&gt;next != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">q</span> = &amp;<span class="title">headers</span>[<span class="title">zeroNode</span>-&gt;<span class="title">next</span>-&gt;<span class="title">value</span>];</span></span><br><span class="line">            <span class="keyword">if</span>(--q-&gt;indegree == <span class="number">0</span>)</span><br><span class="line">                zeroStack[++pIndex] = zeroNode-&gt;next-&gt;value;</span><br><span class="line">            zeroNode = zeroNode-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//栈空</span></span><br><span class="line">        <span class="keyword">if</span>(pIndex &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a[<span class="number">7</span>][<span class="number">7</span>] = &#123; &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">0</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>&#125;,</span><br><span class="line">                    &#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>&#125;</span><br><span class="line">                    &#125;;</span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">7</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">headers</span> = <span class="title">initAdjList</span>(<span class="title">n</span>);</span></span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(a[i][j] == <span class="number">1</span>)</span><br><span class="line">                addAdj(headers, i, j);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//生成各节点indegree</span></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">p</span> = &amp;<span class="title">headers</span>[<span class="title">i</span>];</span></span><br><span class="line">        <span class="keyword">while</span>(p-&gt;next != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            headers[p-&gt;next-&gt;value].indegree++;</span><br><span class="line">            p = p-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span>* q = topSort(headers, n);</span><br><span class="line">    printAdjList(headers, n);</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%d \n"</span>, *q++ + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/图/" rel="tag"># 图</a>
+          
+            <a href="/tags/拓扑排序/" rel="tag"># 拓扑排序</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/13/常用数据结构栈的应用-表达式求值/" rel="next" title="常用数据结构栈的应用----表达式求值">
+                <i class="fa fa-chevron-left"></i> 常用数据结构栈的应用----表达式求值
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/24/常用排序算法--冒泡排序及改进和插入排序时间复杂度分析/" rel="prev" title="常用排序算法--冒泡排序及改进和插入排序时间复杂度分析">
+                常用排序算法--冒泡排序及改进和插入排序时间复杂度分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/09/16/常用数据结构图的应用-拓扑排序/"
+           data-title="常用数据结构图--拓扑排序" data-url="http://yoursite.com/2016/09/16/常用数据结构图的应用-拓扑排序/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/default_avatar.png"
+               alt="Spground" />
+          <p class="site-author-name" itemprop="name">Spground</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">41</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Spground" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/u014532901" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#常用数据结构图–拓扑排序"><span class="nav-number">1.</span> <span class="nav-text">常用数据结构图–拓扑排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图"><span class="nav-number">2.</span> <span class="nav-text">图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图的存储"><span class="nav-number">3.</span> <span class="nav-text">图的存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拓扑排序"><span class="nav-number">4.</span> <span class="nav-text">拓扑排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码示例"><span class="nav-number">5.</span> <span class="nav-text">代码示例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2013 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spground</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
