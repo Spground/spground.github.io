@@ -104,7 +104,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://img.blog.csdn.net/20171119123859600?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://tech.meituan.com/img/java-hashmap/jdk1.8%20hashMap%E6%89%A9%E5%AE%B9%E4%BE%8B%E5%9B%BE.png">
-<meta property="og:updated_time" content="2017-12-30T02:20:16.842Z">
+<meta property="og:updated_time" content="2017-12-30T02:24:33.476Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HashMap工作原理和扩容机制">
 <meta name="twitter:description" content="1. HashMap工作原理HashMap作为优秀的Java集合框架中的一个重要的成员，在很多编程场景下为我们所用。HashMap作为数据结构散列表的一种实现，就其工作原理来讲单独列出一篇博客来讲都是不过分的。由于本文主要是简单总结其扩容机制，因此对于HashMap的实现原理仅做简单的概述。 HashMap内部实现是一个桶数组，每个桶中存放着一个单链表的头结点。其中每个结点存储的是一个键值对整体（">
@@ -398,7 +398,7 @@
       
         <h2 id="1-HashMap工作原理"><a href="#1-HashMap工作原理" class="headerlink" title="1. HashMap工作原理"></a>1. HashMap工作原理</h2><p><code>HashMap</code>作为优秀的<code>Java</code>集合框架中的一个重要的成员，在很多编程场景下为我们所用。<code>HashMap</code>作为数据结构散列表的一种实现，就其工作原理来讲单独列出一篇博客来讲都是不过分的。由于本文主要是简单总结其扩容机制，因此对于<code>HashMap</code>的实现原理仅做简单的概述。</p>
 <p><code>HashMap</code>内部实现是一个<strong>桶数组</strong>，每个桶中存放着一个<strong>单链表</strong>的头结点。其中每个结点存储的是一个<strong>键值对</strong>整体（<code>Entry</code>），<code>HashMap</code>采用<strong>拉链法</strong>解决<strong>哈希冲突</strong>（关于哈希冲突后面会介绍）。</p>
-<p><em>由于<code>Java8</code>的对<code>HashMap</code>对某些地方进行了优化，以下的总结和源码分析都是基于<code>Java7</code>。</em></p>
+<p><em>由于<code>Java8</code>对<code>HashMap</code>的某些地方进行了优化，以下的总结和源码分析都是基于<code>Java7</code>。</em></p>
 <p>示意图如下：</p>
 <p><img src="http://img.blog.csdn.net/20171119123859600?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt=""></p>
 <p><code>HashMap</code>提供两个重要的基本操作，<code>put(K, V)</code>和<code>get(K)</code>。</p>
