@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Spground Blog">
 <meta property="og:description" content="1.数据库事务 事务是用户定义的一个数据库操作系列，这些操作要么全做要么全不做，是一个不可分割的工作单位。  事务是数据库中重要的概念，通常以BEGIN TRANSACTION开始，以COMMIT或者ROLLBACK结束。数据库事务具有四个著名的特性：ACID。  Automatic 原子性：即事务中的操作要么都做，要么都不做。  Consistency 一致性：事务的执行的结果必须是使数据库从一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-04T13:50:44.407Z">
+<meta property="og:updated_time" content="2018-01-05T02:02:47.424Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据库事务隔离级别">
 <meta name="twitter:description" content="1.数据库事务 事务是用户定义的一个数据库操作系列，这些操作要么全做要么全不做，是一个不可分割的工作单位。  事务是数据库中重要的概念，通常以BEGIN TRANSACTION开始，以COMMIT或者ROLLBACK结束。数据库事务具有四个著名的特性：ACID。  Automatic 原子性：即事务中的操作要么都做，要么都不做。  Consistency 一致性：事务的执行的结果必须是使数据库从一">
@@ -322,7 +322,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-04T00:00:00Z">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-04T08:00:00+08:00">
                 2018-01-04
               </time>
             
@@ -410,7 +410,6 @@
 </li>
 <li><p>Duration</p>
 <p>持久性：一个事务一旦提交，它对数据库中数据的改变就该是永久性的。</p>
-<p>​</p>
 <p>事务的<code>ACID</code>特性需要数据库管理系统保证，同时事务也是数据库管理系统<strong>恢复</strong>和<strong>并发控制</strong>的基本单位。</p>
 </li>
 </ul>
@@ -449,7 +448,7 @@
 </ul>
 <h2 id="3-事务隔离级别"><a href="#3-事务隔离级别" class="headerlink" title="3. 事务隔离级别"></a>3. 事务隔离级别</h2><p>考虑到封锁和并发度的权衡，<code>MySQL</code>为用户提供了四种不同的事务隔离性级别。并发度从低到高（数据一致性强度从高到低）分别是：</p>
 <ul>
-<li>SERIALIZABLE（串行化）可避免脏读、不可重复读、幻读情况的发生。</li>
+<li>SERIALIZABLE（可串行化）可避免脏读、不可重复读、幻读情况的发生。</li>
 <li>REPEATABLE READ（可重复读）可避免脏读、不可重复读情况的发生。</li>
 <li>READ COMMITTED（读已提交）可避免脏读情况发生。</li>
 <li>READ UNCOMMITTED（读未提交）最低级别，以上情况均无法保证。</li>
@@ -478,27 +477,93 @@
 </tbody>
 </table>
 <p>含义就是：<code>T1</code>对数据项加了<code>X</code>锁，则<code>T2</code>不能对其加<code>S</code>和<code>X</code>锁，<code>T2</code>对数据项加了<code>S</code>锁，则<code>T1</code>可以对其加<code>S</code>锁而不能加<code>X</code>锁。（<strong>相容矩阵的加锁顺序都是是T1先加锁，T2后加锁</strong>）</p>
-<ol>
-<li><p>READ UNCOMMITTED（读未提交）最低级别，以上情况均无法保证。</p>
+<ul>
+<li><strong>READ UNCOMMITTED（读未提交）</strong>最低级别，以上情况均无法保证。</li>
+</ul>
 <p>官网给出建议：该隔离级别仅仅能做查询</p>
 <blockquote>
 <p>The <strong>isolation level</strong> that provides the least amount of protection between transactions. Queries employ a <strong>locking</strong> strategy that allows them to proceed in situations where they would normally wait for another transaction. However, this extra performance comes at the cost of less reliable results, including data that has been changed by other transactions and not committed yet (known as <strong>dirty read</strong>). Use this isolation level with great caution, and be aware that the results might not be consistent or reproducible, depending on what other transactions are doing at the same time. Typically, transactions with this isolation level only do queries, not insert, update, or delete operations.</p>
 </blockquote>
 <p>由于其不能保证<strong>读脏数据</strong>，因此S锁和X是相容的；因此可能如下：</p>
-<p>| <strong>T1 /  T2</strong> | <strong>X锁</strong>   | <strong>S锁</strong> |<br>| ———— | ——– | —— |<br>| <strong>X锁</strong>       | No（有待考证） | Yes    |<br>| <strong>S锁</strong>       | Yes      | Yes    |</p>
-</li>
-<li><p>READ COMMITTED（读已提交）可避免脏读情况发生。</p>
+<table>
+<thead>
+<tr>
+<th>T1 / T2</th>
+<th>X锁</th>
+<th>S锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>X锁</strong></td>
+<td>No(?待考证)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>S锁</strong></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>READ COMMITTED（读已提交）</strong>可避免脏读情况发生。</li>
+</ul>
 <p>读已提交，避免脏读，但是不能保证可重复读；说明<code>T1</code>的<code>X</code>锁和<code>T2</code>的<code>S</code>锁不相容；而<code>S</code>锁和<code>X</code>锁相容的。<strong>也就是保证了某个事务在写数据项的时候，其他事务是不能读写该数据项的。</strong></p>
-<p>| <strong>T1 /  T2</strong> | <strong>X锁</strong> | <strong>S锁</strong> |<br>| ———— | —— | —— |<br>| <strong>X锁</strong>       | No     | No     |<br>| <strong>S锁</strong>       | Yes    | Yes    |</p>
-</li>
-<li><p>REPEATABLE READ（可重复读）可避免脏读、不可重复读情况的发生。</p>
-<p>可重复读，避免了脏读和不可重复读；说明<code>T1</code>的X锁和T2的S锁、T1的S锁和T2的X锁都不相容。<strong>也就是保证了某个事务在写某个数据项的时候，其他事务不能读写该数据项；且在读某个数据项时，其他事务只能读该数据项。</strong></p>
-<p>| <strong>T1 /  T2</strong> | <strong>X锁</strong> | <strong>S锁</strong> |<br>| ———— | —— | —— |<br>| <strong>X锁</strong>       | No     | No     |<br>| <strong>S锁</strong>       | No     | Yes    |</p>
-</li>
-<li><p>SERIALIZABLE（串行化）可避免脏读、不可重复读、幻读情况的发生。</p>
-<p>为了避免幻读的产生，将事务的并发执行变为串行，会极大的降低并发度；同时，这也是最高的事务隔离级别，这里的相容矩阵同3。</p>
-</li>
-</ol>
+<table>
+<thead>
+<tr>
+<th>T1 / T2</th>
+<th>X锁</th>
+<th>S锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>X锁</strong></td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>S锁</strong></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>REPEATABLE READ（可重复读）</strong>可避免脏读、不可重复读情况的发生。</li>
+</ul>
+<p>可重复读，避免了脏读和不可重复读；说明<code>T1</code>的<code>X</code>锁和<code>T2</code>的<code>S</code>锁、<code>T1</code>的<code>S</code>锁和<code>T2</code>的<code>X</code>锁都不相容。<strong>也就是保证了某个事务在写某个数据项的时候，其他事务不能读写该数据项；且在读某个数据项时，其他事务只能读该数据项。</strong></p>
+<table>
+<thead>
+<tr>
+<th>T1 /  T2</th>
+<th>X锁</th>
+<th>S锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X锁</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>S锁</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>SERIALIZABLE（可串行化）</strong>可避免脏读、不可重复读、幻读情况的发生。</li>
+</ul>
+<p>为了避免幻读、不可重复读、脏读、丢失修改等产生，将并发事务的<strong>事务调度策略</strong>设置为为<strong>可串行化调度</strong>，这能保证该事务调度策略的运行结果同<strong>某一种串行调度</strong>结果一致，但是这会极大的降低并发度；同时，这也是<code>MySQL</code>的<code>InnoDB</code>提供的最高的事务隔离级别，这里的相容矩阵同3。</p>
+<blockquote>
+<p>The <strong>isolation level</strong> that uses the most conservative locking strategy, to prevent any other <strong>transactions</strong> from inserting or changing data that was read by this transaction, until it is finished. This way, the same query can be run over and over within a transaction, and be certain to retrieve the same set of results each time. Any attempt to change data that was committed by another transaction since the start of the current transaction, cause the current transaction to wait.</p>
+<p>This is the default isolation level specified by the SQL standard. In practice, this degree of strictness is rarely needed, so the default isolation level for <code>InnoDB</code> is the next most strict, <strong>REPEATABLE READ</strong>.</p>
+</blockquote>
 <h2 id="4-References"><a href="#4-References" class="headerlink" title="4. References"></a>4. References</h2><p><a href="https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_isolation_level" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_isolation_level</a></p>
 <p><a href="http://www.cnblogs.com/xdp-gacl/p/3984001.html" target="_blank" rel="noopener">http://www.cnblogs.com/xdp-gacl/p/3984001.html</a></p>
 <p><a href="">《数据库系统概论》王珊，萨师煊</a></p>
