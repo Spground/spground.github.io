@@ -94,18 +94,21 @@
 
 
 
-<meta name="description" content="占坑占坑。。。">
+<meta name="description" content="前段时间实验室的电脑磁盘卡盘彻底报废，最近想用github.io上的博客恢复之前的hexo环境，但不幸的发现托管在github.io上的代码仅仅是hexo渲染过后的html css javascript等静态文件，而原始的MarkDown文件和一些hexo site的配置文件却没有同步到github上。在打算从头开始配置一个的时候，意外发现之前的一个备份。为了不吃二次亏，我决定将博客的原始mark">
 <meta name="keywords" content="misc">
 <meta property="og:type" content="article">
 <meta property="og:title" content="配置MacBook Pro Hexo博客源文件备份">
 <meta property="og:url" content="http://yoursite.com/2018/11/13/hexo-backup-config/index.html">
 <meta property="og:site_name" content="Spground Blog">
-<meta property="og:description" content="占坑占坑。。。">
+<meta property="og:description" content="前段时间实验室的电脑磁盘卡盘彻底报废，最近想用github.io上的博客恢复之前的hexo环境，但不幸的发现托管在github.io上的代码仅仅是hexo渲染过后的html css javascript等静态文件，而原始的MarkDown文件和一些hexo site的配置文件却没有同步到github上。在打算从头开始配置一个的时候，意外发现之前的一个备份。为了不吃二次亏，我决定将博客的原始mark">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-11-12T14:09:14.712Z">
+<meta property="og:image" content="http://yoursite.com/images/blog-repo.jpg">
+<meta property="og:image" content="http://yoursite.com/images/blog-deploy.jpg">
+<meta property="og:updated_time" content="2018-11-13T06:57:54.803Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="配置MacBook Pro Hexo博客源文件备份">
-<meta name="twitter:description" content="占坑占坑。。。">
+<meta name="twitter:description" content="前段时间实验室的电脑磁盘卡盘彻底报废，最近想用github.io上的博客恢复之前的hexo环境，但不幸的发现托管在github.io上的代码仅仅是hexo渲染过后的html css javascript等静态文件，而原始的MarkDown文件和一些hexo site的配置文件却没有同步到github上。在打算从头开始配置一个的时候，意外发现之前的一个备份。为了不吃二次亏，我决定将博客的原始mark">
+<meta name="twitter:image" content="http://yoursite.com/images/blog-repo.jpg">
 
 
 
@@ -393,7 +396,20 @@
       
 
       
-        <p>占坑占坑。。。</p>
+        <p>前段时间实验室的电脑磁盘卡盘彻底报废，最近想用github.io上的博客恢复之前的hexo环境，但不幸的发现托管在<code>github.io</code>上的代码仅仅是hexo渲染过后的html css javascript等静态文件，而原始的<code>MarkDown</code>文件和一些hexo site的配置文件却没有同步到github上。在打算从头开始配置一个的时候，意外发现之前的一个备份。为了不吃二次亏，我决定将博客的原始markdown文件也上传到github上。于是我的需求是：在每一次同步hexo渲染后的静态文件后，自动备份原始markdown等文件到github的另一个repo。</p>
+<h1 id="1-新建一个blog-repo"><a href="#1-新建一个blog-repo" class="headerlink" title="1. 新建一个blog repo"></a>1. 新建一个blog repo</h1><p>在github上新建一个blog repo来保存博客原始的markdown等文件。然后在本地电脑的hexo博客目录下，运行：</p>
+<p><img src="/images/blog-repo.jpg" alt=""></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin your_blog_git_url</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git pull origin master --allow-unrelated-hostories</span><br></pre></td></tr></table></figure>
+<p>到这里就将本地的markdown文件和git blog repo关联起来了。</p>
+<h1 id="2-配置git免密提交"><a href="#2-配置git免密提交" class="headerlink" title="2. 配置git免密提交"></a>2. 配置git免密提交</h1><p>这个可以参考其他资料，此处略。</p>
+<h1 id="3-修改当前用户目录下-bashrc-中的alias"><a href="#3-修改当前用户目录下-bashrc-中的alias" class="headerlink" title="3. 修改当前用户目录下.bashrc 中的alias"></a>3. 修改当前用户目录下.bashrc 中的alias</h1><p>如果终端使用的是bash，就修改.bashrc，是zsh则修改.zshrc文件，下面以.zshrc举例。</p>
+<p>在.zshrc加上一行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> hexod = <span class="string">"hexo g --deploy &amp;&amp; git add --all &amp;&amp; git commit -m'Update' &amp;&amp; git push origin HEAD"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> .zshrc <span class="comment">#生效</span></span><br></pre></td></tr></table></figure>
+<p>写完博客，运行hexod：</p>
+<p><img src="/images/blog-deploy.jpg" alt=""></p>
 
       
     </div>
@@ -485,8 +501,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/default_avatar.png"
@@ -572,6 +597,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-新建一个blog-repo"><span class="nav-number">1.</span> <span class="nav-text">1. 新建一个blog repo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-配置git免密提交"><span class="nav-number">2.</span> <span class="nav-text">2. 配置git免密提交</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-修改当前用户目录下-bashrc-中的alias"><span class="nav-number">3.</span> <span class="nav-text">3. 修改当前用户目录下.bashrc 中的alias</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
