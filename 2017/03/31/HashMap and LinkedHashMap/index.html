@@ -102,13 +102,13 @@
 <meta property="og:site_name" content="Spground Blog">
 <meta property="og:description" content="1. 简介在日常开发中我们经常会批量操作数据，因此很多高级语言除了提供数组，还给我们提供很多高级的、抽象的数据类型来让我们处理批量数据时得心应手。由于这些轮子对于程序的性能是比较关键的轮子，因此很多语言都内置的提供了比较精致的实现。在java中，这种实现被称为集合框架。集合框架包含的接口、类十分丰富，而且功能强大，因此理解并熟悉java集合框架，对于写出正确高效的程序是十分有必要的。java集合框">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://img.blog.csdn.net/20171119123859600?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20171119123913562?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-12-22T03:09:56.000Z">
+<meta property="og:image" content="http://yoursite.com/images/hashmap-1.png">
+<meta property="og:image" content="http://yoursite.com/images/hashmap-2.png">
+<meta property="og:updated_time" content="2018-11-15T09:08:22.676Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HashMap与LinkedHashMap">
 <meta name="twitter:description" content="1. 简介在日常开发中我们经常会批量操作数据，因此很多高级语言除了提供数组，还给我们提供很多高级的、抽象的数据类型来让我们处理批量数据时得心应手。由于这些轮子对于程序的性能是比较关键的轮子，因此很多语言都内置的提供了比较精致的实现。在java中，这种实现被称为集合框架。集合框架包含的接口、类十分丰富，而且功能强大，因此理解并熟悉java集合框架，对于写出正确高效的程序是十分有必要的。java集合框">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20171119123859600?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:image" content="http://yoursite.com/images/hashmap-1.png">
 
 
 
@@ -406,8 +406,8 @@
 <p>如果选择<code>LRU</code>访问的顺序，<code>LinkedHashMap</code>对于访问过的<code>item</code>会将其<strong>移动到双链表的末尾</strong>，这样保证最近访问过的<code>item</code>是处于链表末端，因此较老其不经常使用的<code>item</code>会处于<strong>链表前端</strong>。这个特性恰好符合<code>LRU</code>的思想，因此<code>LinkedHashMap</code>可以用来实现<strong><code>LRU Cache</code></strong>。<code>Android</code>提供的<code>SDK</code>的<code>LruCache</code>类便是利用<code>LinkedHashMap</code>实现了基于<code>Lru</code>规则的缓存功能。</p>
 <p>另外可以发现在<code>java8</code>中<code>HashMap</code>和<code>LinkedHashMap</code>有了改动，据说在某些<code>Hash</code>碰撞严重时，性能也不会太差。<code>java8</code>之前的<code>Map</code>实现的问题是当出现某个<code>bucket</code>的后面的链表太长了，也就是说发生<code>hash</code>冲突的<code>item</code>太多了，这样会导致访问操作退化到了<code>O(n)</code>。</p>
 <p><code>java8</code>的改进便是当<code>bucket</code>的链表长度大于阈值的时候，会将链表重新组织为一颗<strong>红黑树</strong>，这样在<code>hash</code>碰撞严重的时候性能还是可以保证到<code>log(n)</code>.改进前后的示意图如下所示：</p>
-<p><img src="http://img.blog.csdn.net/20171119123859600?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
-<p><img src="http://img.blog.csdn.net/20171119123913562?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p><img src="/images/hashmap-1.png" alt=""></p>
+<p><img src="/images/hashmap-2.png" alt="这里写图片描述"></p>
 <p>在使用<code>LinkedHashMap</code>和<code>HashMap</code>的时候应该注意<code>Key</code>的<code>hash</code>值是怎么取得，如果不同的<code>key</code>经常出现相同的hash值，则会频繁出现冲突，降低性能。</p>
 <p>同时，由于改进后的<code>HashMap</code>会在某个<code>bucket</code>后的链表长度超过某个阈值时，重新将连边组织为一颗红黑树，因此在<code>java8</code>上的<code>key</code>最好实现<code>Comparable</code>接口来保证<code>key</code>是可以通过<code>compareTo</code>进行比较的，因为这样会简化建立红黑树的判断流程，提高效率。当然如果不实现<code>Comparable</code>接口的话，也会有相应的方法保证<code>hash</code>值冲突的<code>item</code>形成一颗平衡的红黑树。</p>
 <h2 id="3-源码阅读"><a href="#3-源码阅读" class="headerlink" title="3. 源码阅读"></a>3. 源码阅读</h2><p>此处选取几个关键的地方进行源码分析：</p>

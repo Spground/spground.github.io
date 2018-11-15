@@ -102,15 +102,13 @@
 <meta property="og:site_name" content="Spground Blog">
 <meta property="og:description" content="一、代理简介代理一词含义十分宽泛，例如金融领域的股票发行代理、营销领域的销售代理、以及计算机领域中的代理设计模式等。尽管代理一词被使用的领域如此广泛，但是代理一词的大致的抽象含义是相似的或者说是相同的。代理是一个被委托人委托其执行如下活动：参加活动、行驶权力、执行任务等。这样理解的话，计算机中某个对象或组件的代理就非常好理解了。 计算机领域中代理的概念是一个十分重要的概念，常见的有代理服务器、代理">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://img.blog.csdn.net/20171113204457982?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="https://github.com/Spground/archive/blob/master/Posts/Art/20170415204354.jpg">
-<meta property="og:image" content="https://github.com/Spground/archive/blob/master/Posts/Art/20170415204954.jpg">
-<meta property="og:image" content="http://img.blog.csdn.net/20171113204512438?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-12-22T03:09:56.000Z">
+<meta property="og:image" content="http://yoursite.com/images/static-proxy.jpeg">
+<meta property="og:image" content="http://yoursite.com/images/dynamic-proxy.jpeg">
+<meta property="og:updated_time" content="2018-11-15T09:25:45.904Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java动态代理简述">
 <meta name="twitter:description" content="一、代理简介代理一词含义十分宽泛，例如金融领域的股票发行代理、营销领域的销售代理、以及计算机领域中的代理设计模式等。尽管代理一词被使用的领域如此广泛，但是代理一词的大致的抽象含义是相似的或者说是相同的。代理是一个被委托人委托其执行如下活动：参加活动、行驶权力、执行任务等。这样理解的话，计算机中某个对象或组件的代理就非常好理解了。 计算机领域中代理的概念是一个十分重要的概念，常见的有代理服务器、代理">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20171113204457982?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:image" content="http://yoursite.com/images/static-proxy.jpeg">
 
 
 
@@ -424,9 +422,9 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">I am watching...</span><br><span class="line">you are intercepted!!!!!</span><br><span class="line">-------</span><br><span class="line">I am watching...</span><br><span class="line">proxiedMethod2 Hello, World!</span><br></pre></td></tr></table></figure>
 <h3 id="比较静态代理和动态代理"><a href="#比较静态代理和动态代理" class="headerlink" title="比较静态代理和动态代理"></a>比较静态代理和动态代理</h3><p>一般来讲，静态代理是<strong>硬编码</strong>去实现一个代理类，如果需要被代理的接口有变动，则需要重新编码代理类；静态绑定的过程将代理类的<strong>代理逻辑</strong>和代理类的<strong>生成</strong>绑定到一起了，<br>所以修改起来不是很方便（解耦不彻底）。其实我们最关注的是代理类的<strong>代理逻辑</strong>，因此如果将代理的<strong>生成</strong>自动化（因为代理类的生成的规则是<code>general</code>的，可以泛化。先实现被代理的接口、然后方法转发，就是这么简单。），<br>而将<strong>代理逻辑</strong>分离出来，所有的代理逻辑全部发生在这里；通过这样的解耦，代码可维护性会增强、侵入性会减小，这就是动态代理的思想。</p>
 <p>具体来讲区别如下图：</p>
-<h4 id="静态代理-1"><a href="#静态代理-1" class="headerlink" title="静态代理"></a>静态代理</h4><p><img src="http://img.blog.csdn.net/20171113204457982?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br><img src="https://github.com/Spground/archive/blob/master/Posts/Art/20170415204354.jpg" alt=""></p>
+<h4 id="静态代理-1"><a href="#静态代理-1" class="headerlink" title="静态代理"></a>静态代理</h4><p><img src="/images/static-proxy.jpeg" alt="这里写图片描述"></p>
 <p>静态代理的代理类多处出现代理逻辑的代码，并且同时静态代理的代理类需要自己硬编码。</p>
-<h4 id="动态代理-1"><a href="#动态代理-1" class="headerlink" title="动态代理"></a>动态代理</h4><p><img src="https://github.com/Spground/archive/blob/master/Posts/Art/20170415204954.jpg" alt=""><br><img src="http://img.blog.csdn.net/20171113204512438?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h4 id="动态代理-1"><a href="#动态代理-1" class="headerlink" title="动态代理"></a>动态代理</h4><p><img src="/images/dynamic-proxy.jpeg" alt=""></p>
 <p>动态代理的代理类类似于一个<strong>方法路由</strong>，对被代理对象的任何被代理方法的调用，都会被该路由<strong>转发</strong>到<strong>InvocationHandler</strong>代理逻辑处理类中，从而将代理类的<strong>生成</strong>和代理类的<strong>代理逻辑</strong>分开。<br><code>Java</code>动态代理生成的代理类是直接在内存中按照<code>class</code>文件格式生成了一个二进制文件，然后类加载器加载该二进制类文件，最后实例化一个代理类的实例。</p>
 <h2 id="三、Java动态代理源码分析"><a href="#三、Java动态代理源码分析" class="headerlink" title="三、Java动态代理源码分析"></a>三、Java动态代理源码分析</h2><p>前面已经介绍了<code>Java</code>动态代理的基本用法，主要涉及到如下几个类和方法如下：（<code>JDK7</code>）</p>
 <ul>
