@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker guide,infrastructure," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="4. Swarms介绍在前面的部分，你知道了如何写一个应用以及如何运行在生产环境中，然后将它变为一个服务，在同一个进程中将服务能力伸缩到原来的5倍。 在本部分，你将在集群上部署一个应用，运行在多台机器上。通过将多个机器加入到docker化的集群中，多容器多机器的应用是可能的，这个docker化的集群被称为蜂群。 理解蜂群一个蜂群是一组运行docker的机器，组合成了一个集群。在蜂群上，你也可以运行">
+<meta name="keywords" content="docker guide,infrastructure">
+<meta property="og:type" content="article">
+<meta property="og:title" content="4. Swarms">
+<meta property="og:url" content="http://yoursite.com/2018/10/16/docker-guide-04-Swarms/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="4. Swarms介绍在前面的部分，你知道了如何写一个应用以及如何运行在生产环境中，然后将它变为一个服务，在同一个进程中将服务能力伸缩到原来的5倍。 在本部分，你将在集群上部署一个应用，运行在多台机器上。通过将多个机器加入到docker化的集群中，多容器多机器的应用是可能的，这个docker化的集群被称为蜂群。 理解蜂群一个蜂群是一组运行docker的机器，组合成了一个集群。在蜂群上，你也可以运行">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539073846185-db51f229-5c56-49a8-8977-4be48bbbbd5a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539073913130-21c71a35-7a9f-40c0-9b30-7931883c5e39.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539074266055-ebc35167-b8a8-46bb-a1a1-f918a3170d4a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539074535606-c9ade431-b046-49f7-8876-3001b70df865.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539074691219-6b60a42e-b1e0-4e3d-8f14-90c3e3368889.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539075290873-80e2bd12-9ada-4441-b8f3-0608a0014deb.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539075432098-08247c2a-61e2-4a7e-82f7-d4e44dcd3e85.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539075750740-9f2cefe5-23f2-40ae-86c6-c58128e3451a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076046177-4b85d04c-de22-4346-8ff0-534d0099d03c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076340159-17560546-77a7-45b2-82f0-cf528ef4f027.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076373938-619468ed-afc6-464a-860f-87870f9e1d4a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076395411-62135ed3-01d6-4ae8-9030-5d54282611e0.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076616110-8a9df5d6-486f-459e-97aa-d21bff33bced.png">
+<meta property="og:updated_time" content="2018-11-19T08:31:57.101Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="4. Swarms">
+<meta name="twitter:description" content="4. Swarms介绍在前面的部分，你知道了如何写一个应用以及如何运行在生产环境中，然后将它变为一个服务，在同一个进程中将服务能力伸缩到原来的5倍。 在本部分，你将在集群上部署一个应用，运行在多台机器上。通过将多个机器加入到docker化的集群中，多容器多机器的应用是可能的，这个docker化的集群被称为蜂群。 理解蜂群一个蜂群是一组运行docker的机器，组合成了一个集群。在蜂群上，你也可以运行">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539073846185-db51f229-5c56-49a8-8977-4be48bbbbd5a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/16/docker-guide-04-Swarms/"/>
+
+
+
+
+
+  <title>4. Swarms | Spground Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?94833242a29050288cdb99fe024295fd";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Spground Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/16/docker-guide-04-Swarms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Spground">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/default_avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">4. Swarms</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-16T02:00:00+08:00">
+                2018-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/10/16/docker-guide-04-Swarms/" class="leancloud_visitors" data-flag-title="4. Swarms">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="4-Swarms"><a href="#4-Swarms" class="headerlink" title="4. Swarms"></a>4. Swarms</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在前面的部分，你知道了如何写一个应用以及如何运行在生产环境中，然后将它变为一个服务，在同一个进程中将服务能力伸缩到原来的5倍。</p>
+<p>在本部分，你将在集群上部署一个应用，运行在多台机器上。通过将多个机器加入到docker化的集群中，多容器多机器的应用是可能的，这个docker化的集群被称为蜂群。</p>
+<h2 id="理解蜂群"><a href="#理解蜂群" class="headerlink" title="理解蜂群"></a>理解蜂群</h2><p>一个蜂群是一组运行docker的机器，组合成了一个集群。在蜂群上，你也可以运行docker命令，但是在集群上，docker命令是被蜂群管理器(swarm manager)执行的。蜂群中的机器可以是物理机，也可以是虚拟机。这些机器加入某个蜂群后，他们被称做节点(node)。</p>
+<p>蜂群能使用多种策略来运行容器，例如“emptiest node”，这个策略将首先在资源利用最小的机器上运行容器，还有“global”策略，这个确保每个机器都恰好有一个容器运行。通过Compose文件，你可以指定swarm manager使用何种策略。</p>
+<p>蜂群管理器是蜂群中唯一能执行你命令或者授权其他机器加入蜂群的机器。works是那些提供资源但是没有能力指挥其他机器的机器。</p>
+<p>到目前为止，你使用docker还都是停留在单机模式。docker也可以切换到swarm模式，该模式下可以组建蜂群。启用swarm模式使得你当前的机器变为一个swarm manager。接下来，Docker将会在整个蜂群上执行你的docker命令，而非你当前的机器上。</p>
+<h2 id="设置蜂群"><a href="#设置蜂群" class="headerlink" title="设置蜂群"></a>设置蜂群</h2><p>一个蜂群是由多个节点组成的，这些节点要么是物理的或者虚拟的。使用以下命令启用swarm模式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker swarm init</span><br></pre></td></tr></table></figure>
+<p>该命令启用了swarm模式，并把当前机器设置为了swarm manager。<br>对去其他机器，你可以运行如下命令来加入到某个蜂群成为里面的一个worker。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker swarm join</span><br></pre></td></tr></table></figure>
+<p>下面我们使用虚拟机来创建一个包含两个机器的集群，以此来组建一个蜂群。</p>
+<h2 id="创建集群"><a href="#创建集群" class="headerlink" title="创建集群"></a>创建集群</h2><p>我们需要一个hypervisor来创建虚拟机，因此安装Oracal VirtualBox。</p>
+<p>安装完毕后，我们使用docker-machine来创建3个虚拟机。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker-machine create --driver virtualbox myvm1</span><br><span class="line">docker-machine create --driver virtualbox myvm2</span><br><span class="line">docker-machine create --driver virtualbox myvm3</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539073846185-db51f229-5c56-49a8-8977-4be48bbbbd5a.png" alt="image.png | left | 681x463"></p>
+<h3 id="列出虚拟机查看对应的IP地址"><a href="#列出虚拟机查看对应的IP地址" class="headerlink" title="列出虚拟机查看对应的IP地址"></a>列出虚拟机查看对应的IP地址</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ls</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539073913130-21c71a35-7a9f-40c0-9b30-7931883c5e39.png" alt="image.png | left | 681x82"></p>
+<p>2376是虚拟机上docker守护进程的端口号。</p>
+<h3 id="初始化蜂群，然后增加节点"><a href="#初始化蜂群，然后增加节点" class="headerlink" title="初始化蜂群，然后增加节点"></a>初始化蜂群，然后增加节点</h3><p>我们选择第一台虚拟机作为swarm manager，这台机器执行docker命令和授权其他worker加入到这个蜂群，剩下的两台虚拟机作为worker。</p>
+<p>我们可以使用docker-machine ssh到虚拟机上执行shell命令。<br>先连上myvm1虚拟机：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ssh myvm1 <span class="string">"docker swarm init --advertise-addr 192.168.99.100"</span></span><br></pre></td></tr></table></figure>
+<p>上面的命令ssh连接到myvm1，然后执行初始化蜂群的命令。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539074266055-ebc35167-b8a8-46bb-a1a1-f918a3170d4a.png" alt="image.png | left | 681x99"></p>
+<p>可以看到myvm1上初始化蜂群成功，且作为了swarm manager，暴露了2377端口用于其他机器与其通信加入蜂群。</p>
+<p>接下来我们需要将剩余两台虚拟机作为worker加入到蜂群中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ssh myvm2 <span class="string">"docker swarm join --token \</span></span><br><span class="line"><span class="string">SWMTKN-1-623gp73gn96xqhjclwob4lipvuis34lnshb0g5c7uu31s5c2sx-f3ux24m2vqdecn29oxurs2kim \</span></span><br><span class="line"><span class="string">192.168.99.100:2377"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ssh myvm3 <span class="string">"docker swarm join --token \</span></span><br><span class="line"><span class="string">SWMTKN-1-623gp73gn96xqhjclwob4lipvuis34lnshb0g5c7uu31s5c2sx-f3ux24m2vqdecn29oxurs2kim \</span></span><br><span class="line"><span class="string">192.168.99.100:2377"</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539074535606-c9ade431-b046-49f7-8876-3001b70df865.png" alt="image.png | left | 681x194"></p>
+<p>ssh到swarm manager上使用docker node ls查看节点概况，只有是swarm manager才可以使用该命令查看节点概况。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ssh myvm1 <span class="string">"docker node ls"</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539074691219-6b60a42e-b1e0-4e3d-8f14-90c3e3368889.png" alt="image.png | left | 681x59"></p>
+<h2 id="在蜂群上部署app"><a href="#在蜂群上部署app" class="headerlink" title="在蜂群上部署app"></a>在蜂群上部署app</h2><p>接下来的部署和前面在单机上部署service类似。</p>
+<p>上面我们一致通过docker-machine ssh到远程虚拟机上执行shell命令，因此不太方便，现在我们先配置一个docker-machine shell到swarm manager这个远程虚拟机。这样配置好后，就运训使用本地的docker-compose.yml文件来远程部署app了，而不用把这个文件拷贝来拷贝去。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine env myvm1</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539075290873-80e2bd12-9ada-4441-b8f3-0608a0014deb.png" alt="image.png | left | 681x151"></p>
+<p>运行命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> $(docker-machine env myvm1) <span class="comment">#这一步在设置当前shell的环境变量</span></span><br></pre></td></tr></table></figure>
+<p>运行docker-machine ls验证一下当前的shell确实是连接到myvm1上的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ls</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539075432098-08247c2a-61e2-4a7e-82f7-d4e44dcd3e85.png" alt="image.png | left | 681x82"></p>
+<h2 id="在swarm-manager上部署app"><a href="#在swarm-manager上部署app" class="headerlink" title="在swarm manager上部署app"></a>在swarm manager上部署app</h2><p>和之前的内容一样，使用docker stack deploy进行部署：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack deploy -c docker-compose.yml getstartedlab</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539075750740-9f2cefe5-23f2-40ae-86c6-c58128e3451a.png" alt="image.png | left | 681x62"></p>
+<p>查看部署的结果：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack ps getstartedlab</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076046177-4b85d04c-de22-4346-8ff0-534d0099d03c.png" alt="image.png | left | 681x60"></p>
+<p>可以看到5个容器实例分散在蜂群中的不同节点上。</p>
+<h3 id="访问集群"><a href="#访问集群" class="headerlink" title="访问集群"></a>访问集群</h3><p>web访问一下试试：</p>
+<p>使用3个虚拟机的IP地址访问服务：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076340159-17560546-77a7-45b2-82f0-cf528ef4f027.png" alt="image.png | left | 681x150"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076373938-619468ed-afc6-464a-860f-87870f9e1d4a.png" alt="image.png | left | 681x162"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076395411-62135ed3-01d6-4ae8-9030-5d54282611e0.png" alt="image.png | left | 681x170"></p>
+<p>不同的IP地址随机出现不同的主机名，表明多容器、多机器集群部署完成。</p>
+<p>所有IP地址都能访问部署的app的原因是蜂群中的节点组成了一个ingress网络，构建了一个路由网络。这个保证了部署蜂群上的某个端口上的某个服务，蜂群上的节点都要保留这个端口，无论哪个节点运行容器。下面是一个暴露8080端口的蜂群的网络路由示意图：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539076616110-8a9df5d6-486f-459e-97aa-d21bff33bced.png" alt="image.png | left | 681x303"></p>
+<h3 id="迭代和扩容app"><a href="#迭代和扩容app" class="headerlink" title="迭代和扩容app"></a>迭代和扩容app</h3><p>如果需要扩缩容，只需要修改docker-compose文件即可完成。<br>如果需要对app的功能进行迭代，那么需要编码、重新构建、发布新的镜像。最后只需要重新运行docker stack deploy重新部署即可。</p>
+<h2 id="清理和重启"><a href="#清理和重启" class="headerlink" title="清理和重启"></a>清理和重启</h2><h3 id="Stacks和Swarms"><a href="#Stacks和Swarms" class="headerlink" title="Stacks和Swarms"></a>Stacks和Swarms</h3><p>拆除部署的stack</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack rm getstartedlab</span><br></pre></td></tr></table></figure>
+<h3 id="重置docker-machine-shell变量"><a href="#重置docker-machine-shell变量" class="headerlink" title="重置docker-machine shell变量"></a>重置docker-machine shell变量</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span> $(docker-machine env -u)</span><br></pre></td></tr></table></figure>
+<p>重启机器：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine start &lt;machine-name&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="cheet-sheet"><a href="#cheet-sheet" class="headerlink" title="cheet sheet"></a>cheet sheet</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">docker-machine create --driver virtualbox myvm1 <span class="comment"># Create a VM (Mac, Win7, Linux)</span></span><br><span class="line">docker-machine create -d hyperv --hyperv-virtual-switch <span class="string">"myswitch"</span> myvm1 <span class="comment"># Win10</span></span><br><span class="line">docker-machine env myvm1                <span class="comment"># View basic information about your node</span></span><br><span class="line">docker-machine ssh myvm1 <span class="string">"docker node ls"</span>         <span class="comment"># List the nodes in your swarm</span></span><br><span class="line">docker-machine ssh myvm1 <span class="string">"docker node inspect &lt;node ID&gt;"</span>        <span class="comment"># Inspect a node</span></span><br><span class="line">docker-machine ssh myvm1 <span class="string">"docker swarm join-token -q worker"</span>   <span class="comment"># View join token</span></span><br><span class="line">docker-machine ssh myvm1   <span class="comment"># Open an SSH session with the VM; type "exit" to end</span></span><br><span class="line">docker node ls                <span class="comment"># View nodes in swarm (while logged on to manager)</span></span><br><span class="line">docker-machine ssh myvm2 <span class="string">"docker swarm leave"</span>  <span class="comment"># Make the worker leave the swarm</span></span><br><span class="line">docker-machine ssh myvm1 <span class="string">"docker swarm leave -f"</span> <span class="comment"># Make master leave, kill swarm</span></span><br><span class="line">docker-machine ls <span class="comment"># list VMs, asterisk shows which VM this shell is talking to</span></span><br><span class="line">docker-machine start myvm1            <span class="comment"># Start a VM that is currently not running</span></span><br><span class="line">docker-machine env myvm1      <span class="comment"># show environment variables and command for myvm1</span></span><br><span class="line"><span class="built_in">eval</span> $(docker-machine env myvm1)         <span class="comment"># Mac command to connect shell to myvm1</span></span><br><span class="line">&amp; <span class="string">"C:\Program Files\Docker\Docker\Resources\bin\docker-machine.exe"</span> env myvm1 | Invoke-Expression   <span class="comment"># Windows command to connect shell to myvm1</span></span><br><span class="line">docker stack deploy -c &lt;file&gt; &lt;app&gt;  <span class="comment"># Deploy an app; command shell must be set to talk to manager (myvm1), uses local Compose file</span></span><br><span class="line">docker-machine scp docker-compose.yml myvm1:~ <span class="comment"># Copy file to node's home dir (only required if you use ssh to connect to manager and deploy the app)</span></span><br><span class="line">docker-machine ssh myvm1 <span class="string">"docker stack deploy -c &lt;file&gt; &lt;app&gt;"</span>   <span class="comment"># Deploy an app using ssh (you must have first copied the Compose file to myvm1)</span></span><br><span class="line"><span class="built_in">eval</span> $(docker-machine env -u)     <span class="comment"># Disconnect shell from VMs, use native docker</span></span><br><span class="line">docker-machine stop $(docker-machine ls -q)               <span class="comment"># Stop all running VMs</span></span><br><span class="line">docker-machine rm $(docker-machine ls -q) <span class="comment"># Delete all VMs and their disk images</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker-guide/" rel="tag"># docker guide</a>
+          
+            <a href="/tags/infrastructure/" rel="tag"># infrastructure</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/docker-guide-03-Services/" rel="next" title="3. Services">
+                <i class="fa fa-chevron-left"></i> 3. Services
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/docker-guide-05-Stacks/" rel="prev" title="5. Stacks">
+                5. Stacks <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMjY2OC85MjI5"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/default_avatar.png"
+               alt="Spground" />
+          <p class="site-author-name" itemprop="name">Spground</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">66</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Spground" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/u014532901" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Swarms"><span class="nav-number">1.</span> <span class="nav-text">4. Swarms</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#理解蜂群"><span class="nav-number">1.2.</span> <span class="nav-text">理解蜂群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置蜂群"><span class="nav-number">1.3.</span> <span class="nav-text">设置蜂群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建集群"><span class="nav-number">1.4.</span> <span class="nav-text">创建集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#列出虚拟机查看对应的IP地址"><span class="nav-number">1.4.1.</span> <span class="nav-text">列出虚拟机查看对应的IP地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化蜂群，然后增加节点"><span class="nav-number">1.4.2.</span> <span class="nav-text">初始化蜂群，然后增加节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在蜂群上部署app"><span class="nav-number">1.5.</span> <span class="nav-text">在蜂群上部署app</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在swarm-manager上部署app"><span class="nav-number">1.6.</span> <span class="nav-text">在swarm manager上部署app</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#访问集群"><span class="nav-number">1.6.1.</span> <span class="nav-text">访问集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#迭代和扩容app"><span class="nav-number">1.6.2.</span> <span class="nav-text">迭代和扩容app</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#清理和重启"><span class="nav-number">1.7.</span> <span class="nav-text">清理和重启</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Stacks和Swarms"><span class="nav-number">1.7.1.</span> <span class="nav-text">Stacks和Swarms</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重置docker-machine-shell变量"><span class="nav-number">1.7.2.</span> <span class="nav-text">重置docker-machine shell变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cheet-sheet"><span class="nav-number">1.8.</span> <span class="nav-text">cheet sheet</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2013 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spground</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("wRKkl2JOohrLGXwRFz3LWpg0-gzGzoHsz", "lwprnzMQMxEpXW2CyRkaFrE6");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
