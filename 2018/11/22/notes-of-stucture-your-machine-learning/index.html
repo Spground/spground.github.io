@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="data mismatch,deep learning,transfer learning," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="1. 数据分布不一致 训练集和测试集（包含开发集）数据分布不一致被称为Data Mismatch。  我们知道机器学习模型会存在两种异常情况：  高方差：过拟合 高偏差：欠拟合  数据集一般划分为：train、dev、test。其中当dev/test 和 train的数据分布存在不一致（data mismatch）的时候，则模型的高方差可能来源于两个原因：  过拟合 数据分布不一致  1.1 如何">
+<meta name="keywords" content="data mismatch,deep learning,transfer learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes：Deep Learning-structure your machine learning-week2">
+<meta property="og:url" content="http://yoursite.com/2018/11/22/notes-of-stucture-your-machine-learning/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. 数据分布不一致 训练集和测试集（包含开发集）数据分布不一致被称为Data Mismatch。  我们知道机器学习模型会存在两种异常情况：  高方差：过拟合 高偏差：欠拟合  数据集一般划分为：train、dev、test。其中当dev/test 和 train的数据分布存在不一致（data mismatch）的时候，则模型的高方差可能来源于两个原因：  过拟合 数据分布不一致  1.1 如何">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1542806599420-46ed2a52-d315-4b8e-9066-472e6ce3c9cb.png">
+<meta property="og:updated_time" content="2018-11-21T15:09:46.683Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Notes：Deep Learning-structure your machine learning-week2">
+<meta name="twitter:description" content="1. 数据分布不一致 训练集和测试集（包含开发集）数据分布不一致被称为Data Mismatch。  我们知道机器学习模型会存在两种异常情况：  高方差：过拟合 高偏差：欠拟合  数据集一般划分为：train、dev、test。其中当dev/test 和 train的数据分布存在不一致（data mismatch）的时候，则模型的高方差可能来源于两个原因：  过拟合 数据分布不一致  1.1 如何">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1542806599420-46ed2a52-d315-4b8e-9066-472e6ce3c9cb.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/22/notes-of-stucture-your-machine-learning/"/>
+
+
+
+
+
+  <title>Notes：Deep Learning-structure your machine learning-week2 | Spground Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?94833242a29050288cdb99fe024295fd";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Spground Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/22/notes-of-stucture-your-machine-learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Spground">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/default_avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Notes：Deep Learning-structure your machine learning-week2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-22T07:00:00+08:00">
+                2018-11-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/machine-learning/" itemprop="url" rel="index">
+                    <span itemprop="name">machine learning</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/11/22/notes-of-stucture-your-machine-learning/" class="leancloud_visitors" data-flag-title="Notes：Deep Learning-structure your machine learning-week2">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-数据分布不一致"><a href="#1-数据分布不一致" class="headerlink" title="1. 数据分布不一致"></a>1. 数据分布不一致</h1><blockquote>
+<p>训练集和测试集（包含开发集）数据分布不一致被称为Data Mismatch。</p>
+</blockquote>
+<p>我们知道机器学习模型会存在两种异常情况：</p>
+<ul>
+<li>高方差：过拟合</li>
+<li>高偏差：欠拟合</li>
+</ul>
+<p>数据集一般划分为：train、dev、test。<br>其中当dev/test 和 train的数据分布存在不一致（data mismatch）的时候，则模型的高方差可能来源于两个原因：</p>
+<ul>
+<li>过拟合</li>
+<li>数据分布不一致</li>
+</ul>
+<h2 id="1-1-如何判断高方差来源于data-mismatch呢？"><a href="#1-1-如何判断高方差来源于data-mismatch呢？" class="headerlink" title="1.1 如何判断高方差来源于data mismatch呢？"></a>1.1 如何判断高方差来源于data mismatch呢？</h2><p>将train划分一部分作为train-dev，并在train-dev上对模型进行评价。这样我们可以得到：</p>
+<ul>
+<li>train</li>
+<li>train-dev</li>
+<li>dev</li>
+<li>test</li>
+</ul>
+<p>如果高方差问题主要源于data mismatch，就错误率来讲，train 约等于 train-dev，而train则远小于 dev/test。</p>
+<h2 id="1-2-如何解决Data-Mismatch问题？"><a href="#1-2-如何解决Data-Mismatch问题？" class="headerlink" title="1.2 如何解决Data Mismatch问题？"></a>1.2 如何解决Data Mismatch问题？</h2><p>Data Mismatch的解决方法自然是让train和dev/test的分布一致。<br>首先进行错误分析，观察dev/test上错误的样本和训练集上的样本的差别，然后采用人工合成数据来尽量让训练集与dev/test集合相似，保持相同或相似的分布。</p>
+<p>例如对于一个图像分类任务中，被错误分类的dev/test的图像大多都有雾气背景，则可以将train中的一些样本进行雾气背景的人工合成。</p>
+<h1 id="2-迁移学习"><a href="#2-迁移学习" class="headerlink" title="2. 迁移学习"></a>2. 迁移学习</h1><blockquote>
+<p>将在数据集A上训练的模型运用在数据集B上的过程叫做迁移学习。</p>
+</blockquote>
+<p>迁移学习包含两个重要的概念：</p>
+<ul>
+<li>pre-training：预先在某个数据集上进行模型的训练。</li>
+<li>fine-tuning：在目标数据集上对预训练模型进行训练，微微调整其模型参数。</li>
+</ul>
+<p>迁移学习的目的是为了让一些任务相关的模型可以共享一些低层次的特征，这样即减少了模型的训练时间，也降低了对海量数据集的要求。</p>
+<blockquote>
+<p>ps：马克思主义中国化历程其实可以看做是一次迁移学习，中国共产党人将得到验证的马克思主义理论（pre-training）运用到中国，并对其改革创新、继承发展（fine-tuning），最终创造了毛泽东思想，中国特色社会主义理论体系，习近平新时代中国特色社会主义思想等理论成果。</p>
+</blockquote>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1542806599420-46ed2a52-d315-4b8e-9066-472e6ce3c9cb.png" alt="transfer-learning.png | center | 747x166"></p>
+<p>对于一个预训练模型，如上图所示，对其进行迁移学习和微调的做法不拘一格。</p>
+<ul>
+<li>固定前面n-1层权重不变，将输出层替换为满足自己任务需求的输出层，然后在自己的数据集上进行训练，只调整替换的输出层的权重。</li>
+<li>前面的n-1层的权重作为新模型的初始化权重，并对新模型的n层网络进行训练。</li>
+</ul>
+<p>选择保留哪些网络层，新增多少网络层以及权重的更新策略等都是视具体任务而定的。</p>
+<p>迁移学习的应用场景：</p>
+<ul>
+<li>任务A和任务B有相同的输入，例如输入都是图像、文本等；</li>
+<li>任务A的数据集大于任务B的数据集；</li>
+<li>任务A的低层次的特征对提升任务B的性能大有帮助；</li>
+</ul>
+<p>例子：一个在海量红绿灯数据集上训练的<strong>识别红绿灯</strong>的模型，可以采用迁移学习去训练一个<strong>识别黄灯</strong>的模型，因为都是交通灯，仅仅是颜色不同，这两个任务非常相近。</p>
+<h1 id="3-多任务学习"><a href="#3-多任务学习" class="headerlink" title="3. 多任务学习"></a>3. 多任务学习</h1><p>多任务学习和迁移学习不一样，多任务学习不是先学习一个模型，然后再去训练另一个模型，而是同时进行多个模型的训练（多个任务的学习）。</p>
+<p>例如：检测一个图片中是否有行人、汽车、停止标志和红绿灯，在一个神经网络中，这些任务都可以同时进行学习。不像softmax作为输出层，该任务的预测结果不是每张图片具有多个label，而是是否存在该label。同时，对于一些标注样本，如果某个样本在某个label上缺失，也不影响整个训练，其同样可以作为有效的样本存在于训练集中。</p>
+<p>多任务学习的使用场景没有迁移学习常见，适合多任务学习的场景主要是：在一系列相关的任务中，这些任务有共享的低层次的特征，例如计算机视觉领域的对象检测。</p>
+<h1 id="4-端到端学习"><a href="#4-端到端学习" class="headerlink" title="4. 端到端学习"></a>4. 端到端学习</h1><p>传统的一些计算机任务例如语音识别，需要手动的设计特征（hand-craft feature），例如MFCC，然后人为的划分很多个步骤，每个步骤都有特定的研究者在该领域耕耘数十年。我们在采用这种pipline的方式进行机器学习的时候，很多时候我们强迫算法去学习我们人为定义的概念，例如语音识别中的音素。</p>
+<p>端到端的学习则不是采用这一套pipline的方式，而是利用原始的数据去学习原始输入和输出之间复杂的映射。端到端的学习没有引入人类的一些强迫的概念，而是从数据本身去发现潜在的输入和输出的关系。端到端的学习的成功很大部分取决于海量的数据，而传统的方法并不是一无是处，在一些数据量小的情况下，传统方法具有明显的优势。</p>
+<p>在数据量小的时候，传统的方法可能更适合，在数据量巨大的时候，端到端的学习方法更可取，然而，现实世界中，没有足够的数据去进行端到端的学习，因此在数据量适中的情况下，我们通常将端到端的学习拆分为多个步骤，并同时采用一些传统的方法，相当于除了数据之外，我们还为模型注入一些人类的知识，这样整个模型表达知识的能力才会到达最优。</p>
+<p>例如：人脸识别门禁。</p>
+<ul>
+<li>端到端的方案：输入是一张站着的人的图片，输出是这个人的id，显然站着的人的脸的大小会随着人距离摄像头的远近不同，还有角度等因素，因此采集海量的数据是十分困难的，因此端到端的学习在这不太实用。</li>
+<li>多步骤分开建模方案：首先利用成熟的模型将人脸抠出来，然后再resize的固定的大小进行人脸识别，这样就将人脸识别的大问题拆分为两个易于解决的子问题，而每个子问题可利用的数据集也是巨大的，可以单独的采用端到端的方案去学习。</li>
+</ul>
+<p>端到端学习的优缺点：</p>
+<ul>
+<li>优点<ul>
+<li>充分发挥数据的价值</li>
+<li>花费很少的精力去设计特征</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>要求海量数据</li>
+<li>对于一些很有用的人工特征没有充分利用</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>端到端的学习不是万能的，传统方法并不是一无是处。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/data-mismatch/" rel="tag"># data mismatch</a>
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/transfer-learning/" rel="tag"># transfer learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/13/hexo-backup-config/" rel="next" title="配置MacBook Pro Hexo博客源文件备份">
+                <i class="fa fa-chevron-left"></i> 配置MacBook Pro Hexo博客源文件备份
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMjY2OC85MjI5"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/default_avatar.png"
+               alt="Spground" />
+          <p class="site-author-name" itemprop="name">Spground</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">69</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Spground" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/u014532901" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-数据分布不一致"><span class="nav-number">1.</span> <span class="nav-text">1. 数据分布不一致</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-如何判断高方差来源于data-mismatch呢？"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 如何判断高方差来源于data mismatch呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-如何解决Data-Mismatch问题？"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 如何解决Data Mismatch问题？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-迁移学习"><span class="nav-number">2.</span> <span class="nav-text">2. 迁移学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-多任务学习"><span class="nav-number">3.</span> <span class="nav-text">3. 多任务学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-端到端学习"><span class="nav-number">4.</span> <span class="nav-text">4. 端到端学习</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2013 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spground</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("wRKkl2JOohrLGXwRFz3LWpg0-gzGzoHsz", "lwprnzMQMxEpXW2CyRkaFrE6");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
