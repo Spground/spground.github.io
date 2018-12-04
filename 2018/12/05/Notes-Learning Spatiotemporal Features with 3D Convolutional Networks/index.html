@@ -111,7 +111,7 @@
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543929638383-892c2b54-ae7f-4c98-9f9b-f7a53edb83ba.png">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543930139869-3057c701-fb0e-4546-a786-85da9f3ca583.png">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543930176701-e36f2b39-c626-45b4-8f8c-8c3140b0b7dc.png">
-<meta property="og:updated_time" content="2018-12-04T13:37:23.387Z">
+<meta property="og:updated_time" content="2018-12-04T13:45:38.526Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks">
 <meta name="twitter:description" content="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks Abstract：本文提出了一个简单有效的方案，使用3D卷积在大规模视频中来学习空间时序(Spatiotemporal)特征，本文的贡献如下：  相比于2D卷积，3D卷积更加适合学习空间时序特征； 作者通过实验不同的网络结构，发现3*3*3的卷积核是最好的网络">
@@ -429,12 +429,12 @@
 <h1 id="Related-Work"><a href="#Related-Work" class="headerlink" title="Related Work"></a>Related Work</h1><p>作者回顾了一些传统的视频描述子的方法，重点提到了目前最好的称为iDT的方法，并指出这个方法计算量大，难以扩展到大规模视频的任务中。</p>
 <p>随着机器的计算力提高和数据量的增多，卷积神经网络在很多任务中有所突破。有些人利用深度学习学习到Image特征，通过迁移学习的方式在一些任务上取得了不错的效果，但是这些方法都是不适用于视频特征学习的。</p>
 <p>在作者这篇文章之前，有几篇文章已经开始或多或少的提到了利用3D卷积去进行视频特征的学习，其中一篇文章是2013年的 <em><strong>3d convolutional neural networks for human action recognition，文章</strong></em>利用预处理的方式将视频中的头和身体进行分割，然后将分割后的视频送入3d卷积网络中做动作识别；另一篇是2014年<strong>Karpathy</strong>等人训练了深度网络去进行视频分类。</p>
-<h1 id="Learning-features-with-3D-ConvNets"><a href="#Learning-features-with-3D-ConvNets" class="headerlink" title="Learning features with 3D ConvNets"></a>Learning features with 3D ConvNets</h1><h2 id="3D卷积、3D池化、搜索网络结构"><a href="#3D卷积、3D池化、搜索网络结构" class="headerlink" title="3D卷积、3D池化、搜索网络结构"></a>3D卷积、3D池化、搜索网络结构</h2><h3 id="3D卷积和池化"><a href="#3D卷积和池化" class="headerlink" title="3D卷积和池化"></a>3D卷积和池化</h3><p>和2D卷积不同，3D卷积有能力通过3D卷积和3D池化对时间信息进行建模。</p>
+<h1 id="Learning-features-with-3D-ConvNets"><a href="#Learning-features-with-3D-ConvNets" class="headerlink" title="Learning features with 3D ConvNets"></a>Learning features with 3D ConvNets</h1><h2 id="3D-Convolution、3D-Pooling、search-for-Network-Architecture"><a href="#3D-Convolution、3D-Pooling、search-for-Network-Architecture" class="headerlink" title="3D Convolution、3D Pooling、search for Network Architecture"></a>3D Convolution、3D Pooling、search for Network Architecture</h2><h3 id="3D-Convolution-VS-2D-Convolution"><a href="#3D-Convolution-VS-2D-Convolution" class="headerlink" title="3D Convolution VS 2D Convolution"></a>3D Convolution VS 2D Convolution</h3><p>和2D卷积不同，3D卷积有能力通过3D卷积和3D池化对时间信息进行建模。</p>
 <p>2D卷积和3D卷积的区别</p>
 <p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926034473-47500c66-976a-4f31-8e4f-c4ba02800ebd.png" alt="image.png | left | 747x170"></p>
 <p>在一张图片上进行一次2D卷积，输出是一张图片（Feature Map），在一个视频进行一次2D卷积，输出同样是一张图片（Feature Map），在一个视频上进行一次3D卷积，输出则是另一个立方体，这个立方体保留了输入信号的时序信息。</p>
 <p><strong>总结： 2D卷积在每次卷积和池化和都丢失了时序信息，而3D卷积和池化则保留了时序信息。</strong></p>
-<h3 id="搜索网络结构"><a href="#搜索网络结构" class="headerlink" title="搜索网络结构"></a>搜索网络结构</h3><p>因为训练这种大型的网络是十分耗费时间的，因此作者根据2D卷积的经验，空间维度的卷积核采用3*3，而时间维度的卷积深度则通过不同的实验来选择，因此3D卷积核的大小为d*3*3。</p>
+<h3 id="search-for-Network-Architecture"><a href="#search-for-Network-Architecture" class="headerlink" title="search for Network Architecture"></a>search for Network Architecture</h3><p>因为训练这种大型的网络是十分耗费时间的，因此作者根据2D卷积的经验，空间维度的卷积核采用3*3，而时间维度的卷积深度则通过不同的实验来选择，因此3D卷积核的大小为d*3*3。</p>
 <p>为了找到时间维度上最优的卷积深度d，作者在中等规模的UCF101数据集上进行了3类实验：</p>
 <ul>
 <li>全局采用一致的时间维度卷积深度d；</li>
@@ -457,7 +457,7 @@
 </ul>
 <p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926692559-3ab35db1-52e9-4410-b288-4aa4dbde51f4.png" alt="image.png | left | 400x220"></p>
 <p>最终作者发现时间维度的卷积深度为3的时候，网络性能最佳，因此3*3*3是经验最优的3D卷积核，这也和2D卷积的3*3卷积核是统一的。</p>
-<h2 id="空间时序特征学习"><a href="#空间时序特征学习" class="headerlink" title="空间时序特征学习"></a>空间时序特征学习</h2><p>为了进行空间时序特征的学习，作者在一个大规模的数据集Sport-1M上进行了训练。Sport-1M包含100万个视频，每个视频属于487种运行类别种的一种，和UCF101相比，Sports-1M的视频数量是它的100倍，类别数目是它的5倍。因此作者也设计了容量更大的网络结构，如下所示：</p>
+<h2 id="Spatiotemporal-Feature-learning"><a href="#Spatiotemporal-Feature-learning" class="headerlink" title="Spatiotemporal Feature learning"></a>Spatiotemporal Feature learning</h2><p>为了进行空间时序特征的学习，作者在一个大规模的数据集Sport-1M上进行了训练。Sport-1M包含100万个视频，每个视频属于487种运行类别种的一种，和UCF101相比，Sports-1M的视频数量是它的100倍，类别数目是它的5倍。因此作者也设计了容量更大的网络结构，如下所示：</p>
 <p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926857864-0d3a3cce-d9f2-4381-8d78-e7a6f8aeef25.png" alt="image.png | left | 747x127"></p>
 <p>网络一共8层卷积层，每一层紧接一个池化层，最后两个全连接层。<br>作者的实验结果如下：</p>
 <p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543928718199-20336e5c-7a20-4ebb-8495-ce1c6c9b6eab.png" alt="image.png | left | 747x139"></p>
@@ -468,7 +468,7 @@
 </ul>
 </li>
 </ul>
-<h1 id="后续实验"><a href="#后续实验" class="headerlink" title="后续实验"></a>后续实验</h1><p>作者后续又先后在</p>
+<h1 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h1><p>作者后续又先后在</p>
 <ul>
 <li>Action Recognition</li>
 <li>Action Similarity Labeling</li>
@@ -692,7 +692,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Abstract："><span class="nav-number">1.</span> <span class="nav-text">Abstract：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Related-Work"><span class="nav-number">3.</span> <span class="nav-text">Related Work</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Learning-features-with-3D-ConvNets"><span class="nav-number">4.</span> <span class="nav-text">Learning features with 3D ConvNets</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3D卷积、3D池化、搜索网络结构"><span class="nav-number">4.1.</span> <span class="nav-text">3D卷积、3D池化、搜索网络结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3D卷积和池化"><span class="nav-number">4.1.1.</span> <span class="nav-text">3D卷积和池化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#搜索网络结构"><span class="nav-number">4.1.2.</span> <span class="nav-text">搜索网络结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#空间时序特征学习"><span class="nav-number">4.2.</span> <span class="nav-text">空间时序特征学习</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后续实验"><span class="nav-number">5.</span> <span class="nav-text">后续实验</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Runtime-Analysis"><span class="nav-number">6.</span> <span class="nav-text">Runtime Analysis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Conclusion"><span class="nav-number">7.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Abstract："><span class="nav-number">1.</span> <span class="nav-text">Abstract：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Related-Work"><span class="nav-number">3.</span> <span class="nav-text">Related Work</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Learning-features-with-3D-ConvNets"><span class="nav-number">4.</span> <span class="nav-text">Learning features with 3D ConvNets</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3D-Convolution、3D-Pooling、search-for-Network-Architecture"><span class="nav-number">4.1.</span> <span class="nav-text">3D Convolution、3D Pooling、search for Network Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3D-Convolution-VS-2D-Convolution"><span class="nav-number">4.1.1.</span> <span class="nav-text">3D Convolution VS 2D Convolution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#search-for-Network-Architecture"><span class="nav-number">4.1.2.</span> <span class="nav-text">search for Network Architecture</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spatiotemporal-Feature-learning"><span class="nav-number">4.2.</span> <span class="nav-text">Spatiotemporal Feature learning</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Experiment"><span class="nav-number">5.</span> <span class="nav-text">Experiment</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Runtime-Analysis"><span class="nav-number">6.</span> <span class="nav-text">Runtime Analysis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Conclusion"><span class="nav-number">7.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
             
 
           </div>
