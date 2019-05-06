@@ -20,7 +20,7 @@ menu,
 nav,
 section,
 summary {
- display: block;
+  display: block;
 }
 audio,
 canvas,
@@ -442,7 +442,7 @@ body {
   }
 }
 .main {
-  padding-bottom: 150px;
+  padding-bottom: 250px;
 }
 .main-inner {
   margin: 0 auto;
@@ -458,7 +458,7 @@ body {
   left: 0;
   bottom: 0;
   width: 100%;
-  min-height: 50px;
+  min-height: 150px;
 }
 .footer-inner {
   box-sizing: border-box;
@@ -1807,7 +1807,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #ddffab;
+  background: #461678;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -2645,7 +2645,4 @@ embed {
 }
 .links-of-blogroll-inline .links-of-blogroll-item {
   display: inline-block;
-}
-.main {
-  padding-bottom: 250px;
 }
