@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.堆堆(Heap)是一种重要的数据结构，是实现优先队列(Priority Queues) 首选的数据结构。由于堆有很多种变体，包括二项式堆、斐波那契堆等，但是这里只考虑最常见的就是二叉堆（以下简称堆）。 堆是一棵满足一定性质的二叉树，具体的讲堆具有如下性质：父节点的键值总是不大于它的孩子节点的键值（小顶堆）, 堆可以分为小顶堆和大顶堆，这里以小顶堆为例，其主要包含的操作有：  insert()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="堆和堆的应用：堆排序和优先队列">
+<meta property="og:url" content="https://spground.github.io/2017/07/07/Heap%20and%20Heap's%20Application-Heap%20Sort%20and%20Priority%20Queue/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1.堆堆(Heap)是一种重要的数据结构，是实现优先队列(Priority Queues) 首选的数据结构。由于堆有很多种变体，包括二项式堆、斐波那契堆等，但是这里只考虑最常见的就是二叉堆（以下简称堆）。 堆是一棵满足一定性质的二叉树，具体的讲堆具有如下性质：父节点的键值总是不大于它的孩子节点的键值（小顶堆）, 堆可以分为小顶堆和大顶堆，这里以小顶堆为例，其主要包含的操作有：  insert()">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://spground.github.io/images/case1-1.jpeg">
+<meta property="og:image" content="https://spground.github.io/images/case1-2.jpeg">
+<meta property="og:image" content="https://spground.github.io/images/case2-1.jpeg">
+<meta property="og:image" content="https://spground.github.io/images/case2-2.jpeg">
+<meta property="og:image" content="https://spground.github.io/images/optim-prefix-tree.png">
+<meta property="og:image" content="https://spground.github.io/images/haffman-tree-build.jpeg">
+<meta property="article:published_time" content="2017-07-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.565Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="优先队列">
+<meta property="article:tag" content="堆排序">
+<meta property="article:tag" content="霍夫曼编码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://spground.github.io/images/case1-1.jpeg">
+
+
+<link rel="canonical" href="https://spground.github.io/2017/07/07/Heap%20and%20Heap's%20Application-Heap%20Sort%20and%20Priority%20Queue/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2017/07/07/Heap%20and%20Heap's%20Application-Heap%20Sort%20and%20Priority%20Queue/","path":"2017/07/07/Heap and Heap's Application-Heap Sort and Priority Queue/","title":"堆和堆的应用：堆排序和优先队列"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>堆和堆的应用：堆排序和优先队列 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%A0%86"><span class="nav-number">1.</span> <span class="nav-text">1.堆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%A0%86%E7%9A%84%E5%BA%94%E7%94%A8%EF%BC%9A%E5%A0%86%E6%8E%92%E5%BA%8F"><span class="nav-number">2.</span> <span class="nav-text">2.堆的应用：堆排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%A0%86%E7%9A%84%E5%BA%94%E7%94%A8%EF%BC%9A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97"><span class="nav-number">3.</span> <span class="nav-text">3.堆的应用：优先队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%A0%86%E7%9A%84%E5%BA%94%E7%94%A8%EF%BC%9A%E6%B5%B7%E9%87%8F%E5%AE%9E%E6%95%B0%E4%B8%AD%EF%BC%88%E4%B8%80%E4%BA%BF%E7%BA%A7%E5%88%AB%E4%BB%A5%E4%B8%8A%EF%BC%89%E6%89%BE%E5%88%B0TopK%EF%BC%88%E4%B8%80%E4%B8%87%E7%BA%A7%E5%88%AB%E4%BB%A5%E4%B8%8B%EF%BC%89%E7%9A%84%E6%95%B0%E9%9B%86%E5%90%88%E3%80%82"><span class="nav-number">4.</span> <span class="nav-text">4 堆的应用：海量实数中（一亿级别以上）找到TopK（一万级别以下）的数集合。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-references"><span class="nav-number">6.</span> <span class="nav-text">6 references</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2017/07/07/Heap%20and%20Heap's%20Application-Heap%20Sort%20and%20Priority%20Queue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="堆和堆的应用：堆排序和优先队列 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          堆和堆的应用：堆排序和优先队列
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-07-07 00:00:00" itemprop="dateCreated datePublished" datetime="2017-07-07T00:00:00+08:00">2017-07-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-堆"><a href="#1-堆" class="headerlink" title="1.堆"></a>1.堆</h2><p><a href="https://en.wikipedia.org/wiki/Heap_(data_structure)">堆(Heap)</a>是一种重要的数据结构，是实现<a href="https://en.wikipedia.org/wiki/Priority_queue">优先队列(Priority Queues)</a></p>
+<p>首选的数据结构。由于堆有很多种变体，包括二项式堆、斐波那契堆等，但是这里只考虑最常见的就是二叉堆（以下简称堆）。</p>
+<p>堆是一棵满足一定性质的二叉树，具体的讲堆具有如下性质：<strong>父节点的键值总是不大于它的孩子节点的键值（小顶堆）</strong>, 堆可以分为<strong>小顶堆</strong>和<strong>大顶堆</strong>，这里以<strong>小顶堆</strong>为例，其主要包含的操作有：</p>
+<ul>
+<li>insert()</li>
+<li>extractMin</li>
+<li>peek(findMin)</li>
+<li>delete(i)</li>
+</ul>
+<p>由于堆是一棵形态规则的二叉树，因此堆的父节点和孩子节点存在如下关系：</p>
+<blockquote>
+<p><strong>设父节点的编号为 <code>i</code>, 则其左孩子节点的编号为<code>2*i+1</code>, 右孩子节点的编号为<code>2*i+2</code></strong><br><strong>设孩子节点的编号为<code>i</code>, 则其父节点的编号为<code>(i-1)/2</code></strong></p>
+</blockquote>
+<p>由于二叉树良好的形态已经包含了父节点和孩子节点的关系信息，因此就可以不使用链表而简单的使用数组来存储堆。</p>
+<p>要实现堆的基本操作，涉及到的两个关键的函数</p>
+<ul>
+<li><code>siftUp(i, x)</code> ： 将位置<code>i</code>的元素<code>x</code>向上调整，以满足堆得性质，常常是用于<code>insert</code>后，用于调整堆；</li>
+<li><code>siftDown(i, x)</code>：同理，常常是用于<code>delete(i)</code>后，用于调整堆；</li>
+</ul>
+<p>具体的操作如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">siftUp</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">	<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">	<span class="keyword">for</span> (; i &gt; <span class="number">0</span>;) &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">p</span> <span class="operator">=</span> (i - <span class="number">1</span>) &gt;&gt;&gt; <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">if</span> (nums[p] &lt;= key)</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		nums[i] = nums[p];</span><br><span class="line">		i = p;</span><br><span class="line">	&#125;</span><br><span class="line">	nums[i] = key;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">siftDown</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">		<span class="keyword">for</span> (;i &lt; nums.length / <span class="number">2</span>;) &#123;</span><br><span class="line">			<span class="type">int</span> <span class="variable">child</span> <span class="operator">=</span> (i &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">if</span> (child + <span class="number">1</span> &lt; nums.length &amp;&amp; nums[child] &gt; nums[child+<span class="number">1</span>])</span><br><span class="line">				child++;</span><br><span class="line">			<span class="keyword">if</span> (key &lt;= nums[child])</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			nums[i] = nums[child];</span><br><span class="line">			i = child;</span><br><span class="line">		&#125;</span><br><span class="line">		nums[i] = key;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到<code>siftUp</code>和<code>siftDown</code>不停的在父节点和子节点之间比较、交换；在不超过<code>logn</code>的时间复杂度就可以完成一次操作。</p>
+<p>有了这两个基本的函数，就可以实现上述提及的堆的基本操作。</p>
+<p>首先是如何建堆，<strong>实现建堆操作有两个思路</strong>:</p>
+<ul>
+<li>一个是不断地<code>insert</code>（<code>insert</code>后调用的是<code>siftUp</code>）</li>
+<li>另一个将原始数组当成一个需要调整的堆，然后自底向上地<br>在每个位置<code>i</code>调用<code>siftDown(i)</code>，完成后我们就可以得到一个满足堆性质的堆。这里考虑后一种思路：</li>
+</ul>
+<p>通常堆的<code>insert</code>操作是将元素插入到堆尾，由于新元素的插入可能违反堆的性质，因此需要调用<code>siftUp</code>操作自底向上调整堆；堆移除堆顶元素操作是将堆顶元素删除，然后将堆最后一个元素放置在堆顶，接着执行<code>siftDown</code>操作，同理替换堆顶元素也是相同的操作。</p>
+<p><strong>建堆</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 建立小顶堆</span><br><span class="line">private void buildMinHeap(int[] nums) &#123;</span><br><span class="line">	int size = nums.length;</span><br><span class="line">	for (int j = size / 2 - 1; j &gt;= 0; j--)</span><br><span class="line">		siftDown(nums, j, size);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>那么建堆操作的时间复杂度是多少呢？答案是<code>O(n)</code>。虽然<code>siftDown</code>的操作时间是<code>logn</code>，但是由于高度在递减的同时，每一层的节点数量也在成倍减少，最后通过数列错位相减可以得到时间复杂度是<code>O(n)</code>。</p>
+<p><strong>extractMin</strong><br>由于堆的固有性质，堆的根便是最小的元素，因此<strong>peek</strong>操作就是返回根<code>nums[0]</code>元素即可；<br>若要将<code>nums[0]</code>删除，可以将末尾的元素<code>nums[n-1]</code>覆盖<code>nums[0]</code>,然后将堆得<code>size = size-1</code>，调用<code>siftDown(0)</code>调整堆。时间复杂度为<code>logn</code>。</p>
+<p><strong>peek</strong><br>同上</p>
+<p><strong>delete(i)</strong></p>
+<p>删除堆中位置为<code>i</code>的节点，涉及到两个函数<code>siftUp</code>和<code>siftDown</code>，时间复杂度为<code>logn</code>,具体步骤是，</p>
+<ul>
+<li>将元素<code>last</code>覆盖元素<code>i</code>，然后<code>siftDown</code></li>
+<li>检查是否需要<code>siftUp</code></li>
+</ul>
+<p><strong>注意到堆的删除操作，如果是删除堆的根节点，则不用考虑执行siftUp的操作；若删除的是堆的非根节点，则要视情况决定是siftDown还是siftUp操作，两个操作是互斥的。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">delete</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">	<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">	<span class="comment">//将last元素移动过来，先siftDown; 再视情况考虑是否siftUp</span></span><br><span class="line">	<span class="type">int</span> <span class="variable">last</span> <span class="operator">=</span> nums[i] = nums[size-<span class="number">1</span>];</span><br><span class="line">	size--;</span><br><span class="line">	siftDown(i);</span><br><span class="line">	<span class="comment">//check #i的node的键值是否确实发生改变（是否siftDown操作生效）,若发生改变，则ok,否则为确保堆性质，则需要siftUp </span></span><br><span class="line">	<span class="keyword">if</span> (i &lt; size &amp;&amp; nums[i] == last) &#123;</span><br><span class="line">		System.out.println(<span class="string">&quot;delete siftUp&quot;</span>);</span><br><span class="line">		siftUp(i);</span><br><span class="line">	&#125;	</span><br><span class="line">     <span class="keyword">return</span> key;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>case 1 :</strong> </p>
+<p>删除中间节点<code>i</code>21，将最后一个节点复制过来；</p>
+<p><img src="/images/case1-1.jpeg" alt="这里写图片描述"></p>
+<p>由于没有进行<code>siftDown</code>操作，节点<code>i</code>的值仍然为6，因此为确保堆的性质，执行<code>siftUp</code>操作；</p>
+<p><img src="/images/case1-2.jpeg" alt="这里写图片描述"></p>
+<p><strong>case 2</strong></p>
+<p>删除中间节点<code>i</code>，将值为11的节点复制过来，执行<code>siftDown</code>操作；<br><img src="/images/case2-1.jpeg" alt="这里写图片描述"></p>
+<p>由于执行<code>siftDown</code>操作后，节点<code>i</code>的值不再是<code>11</code>，因此就不用再执行<code>siftUp</code>操作了，因为堆的性质在<code>siftDown</code>操作生效后已经得到了保持。</p>
+<p><img src="/images/case2-2.jpeg" alt="这里写图片描述"></p>
+<hr>
+<p>可以看出，堆的基本操作都依赖于两个核心的函数<code>siftUp</code>和<code>siftDown</code>；较为完整的<code>Heap</code>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Heap</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">N</span> <span class="operator">=</span> <span class="number">100</span>; <span class="comment">//default size</span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span>[] nums;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> size;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">Heap</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.nums = nums;</span><br><span class="line">		<span class="built_in">this</span>.size = nums.length;</span><br><span class="line">		heapify(<span class="built_in">this</span>.nums);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">Heap</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.nums = <span class="keyword">new</span> <span class="title class_">int</span>[N];</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * heapify an array, O(n)</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> nums An array to be heapified. </span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">heapify</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (size - <span class="number">1</span>) &gt;&gt; <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--)</span><br><span class="line">			siftDown(j);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * append x to heap</span></span><br><span class="line"><span class="comment">	 * O(logn)</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> x</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">insert</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (size &gt;= <span class="built_in">this</span>.nums.length)</span><br><span class="line">			expandSpace();</span><br><span class="line">		size += <span class="number">1</span>;</span><br><span class="line">		nums[size-<span class="number">1</span>] = x;</span><br><span class="line">		siftUp(size-<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">return</span> x;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * delete an element located in i position.</span></span><br><span class="line"><span class="comment">	 * O(logn)</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> i</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">delete</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		rangeCheck(i);</span><br><span class="line">		<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">		<span class="comment">//将last元素覆盖过来,先siftDown; 再视情况考虑是否siftUp;</span></span><br><span class="line">		<span class="type">int</span> <span class="variable">last</span> <span class="operator">=</span> nums[i] = nums[size-<span class="number">1</span>];</span><br><span class="line">		size--;</span><br><span class="line">		siftDown(i);</span><br><span class="line">		<span class="comment">//check #i的node的键值是否确实发生改变,若发生改变，则ok,否则为确保堆性质，则需要siftUp; </span></span><br><span class="line">		<span class="keyword">if</span> (i &lt; size &amp;&amp; nums[i] == last) </span><br><span class="line">			siftUp(i);</span><br><span class="line">		<span class="keyword">return</span> key;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * remove the root of heap, return it&#x27;s value, and adjust heap to maintain the heap&#x27;s property. </span></span><br><span class="line"><span class="comment">	 * O(logn)</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">extractMin</span><span class="params">()</span> &#123;</span><br><span class="line">		rangeCheck(<span class="number">0</span>);</span><br><span class="line">		<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[<span class="number">0</span>], last = nums[size-<span class="number">1</span>];</span><br><span class="line">		nums[<span class="number">0</span>] = last;</span><br><span class="line">		size--;</span><br><span class="line">		siftDown(<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">return</span> key;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * return an element&#x27;s index, if not exists, return -1;</span></span><br><span class="line"><span class="comment">	 * O(n)</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> x</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">search</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)</span><br><span class="line">			<span class="keyword">if</span> (nums[i] == x)</span><br><span class="line">				<span class="keyword">return</span> i;</span><br><span class="line">		<span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * return but does not remove the root of heap.</span></span><br><span class="line"><span class="comment">	 * O(1)</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">peek</span><span class="params">()</span> &#123;</span><br><span class="line">		rangeCheck(<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">return</span> nums[<span class="number">0</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">siftUp</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">		<span class="keyword">for</span> (; i &gt; <span class="number">0</span>;) &#123;</span><br><span class="line">			<span class="type">int</span> <span class="variable">p</span> <span class="operator">=</span> (i - <span class="number">1</span>) &gt;&gt;&gt; <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">if</span> (nums[p] &lt;= key)</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			nums[i] = nums[p];</span><br><span class="line">			i = p;</span><br><span class="line">		&#125;</span><br><span class="line">		nums[i] = key;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">siftDown</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">		<span class="keyword">for</span> (;i &lt; size / <span class="number">2</span>;) &#123;</span><br><span class="line">			<span class="type">int</span> <span class="variable">child</span> <span class="operator">=</span> (i &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">if</span> (child + <span class="number">1</span> &lt; size &amp;&amp; nums[child] &gt; nums[child+<span class="number">1</span>])</span><br><span class="line">				child++;</span><br><span class="line">			<span class="keyword">if</span> (key &lt;= nums[child])</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			nums[i] = nums[child];</span><br><span class="line">			i = child;</span><br><span class="line">		&#125;</span><br><span class="line">		nums[i] = key;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">rangeCheck</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (!(<span class="number">0</span> &lt;= i &amp;&amp; i &lt; size))</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;Index is out of boundary&quot;</span>);	</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">expandSpace</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.nums = Arrays.copyOf(<span class="built_in">this</span>.nums, size * <span class="number">2</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">		sb.append(<span class="string">&quot;[&quot;</span>);</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++)</span><br><span class="line">			sb.append(String.format((i != <span class="number">0</span> ? <span class="string">&quot;, &quot;</span> : <span class="string">&quot;&quot;</span>) + <span class="string">&quot;%d&quot;</span>, nums[i]));</span><br><span class="line">		sb.append(<span class="string">&quot;]\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> sb.toString();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-堆的应用：堆排序"><a href="#2-堆的应用：堆排序" class="headerlink" title="2.堆的应用：堆排序"></a>2.堆的应用：堆排序</h2><p>运用堆的性质，我们可以得到一种常用的、稳定的、高效的排序算法————<strong>堆排序</strong>。堆排序的时间复杂度为<code>O(n*log(n))</code>，空间复杂度为<code>O(1)</code>，堆排序的思想是：<br>对于含有<code>n</code>个元素的无序数组<code>nums</code>, 构建一个堆(这里是小顶堆)<code>heap</code>，然后执行<code>extractMin</code>得到最小的元素，这样执行<code>n</code>次得到序列就是排序好的序列。<br>如果是降序排列则是小顶堆；否则利用大顶堆。</p>
+<p><strong>Trick</strong></p>
+<p>由于<code>extractMin</code>执行完毕后，最后一个元素<code>last</code>已经被移动到了<code>root</code>，因此可以将<code>extractMin</code>返回的元素放置于最后，这样可以得到<code>sort in place</code>的堆排序算法。</p>
+<p>具体操作如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>[] n = <span class="keyword">new</span> <span class="title class_">int</span>[] &#123;<span class="number">1</span>,<span class="number">9</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">8</span>,<span class="number">3</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">9</span>,<span class="number">86</span>&#125;;</span><br><span class="line"><span class="type">Heap</span> <span class="variable">h</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Heap</span>(n);</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n.length; i++)</span><br><span class="line">	n[n.length-<span class="number">1</span>-i] = h.extractMin();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>当然，如果不使用前面定义的<code>heap</code>，则可以手动写堆排序，由于堆排序设计到<strong>建堆</strong>和<strong>extractMin</strong>， 两个操作都公共依赖于<code>siftDown</code>函数，因此我们只需要实现<code>siftDown</code>即可。(trick:由于建堆操作可以采用<code>siftUp</code>或者<code>siftDown</code>，而<code>extractMin</code>是需要<code>siftDown</code>操作，因此取公共部分，则采用<code>siftDown</code>建堆)。</p>
+<p>这里便于和前面统一，采用小顶堆数组进行降序排列。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">heapSort</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> nums.length;</span><br><span class="line">		buildMinHeap(nums);</span><br><span class="line">		<span class="keyword">while</span> (size != <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="comment">// 交换堆顶和最后一个元素</span></span><br><span class="line">			<span class="type">int</span> <span class="variable">tmp</span> <span class="operator">=</span> nums[<span class="number">0</span>];</span><br><span class="line">			nums[<span class="number">0</span>] = nums[size - <span class="number">1</span>];</span><br><span class="line">			nums[size - <span class="number">1</span>] = tmp;</span><br><span class="line">			size--;</span><br><span class="line">			siftDown(nums, <span class="number">0</span>, size);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 建立小顶堆</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">buildMinHeap</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> nums.length;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> size / <span class="number">2</span> - <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--)</span><br><span class="line">			siftDown(nums, j, size);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">siftDown</span><span class="params">(<span class="type">int</span>[] nums, <span class="type">int</span> i, <span class="type">int</span> newSize)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">		<span class="keyword">while</span> (i &lt; newSize &gt;&gt;&gt; <span class="number">1</span>) &#123;</span><br><span class="line">			<span class="type">int</span> <span class="variable">leftChild</span> <span class="operator">=</span> (i &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">			<span class="type">int</span> <span class="variable">rightChild</span> <span class="operator">=</span> leftChild + <span class="number">1</span>;</span><br><span class="line">			<span class="comment">// 最小的孩子，比最小的孩子还小</span></span><br><span class="line">			<span class="type">int</span> <span class="variable">min</span> <span class="operator">=</span> (rightChild &gt;= newSize || nums[leftChild] &lt; nums[rightChild]) ? leftChild : rightChild;</span><br><span class="line">			<span class="keyword">if</span> (key &lt;= nums[min])</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			nums[i] = nums[min];</span><br><span class="line">			i = min;</span><br><span class="line">		&#125;</span><br><span class="line">		nums[i] = key;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="3-堆的应用：优先队列"><a href="#3-堆的应用：优先队列" class="headerlink" title="3.堆的应用：优先队列"></a>3.堆的应用：优先队列</h2><p>优先队列是一种抽象的数据类型，它和堆的关系类似于，<code>List</code>和数组、链表的关系一样；我们常常使用堆来实现优先队列，因此很多时候堆和优先队列都很相似，它们只是概念上的区分。<br>优先队列的应用场景十分的广泛：<br>常见的应用有：</p>
+<ul>
+<li>Dijkstra’s algorithm（单源最短路问题中需要在邻接表中找到某一点的最短邻接边，这可以将复杂度降低。）</li>
+<li>Huffman coding（贪心算法的一个典型例子，采用优先队列构建最优的前缀编码树(<code>prefixEncodeTree</code>)）</li>
+<li>Prim’s algorithm for minimum spanning tree</li>
+<li>Best-first search algorithms</li>
+</ul>
+<p>这里简单介绍上述应用之一：<a href="https://en.wikipedia.org/wiki/Huffman_coding">Huffman coding</a>。</p>
+<p>Huffman编码是一种变长的编码方案，对于每一个字符，所对应的二进制位串的长度是不一致的，但是遵守如下原则：</p>
+<ul>
+<li>出现频率高的字符的二进制位串的长度小</li>
+<li>不存在一个字符<code>c</code>的二进制位串<code>s</code>是除<code>c</code>外任意字符的二进制位串的前缀</li>
+</ul>
+<p>遵守这样原则的Huffman编码属于变长编码，可以无损的压缩数据，压缩后通常可以节省20%-90%的空间，具体压缩率依赖于数据的固有结构。</p>
+<p>Huffman编码的实现就是要找到满足这两种原则的 <strong>字符-二进制位串</strong> 对照关系，即找到<strong>最优前缀码</strong>的编码方案（前缀码：没有任何字符编码后的二进制位串是其他字符编码后位串的前缀）。<br>这里我们需要用到二叉树来表达最优前缀码，该树称为<strong>最优前缀码树</strong><br>一棵最优前缀码树看起来像这样：</p>
+<p><img src="/images/optim-prefix-tree.png" alt="这里写图片描述"></p>
+<p>算法思想：用一个属性为<code>freqeunce</code>关键字的最小优先队列Q,将当前最小的两个元素x,y合并得到一个新元素z（z.frequence &#x3D; x.freqeunce + y.frequence）,<br>然后插入到优先队列中Q中，这样执行<code>n-1</code>次合并后，得到一棵最优前缀码树（这里不讨论算法的证明）。</p>
+<p>一个常见的构建流程如下：</p>
+<p><img src="/images/haffman-tree-build.jpeg" alt="这里写图片描述"></p>
+<p>树中指向某个节点左孩子的边上表示位<code>0</code>,指向右孩子的边上的表示位<code>1</code>，这样遍历一棵最优前缀码树就可以得到对照表。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Comparator;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.PriorityQueue;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> *                            root </span></span><br><span class="line"><span class="comment"> *                            /   \ </span></span><br><span class="line"><span class="comment"> *                    --------- ---------- </span></span><br><span class="line"><span class="comment"> *                    |c:freq | | c:freq | </span></span><br><span class="line"><span class="comment"> *                    --------- ----------</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HuffmanEncodeDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		Node[] n = <span class="keyword">new</span> <span class="title class_">Node</span>[<span class="number">6</span>];</span><br><span class="line">		<span class="type">float</span>[] freq = <span class="keyword">new</span> <span class="title class_">float</span>[] &#123; <span class="number">9</span>, <span class="number">5</span>, <span class="number">45</span>, <span class="number">13</span>, <span class="number">16</span>, <span class="number">12</span> &#125;;</span><br><span class="line">		<span class="type">char</span>[] chs = <span class="keyword">new</span> <span class="title class_">char</span>[] &#123; <span class="string">&#x27;e&#x27;</span>, <span class="string">&#x27;f&#x27;</span>, <span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;d&#x27;</span>, <span class="string">&#x27;c&#x27;</span> &#125;;</span><br><span class="line">		<span class="type">HuffmanEncodeDemo</span> <span class="variable">demo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">HuffmanEncodeDemo</span>();</span><br><span class="line">		<span class="type">Node</span> <span class="variable">root</span> <span class="operator">=</span> demo.buildPrefixEncodeTree(n, freq, chs);</span><br><span class="line">		Map&lt;Character, String&gt; collector = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">		<span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">		demo.tranversalPrefixEncodeTree(root, collector, sb);</span><br><span class="line">		System.out.println(collector);</span><br><span class="line">		<span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;abcabcefefefeabcdbebfbebfbabc&quot;</span>;</span><br><span class="line">		<span class="type">StringBuilder</span> <span class="variable">sb1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">char</span> c : s.toCharArray()) &#123;</span><br><span class="line">			sb1.append(collector.get(c));</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(sb1.toString());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> Node <span class="title function_">buildPrefixEncodeTree</span><span class="params">(Node[] n, <span class="type">float</span>[] freq, <span class="type">char</span>[] chs)</span> &#123;</span><br><span class="line">		PriorityQueue&lt;Node&gt; pQ = <span class="keyword">new</span> <span class="title class_">PriorityQueue</span>&lt;&gt;(<span class="keyword">new</span> <span class="title class_">Comparator</span>&lt;Node&gt;() &#123;</span><br><span class="line">			<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">compare</span><span class="params">(Node o1, Node o2)</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> o1.item.freq &gt; o2.item.freq ? <span class="number">1</span> : o1.item.freq == o2.item.freq ? <span class="number">0</span> : -<span class="number">1</span>;</span><br><span class="line">			&#125;;</span><br><span class="line">		&#125;);</span><br><span class="line">		<span class="type">Node</span> <span class="variable">e</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; chs.length; i++) &#123;</span><br><span class="line">			n[i] = e = <span class="keyword">new</span> <span class="title class_">Node</span>(<span class="literal">null</span>, <span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">Item</span>(chs[i], freq[i]));</span><br><span class="line">			pQ.add(e);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">			<span class="type">Node</span> <span class="variable">x</span> <span class="operator">=</span> pQ.poll(), y = pQ.poll();</span><br><span class="line">			<span class="type">Node</span> <span class="variable">z</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Node</span>(x, y, <span class="keyword">new</span> <span class="title class_">Item</span>(<span class="string">&#x27;$&#x27;</span>, x.item.freq + y.item.freq));</span><br><span class="line">			pQ.add(z);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> pQ.poll();</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * tranversal  </span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> root</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> collector</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> sb</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">tranversalPrefixEncodeTree</span><span class="params">(Node root, Map&lt;Character, String&gt; collector, StringBuilder sb)</span> &#123;</span><br><span class="line">		<span class="comment">// leaf node</span></span><br><span class="line">		<span class="keyword">if</span> (root.left == <span class="literal">null</span> &amp;&amp; root.right == <span class="literal">null</span>) &#123;</span><br><span class="line">			collector.put(root.item.c, sb.toString());</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="type">Node</span> <span class="variable">left</span> <span class="operator">=</span> root.left, right = root.right;</span><br><span class="line">		tranversalPrefixEncodeTree(left, collector, sb.append(<span class="number">0</span>));</span><br><span class="line">		sb.delete(sb.length() - <span class="number">1</span>, sb.length());</span><br><span class="line">		tranversalPrefixEncodeTree(right, collector, sb.append(<span class="number">1</span>));</span><br><span class="line">		sb.delete(sb.length() - <span class="number">1</span>, sb.length());</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">	<span class="keyword">public</span> Node left, right;</span><br><span class="line">	<span class="keyword">public</span> Item item;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(Node left, Node right, Item item)</span> &#123;</span><br><span class="line">		<span class="built_in">super</span>();</span><br><span class="line">		<span class="built_in">this</span>.left = left;</span><br><span class="line">		<span class="built_in">this</span>.right = right;</span><br><span class="line">		<span class="built_in">this</span>.item = item;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Item</span> &#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="type">char</span> c;</span><br><span class="line">	<span class="keyword">public</span> <span class="type">float</span> freq;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">Item</span><span class="params">(<span class="type">char</span> c, <span class="type">float</span> freq)</span> &#123;</span><br><span class="line">		<span class="built_in">super</span>();</span><br><span class="line">		<span class="built_in">this</span>.c = c;</span><br><span class="line">		<span class="built_in">this</span>.freq = freq;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>输出如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;a=0, b=101, c=100, d=111, e=1101, f=1100&#125;</span><br><span class="line">010110001011001101110011011100110111001101010110011110111011011100101110110111001010101100</span><br></pre></td></tr></table></figure>
+<h2 id="4-堆的应用：海量实数中（一亿级别以上）找到TopK（一万级别以下）的数集合。"><a href="#4-堆的应用：海量实数中（一亿级别以上）找到TopK（一万级别以下）的数集合。" class="headerlink" title="4 堆的应用：海量实数中（一亿级别以上）找到TopK（一万级别以下）的数集合。"></a>4 堆的应用：海量实数中（一亿级别以上）找到TopK（一万级别以下）的数集合。</h2><ul>
+<li><p>A:通常遇到找一个集合中的TopK问题，想到的便是排序，因为常见的排序算法例如快排算是比较快了，然后再取出K个TopK数，时间复杂度为<code>O(nlogn)</code>，当<code>n</code>很大的时候这个时间复杂度还是很大的；</p>
+</li>
+<li><p>B:另一种思路就是打擂台的方式,每个元素与K个待选元素比较一次，时间复杂度很高：<code>O(k*n)</code>，此方案明显逊色于前者。</p>
+</li>
+</ul>
+<p>对于一亿数据来说，A方案大约是<code>26.575424*n</code>；</p>
+<ul>
+<li>C:由于我们只需要TopK，因此不需要对所有数据进行排序，可以利用堆得思想，维护一个大小为K的小顶堆，然后依次遍历每个元素<code>e</code>, 若元素<code>e</code>大于堆顶元素<code>root</code>，则删除<code>root</code>，将<code>e</code>放在堆顶，然后调整，时间复杂度为<code>logK</code>；若小于或等于，则考察下一个元素。这样遍历一遍后，最小堆里面保留的数就是我们要找的<code>topK</code>，整体时间复杂度为<code>O(k+n*logk)</code>约等于<code>O(n*logk)</code>，大约是<code>13.287712*n</code>（由于k与n数量级差太多），这样时间复杂度下降了约一半。</li>
+</ul>
+<p>A、B、C三个方案中，C通常是优于B的，因为logK通常是小于k的，当<code>K</code>和<code>n</code>的数量级相差越大，这种方式越有效。</p>
+<p>以下为具体操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"><span class="keyword">import</span> java.io.PrintWriter;</span><br><span class="line"><span class="keyword">import</span> java.io.UnsupportedEncodingException;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.Scanner;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"><span class="keyword">import</span> java.util.TreeSet;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TopKNumbersInMassiveNumbersDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">int</span>[] topK = <span class="keyword">new</span> <span class="title class_">int</span>[]&#123;<span class="number">50001</span>,<span class="number">50002</span>,<span class="number">50003</span>,<span class="number">50004</span>,<span class="number">50005</span>&#125;;</span><br><span class="line">		genData(<span class="number">1000</span> * <span class="number">1000</span> * <span class="number">1000</span>, <span class="number">500</span>, topK);</span><br><span class="line">		<span class="type">long</span> <span class="variable">t</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">		findTopK(topK.length);</span><br><span class="line">		System.out.println(String.format(<span class="string">&quot;cost:%fs&quot;</span>, (System.currentTimeMillis() - t) * <span class="number">1.0</span> / <span class="number">1000</span>));</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">genData</span><span class="params">(<span class="type">int</span> N, <span class="type">int</span> maxRandomNumer, <span class="type">int</span>[] topK)</span> &#123;</span><br><span class="line">		<span class="type">File</span> <span class="variable">f</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;data.txt&quot;</span>);</span><br><span class="line">		<span class="type">int</span> <span class="variable">k</span> <span class="operator">=</span> topK.length;</span><br><span class="line">		Set&lt;Integer&gt; index = <span class="keyword">new</span> <span class="title class_">TreeSet</span>&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (;;) &#123;</span><br><span class="line">			index.add((<span class="type">int</span>)(Math.random() * N));</span><br><span class="line">			<span class="keyword">if</span> (index.size() == k)</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(index);</span><br><span class="line">		<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="type">PrintWriter</span> <span class="variable">pW</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PrintWriter</span>(f, <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">				<span class="keyword">if</span>(!index.contains(i))</span><br><span class="line">					pW.println((<span class="type">int</span>)(Math.random() * maxRandomNumer));</span><br><span class="line">				<span class="keyword">else</span></span><br><span class="line">					pW.println(topK[j++]);</span><br><span class="line">			pW.flush();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">findTopK</span><span class="params">(<span class="type">int</span> k)</span> &#123;</span><br><span class="line">		<span class="type">int</span>[] nums = <span class="keyword">new</span> <span class="title class_">int</span>[k];</span><br><span class="line">		<span class="comment">//read</span></span><br><span class="line">		<span class="type">File</span> <span class="variable">f</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;data.txt&quot;</span>);</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="type">Scanner</span> <span class="variable">scanner</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Scanner</span>(f);</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>;j &lt; k; j++)</span><br><span class="line">				nums[j] = scanner.nextInt();</span><br><span class="line">			heapify(nums);</span><br><span class="line">			<span class="comment">//core</span></span><br><span class="line">			<span class="keyword">while</span> (scanner.hasNextInt()) &#123;</span><br><span class="line">				<span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> scanner.nextInt();</span><br><span class="line">				<span class="keyword">if</span> (a &lt;= nums[<span class="number">0</span>])</span><br><span class="line">					<span class="keyword">continue</span>;</span><br><span class="line">				<span class="keyword">else</span> &#123;</span><br><span class="line">					nums[<span class="number">0</span>] = a;</span><br><span class="line">					siftDown(<span class="number">0</span>, k, nums);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			System.out.println(Arrays.toString(nums));</span><br><span class="line">		&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//O(n), minimal heap</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">heapify</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> nums.length;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> (size - <span class="number">1</span>) &gt;&gt; <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--)</span><br><span class="line">			siftDown(j, size, nums);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">siftDown</span><span class="params">(<span class="type">int</span> i, <span class="type">int</span> n, <span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> nums[i];</span><br><span class="line">		<span class="keyword">for</span> (;i &lt; (n &gt;&gt;&gt; <span class="number">1</span>);) &#123;</span><br><span class="line">			<span class="type">int</span> <span class="variable">child</span> <span class="operator">=</span> (i &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">			<span class="keyword">if</span> (child + <span class="number">1</span> &lt; n &amp;&amp; nums[child] &gt; nums[child+<span class="number">1</span>])</span><br><span class="line">				child++;</span><br><span class="line">			<span class="keyword">if</span> (key &lt;= nums[child])</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			nums[i] = nums[child];</span><br><span class="line">			i = child;</span><br><span class="line">		&#125;</span><br><span class="line">		nums[i] = key;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>ps:大致测试了一下，10亿个数中找到top5需要140秒左右，应该是很快了。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5 总结"></a>5 总结</h2><ul>
+<li>堆是基于树的满足一定约束的重要数据结构，存在许多变体例如二叉堆、二项式堆、斐波那契堆（很高效）等。</li>
+<li>堆的几个基本操作都依赖于两个重要的函数<code>siftUp</code>和<code>siftDown</code>，堆的<code>insert</code>通常是在堆尾插入新元素并<code>siftUp</code>调整堆，而<code>extractMin</code>是在<br>删除堆顶元素，然后将最后一个元素放置堆顶并调用<code>siftDown</code>调整堆。</li>
+<li>二叉堆是常用的一种堆，其是一棵二叉树；由于二叉树良好的性质，因此常常采用数组来存储堆。<br>堆得基本操作的时间复杂度如下表所示：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>heapify</th>
+<th>insert</th>
+<th>peek</th>
+<th>extractMin</th>
+<th>delete(i)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>O(n)</code></td>
+<td><code>O(logn)</code></td>
+<td><code>O(1)</code></td>
+<td><code>O(logn)</code></td>
+<td><code>O(logn)</code></td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>二叉堆通常被用来实现堆排序算法，堆排序可以<code>sort in place</code>，堆排序的时间复杂度的上界是<code>O(nlogn)</code>，是一种很优秀的排序算法。由于存在相同键值的两个元素处于两棵子树中，而两个元素的顺序可能会在后续的堆调整中发生改变，因此堆排序不是稳定的。降序排序需要建立小顶堆，升序排序需要建立大顶堆。</p>
+</li>
+<li><p>堆是实现抽象数据类型优先队列的一种方式，优先队列有很广泛的应用，例如Huffman编码中使用优先队列利用贪心算法构建最优前缀编码树。</p>
+</li>
+<li><p>堆的另一个应用就是在海量数据中找到TopK个数，思想是维护一个大小为K的二叉堆，然后不断地比较堆顶元素，判断是否需要执行替换对顶元素的操作，采用<br>此方法的时间复杂度为<code>n*logk</code>，当<code>k</code>和<code>n</code>的数量级差距很大的时候，这种方式是很有效的方法。</p>
+</li>
+</ul>
+<h2 id="6-references"><a href="#6-references" class="headerlink" title="6 references"></a>6 references</h2><p>[1] <a href="https://en.wikipedia.org/wiki/Heap_(data_structure)">https://en.wikipedia.org/wiki/Heap_(data_structure)</a>  </p>
+<p>[2] <a href="https://en.wikipedia.org/wiki/Heapsort">https://en.wikipedia.org/wiki/Heapsort</a></p>
+<p>[3] <a href="https://en.wikipedia.org/wiki/Priority_queue">https://en.wikipedia.org/wiki/Priority_queue</a></p>
+<p>[4] <a href="https://www.cnblogs.com/swiftma/p/6006395.html">https://www.cnblogs.com/swiftma/p/6006395.html</a></p>
+<p>[5] Thomas H.Cormen, Charles E.Leiserson, Ronald L.Rivest, Clifford Stein.算法导论[M].北京:机械工业出版社,2015:245-249</p>
+<p>[6] Jon Bentley.编程珠玑[M].北京:人民邮电出版社,2015:161-174</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A0%86%E6%8E%92%E5%BA%8F/" rel="tag"># 堆排序</a>
+              <a href="/tags/%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/" rel="tag"># 优先队列</a>
+              <a href="/tags/%E9%9C%8D%E5%A4%AB%E6%9B%BC%E7%BC%96%E7%A0%81/" rel="tag"># 霍夫曼编码</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/06/20/LCS%20problem/" rel="prev" title="LCS问题">
+                  <i class="fa fa-angle-left"></i> LCS问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/07/19/Java%20getClass()%20VS%20instanceof%20VS%20==/" rel="next" title="Java getClass()  VS  instanceof  VS  &#x3D;&#x3D;">
+                  Java getClass()  VS  instanceof  VS  == <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks Abstract：本文提出了一个简单有效的方案，使用3D卷积在大规模视频中来学习空间时序(Spatiotemporal)特征，本文的贡献如下：  相比于2D卷积，3D卷积更加适合学习空间时序特征； 作者通过实验不同的网络结构，发现3*3*3的卷积核是最好的网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks">
+<meta property="og:url" content="https://spground.github.io/2018/12/04/Notes-Learning%20Spatiotemporal%20Features%20with%203D%20Convolutional%20Networks/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks Abstract：本文提出了一个简单有效的方案，使用3D卷积在大规模视频中来学习空间时序(Spatiotemporal)特征，本文的贡献如下：  相比于2D卷积，3D卷积更加适合学习空间时序特征； 作者通过实验不同的网络结构，发现3*3*3的卷积核是最好的网络">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926034473-47500c66-976a-4f31-8e4f-c4ba02800ebd.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926692559-3ab35db1-52e9-4410-b288-4aa4dbde51f4.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926857864-0d3a3cce-d9f2-4381-8d78-e7a6f8aeef25.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543928718199-20336e5c-7a20-4ebb-8495-ce1c6c9b6eab.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543929463034-2c1d28bc-f6f5-408f-a7fb-4fbfe95db712.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543929431565-ced0c458-6062-4b53-a8dd-dc9872b95892.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543929638383-892c2b54-ae7f-4c98-9f9b-f7a53edb83ba.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543930139869-3057c701-fb0e-4546-a786-85da9f3ca583.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543930176701-e36f2b39-c626-45b4-8f8c-8c3140b0b7dc.png">
+<meta property="article:published_time" content="2018-12-04T12:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.567Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="3D Convolution Networks">
+<meta property="article:tag" content="C3D">
+<meta property="article:tag" content="Video Feature Descriptor">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926034473-47500c66-976a-4f31-8e4f-c4ba02800ebd.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2018/12/04/Notes-Learning%20Spatiotemporal%20Features%20with%203D%20Convolutional%20Networks/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2018/12/04/Notes-Learning%20Spatiotemporal%20Features%20with%203D%20Convolutional%20Networks/","path":"2018/12/04/Notes-Learning Spatiotemporal Features with 3D Convolutional Networks/","title":"Notes：Learning Spatiotemporal Features with 3D Convolutional Networks"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Notes：Learning Spatiotemporal Features with 3D Convolutional Networks | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Abstract%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">Abstract：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Related-Work"><span class="nav-number">3.</span> <span class="nav-text">Related Work</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Learning-features-with-3D-ConvNets"><span class="nav-number">4.</span> <span class="nav-text">Learning features with 3D ConvNets</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3D-Convolution%E3%80%813D-Pooling%E3%80%81search-for-Network-Architecture"><span class="nav-number">4.1.</span> <span class="nav-text">3D Convolution、3D Pooling、search for Network Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3D-Convolution-VS-2D-Convolution"><span class="nav-number">4.1.1.</span> <span class="nav-text">3D Convolution VS 2D Convolution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#search-for-Network-Architecture"><span class="nav-number">4.1.2.</span> <span class="nav-text">search for Network Architecture</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spatiotemporal-Feature-learning"><span class="nav-number">4.2.</span> <span class="nav-text">Spatiotemporal Feature learning</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Experiment"><span class="nav-number">5.</span> <span class="nav-text">Experiment</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Runtime-Analysis"><span class="nav-number">6.</span> <span class="nav-text">Runtime Analysis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Conclusion"><span class="nav-number">7.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2018/12/04/Notes-Learning%20Spatiotemporal%20Features%20with%203D%20Convolutional%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Notes：Learning Spatiotemporal Features with 3D Convolutional Networks
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-04 20:00:00" itemprop="dateCreated datePublished" datetime="2018-12-04T20:00:00+08:00">2018-12-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/deep-learning/" itemprop="url" rel="index"><span itemprop="name">deep learning</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Notes：Learning Spatiotemporal Features with 3D Convolutional Networks</p>
+<h1 id="Abstract："><a href="#Abstract：" class="headerlink" title="Abstract："></a>Abstract：</h1><p>本文提出了一个简单有效的方案，使用3D卷积在大规模视频中来学习空间时序(<strong>Spatiotemporal</strong>)特征，本文的贡献如下：</p>
+<ul>
+<li>相比于2D卷积，3D卷积更加适合学习空间时序特征；</li>
+<li>作者通过实验不同的网络结构，发现3*3*3的卷积核是最好的网络结构；</li>
+<li>作者通过学习到的C3D特征去作为视频的描述子，采用简单的线性分类器，在4个benchmarks上，取得了比SOTA好的结果，同时在另外2个benchmarks上取得了和SOTA相当的结果；</li>
+<li>C3D学习到特征是压缩的、具有判别性的，通过PCA降维到10维，也能在UCF101上达到52.8%的准确度，相比于其他方法学到的特征，C3D特征更加压缩和具有判别性，在现实环境中可以更容易提高准确度和计算复杂度的trade-off；</li>
+</ul>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>作者表明虽然在不同的视频任务领域，存在很多好的解决方案，但是仍然需要一个__通用的视频描述子(generic video desciptor)__，这样会以一种统一的方式去解决大规模视频任务中的问题。</p>
+<p>对于一个通用的视频描述子，以下简称GVD，作者认为有效的GVD应该具有如下四个性质：</p>
+<ol>
+<li>通用性，这样才能才具有判别性的同时可以表示不同类型的视频，例如自然风景、体育运动、电视节目、电影等；</li>
+<li>压缩性，因为当处理数百万个视频时，压缩的特征可以跟有效的处理、存储和检索；</li>
+<li>计算有效性，在现实系统中，我们需要每分钟处理数千个视频；</li>
+<li>易于实现，经过该描述子提取的特征，即使采用简单的分类器，例如线性分类器，也应该能取得不错的效果；</li>
+</ol>
+<p>使用深度学习提取的图像特征不能直接适用于视频任务，因为这些图像特征缺乏对动作的建模。</p>
+<p>作者人为本文的贡献如下：</p>
+<ul>
+<li>作者做了一系列实验，包括视频分类、动作识别、场景识别和对象检测等，<strong>表明了3d深度卷积网络是好的模型来对外观（apperance）和动作（motion）同时建模；</strong></li>
+<li>作者通过有限的实验探索了各种不同的3d卷积网络的结构（kernel的大小不同），<strong>最终发现3*3*3的kernel是经验最优的结构</strong>，这一点和2D卷积中kernel的选取经验相似；</li>
+<li>使用作者提出的C3D网络结构提取的特征，使用简单的线性SVM分类器，在4个不同的任务和6个不同的benchmark中取得了最优的效果；</li>
+</ul>
+<h1 id="Related-Work"><a href="#Related-Work" class="headerlink" title="Related Work"></a>Related Work</h1><p>作者回顾了一些传统的视频描述子的方法，重点提到了目前最好的称为iDT的方法，并指出这个方法计算量大，难以扩展到大规模视频的任务中。</p>
+<p>随着机器的计算力提高和数据量的增多，卷积神经网络在很多任务中有所突破。有些人利用深度学习学习到Image特征，通过迁移学习的方式在一些任务上取得了不错的效果，但是这些方法都是不适用于视频特征学习的。</p>
+<p>在作者这篇文章之前，有几篇文章已经开始或多或少的提到了利用3D卷积去进行视频特征的学习，其中一篇文章是2013年的 *<strong>3d convolutional neural networks for human action recognition，文章</strong>*利用预处理的方式将视频中的头和身体进行分割，然后将分割后的视频送入3d卷积网络中做动作识别；另一篇是2014年__Karpathy__等人训练了深度网络去进行视频分类。</p>
+<h1 id="Learning-features-with-3D-ConvNets"><a href="#Learning-features-with-3D-ConvNets" class="headerlink" title="Learning features with 3D ConvNets"></a>Learning features with 3D ConvNets</h1><h2 id="3D-Convolution、3D-Pooling、search-for-Network-Architecture"><a href="#3D-Convolution、3D-Pooling、search-for-Network-Architecture" class="headerlink" title="3D Convolution、3D Pooling、search for Network Architecture"></a>3D Convolution、3D Pooling、search for Network Architecture</h2><h3 id="3D-Convolution-VS-2D-Convolution"><a href="#3D-Convolution-VS-2D-Convolution" class="headerlink" title="3D Convolution VS 2D Convolution"></a>3D Convolution VS 2D Convolution</h3><p>和2D卷积不同，3D卷积有能力通过3D卷积和3D池化对时间信息进行建模。</p>
+<p>2D卷积和3D卷积的区别</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926034473-47500c66-976a-4f31-8e4f-c4ba02800ebd.png" alt="image.png | left | 747x170"></p>
+<p>在一张图片上进行一次2D卷积，输出是一张图片（Feature Map），在一个视频进行一次2D卷积，输出同样是一张图片（Feature Map），在一个视频上进行一次3D卷积，输出则是另一个立方体，这个立方体保留了输入信号的时序信息。</p>
+<p><strong>总结： 2D卷积在每次卷积和池化和都丢失了时序信息，而3D卷积和池化则保留了时序信息。</strong></p>
+<h3 id="search-for-Network-Architecture"><a href="#search-for-Network-Architecture" class="headerlink" title="search for Network Architecture"></a>search for Network Architecture</h3><p>因为训练这种大型的网络是十分耗费时间的，因此作者根据2D卷积的经验，空间维度的卷积核采用3*3，而时间维度的卷积深度则通过不同的实验来选择，因此3D卷积核的大小为d*3*3。</p>
+<p>为了找到时间维度上最优的卷积深度d，作者在中等规模的UCF101数据集上进行了3类实验：</p>
+<ul>
+<li>全局采用一致的时间维度卷积深度d；</li>
+<li>从前往后，时间维度卷积深度d逐层递增，3-3-5-5-7；</li>
+<li>从前往后，时间维度卷积深度d逐层递减，7-5-5-3-3；</li>
+</ul>
+<p>作者在搜索最优的时间卷积深度的时候，由于是在中等规模数据集上进行的，网络结构为：5层卷积和2层全连接。<br>卷积层的配置逐层如下：</p>
+<ul>
+<li>64 kernels</li>
+<li>128 kernels</li>
+<li>256 kernels</li>
+<li>256 kernels</li>
+<li>256 kernels</li>
+</ul>
+<p>所有的卷积层在空间和时间维度都采用SAME padding，因此卷积前后的size是不变的。每一层卷积后都接一层3D pooling层，除了第一层池化层的核为1*2*2外，其余池化层全部为2*2*2，因此经过池化层的size会缩小为原来的1&#x2F;8。</p>
+<p><strong>说明：作者强调了第一层池化层在时间维度不进行池化有两个目的：</strong></p>
+<ul>
+<li>不想过早的合并时序信息；</li>
+<li>输入是16帧图像，因此时间维度最多进行4次池化；</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926692559-3ab35db1-52e9-4410-b288-4aa4dbde51f4.png" alt="image.png | left | 400x220"></p>
+<p>最终作者发现时间维度的卷积深度为3的时候，网络性能最佳，因此3*3*3是经验最优的3D卷积核，这也和2D卷积的3*3卷积核是统一的。</p>
+<h2 id="Spatiotemporal-Feature-learning"><a href="#Spatiotemporal-Feature-learning" class="headerlink" title="Spatiotemporal Feature learning"></a>Spatiotemporal Feature learning</h2><p>为了进行空间时序特征的学习，作者在一个大规模的数据集Sport-1M上进行了训练。Sport-1M包含100万个视频，每个视频属于487种运行类别种的一种，和UCF101相比，Sports-1M的视频数量是它的100倍，类别数目是它的5倍。因此作者也设计了容量更大的网络结构，如下所示：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543926857864-0d3a3cce-d9f2-4381-8d78-e7a6f8aeef25.png" alt="image.png | left | 747x127"></p>
+<p>网络一共8层卷积层，每一层紧接一个池化层，最后两个全连接层。<br>作者的实验结果如下：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543928718199-20336e5c-7a20-4ebb-8495-ce1c6c9b6eab.png" alt="image.png | left | 747x139"></p>
+<ul>
+<li><strong>C3D视频描述子：在Sport-1M上训练过的网络可以用来作为视频分析任务的特征提取器，因为该c3d视频描述子具有很多优良的性质；</strong></li>
+<li><strong>C3D网络学习到了什么？</strong><ul>
+<li><strong>作者通过反卷积可视化技术，观察到对于视频的前几帧，网络学习到了外观apperance，在接下来的图像帧中，网络重点学习到了显著的动作。这表明和2D卷积网络不同，3D卷积网络选择性的学习到了动作和外观特征，而这些特征对于视频分类等问题，具有很好的判别性。</strong></li>
+</ul>
+</li>
+</ul>
+<h1 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h1><p>作者后续又先后在</p>
+<ul>
+<li>Action Recognition</li>
+<li>Action Similarity Labeling</li>
+<li>Scene and Object Recognition<br>等任务中进行了实验，实验结果几乎都是属于SOTA结果，这也证明了C3D网络是一种优秀的网络结构用于处理视频任务。</li>
+</ul>
+<p>作者其中还通过可视化技术t-SNE，将C3D学习到特征通过特征嵌入的方式，和ImageNet的特征进行了对比，表明了C3D学习到特征是压缩的。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543929463034-2c1d28bc-f6f5-408f-a7fb-4fbfe95db712.png" alt="image.png | center | 401x295"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543929431565-ced0c458-6062-4b53-a8dd-dc9872b95892.png" alt="image.png | center | 364x274"></p>
+<h1 id="Runtime-Analysis"><a href="#Runtime-Analysis" class="headerlink" title="Runtime Analysis"></a>Runtime Analysis</h1><p>作者通过和传统方法iDT、深度学习方法Temporal Stream Network TSN方法的运行时间做了对比，表明c3d网络是高效的、计算成本低的方法。这也表明c3d可以很好的运行在现实系统中，因此具有很好的现实意义。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543929638383-892c2b54-ae7f-4c98-9f9b-f7a53edb83ba.png" alt="image.png | center | 534x232"></p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><ul>
+<li>C3D能同时对空间和时间信息建模；</li>
+<li>C3D特征是有效的、通用的、压缩的且易于实现的；</li>
+<li>C3D网络中<ul>
+<li>浅层的卷积层学习到了低层次的运动模式：例如颜色的改变、移动的边缘和边缘方向的改变；</li>
+<li>中层的卷积层学习到了高层次、更大的运动模式：例如纹理的移动、身体躯干的移动、轨迹的移动等；</li>
+<li>高层的卷积层学习到了更复杂的运行模式：例如移动的圆形物体、移动的自行车形状的物体；</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543930139869-3057c701-fb0e-4546-a786-85da9f3ca583.png" alt="image.png | left | 747x644"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1543930176701-e36f2b39-c626-45b4-8f8c-8c3140b0b7dc.png" alt="image.png | left | 747x582"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C3D/" rel="tag"># C3D</a>
+              <a href="/tags/Video-Feature-Descriptor/" rel="tag"># Video Feature Descriptor</a>
+              <a href="/tags/3D-Convolution-Networks/" rel="tag"># 3D Convolution Networks</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/11/21/notes-of-stucture-your-machine-learning/" rel="prev" title="Notes：Deep Learning-structure your machine learning-week2">
+                  <i class="fa fa-angle-left"></i> Notes：Deep Learning-structure your machine learning-week2
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/01/14/Notes%EF%BC%9ATemporal%20Relational%20Reasoning%20in%20Videos/" rel="next" title="Notes：Temporal Relational Reasoning in Videos">
+                  Notes：Temporal Relational Reasoning in Videos <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

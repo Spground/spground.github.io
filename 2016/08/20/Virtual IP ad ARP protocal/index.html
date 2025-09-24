@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. 虚拟IP虚拟IP（Virtual IP Address），是一种不与特定计算机或者特定计算机网卡相对应的IP地址。所有发往这个IP地址的数据包最后都会经过真实的网卡到达目的主机的目的进程。 引用维基上面的定义：  A virtual IP address (VIP or VIPA) is an IP address that doesn’t correspond to an actual p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟IP与ARP协议">
+<meta property="og:url" content="https://spground.github.io/2016/08/20/Virtual%20IP%20ad%20ARP%20protocal/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. 虚拟IP虚拟IP（Virtual IP Address），是一种不与特定计算机或者特定计算机网卡相对应的IP地址。所有发往这个IP地址的数据包最后都会经过真实的网卡到达目的主机的目的进程。 引用维基上面的定义：  A virtual IP address (VIP or VIPA) is an IP address that doesn’t correspond to an actual p">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.blog.csdn.net/20171118164743381?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="article:published_time" content="2016-08-20T02:47:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.568Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="ARP协议">
+<meta property="article:tag" content="虚拟IP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20171118164743381?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+
+
+<link rel="canonical" href="https://spground.github.io/2016/08/20/Virtual%20IP%20ad%20ARP%20protocal/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2016/08/20/Virtual%20IP%20ad%20ARP%20protocal/","path":"2016/08/20/Virtual IP ad ARP protocal/","title":"虚拟IP与ARP协议"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>虚拟IP与ARP协议 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%99%9A%E6%8B%9FIP"><span class="nav-number">1.</span> <span class="nav-text">1. 虚拟IP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-ARP%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.</span> <span class="nav-text">2. ARP协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-ARP%E5%8D%8F%E8%AE%AE"><span class="nav-number">2.1.</span> <span class="nav-text">2.1  ARP协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-ARP%E7%BC%93%E5%AD%98"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 ARP缓存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E8%99%9A%E6%8B%9FIP%E4%B8%8EARP%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.</span> <span class="nav-text">3. 虚拟IP与ARP协议</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2016/08/20/Virtual%20IP%20ad%20ARP%20protocal/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="虚拟IP与ARP协议 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          虚拟IP与ARP协议
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-08-20 10:47:00" itemprop="dateCreated datePublished" datetime="2016-08-20T10:47:00+08:00">2016-08-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-虚拟IP"><a href="#1-虚拟IP" class="headerlink" title="1. 虚拟IP"></a>1. 虚拟IP</h2><p><strong>虚拟IP（Virtual IP Address），是一种不与特定计算机或者特定计算机网卡相对应的IP地址。所有发往这个IP地址的数据包最后都会经过真实的网卡到达目的主机的目的进程。</strong></p>
+<p>引用<a href="https://en.wikipedia.org/wiki/Virtual_IP_address">维基</a>上面的定义：</p>
+<blockquote>
+<p>A virtual IP address (VIP or VIPA) is an IP address that doesn’t correspond to an actual physical network interface (port). Uses for VIPs include network address translation (especially, one-to-many NAT), fault-tolerance, and mobility.</p>
+</blockquote>
+<p>虚拟IP主要是用来网络地址转换，网络容错和可移动性。</p>
+<p>虚拟IP比较常见的一个用例就是在**系统高可用性（High Availability HA）**方面的应用，通常一个系统会因为日常维护或者非计划外的情况而发生宕机，为了提高系统对外服务的高可用性，就会采用主备模式进行高可用性的配置。</p>
+<p>当提供服务的主机<code>M</code>宕机后，服务会切换到备用主机<code>S</code>继续对外提供服务。而这一切用户是感觉不到的，在这种情况下系统对客户端提供服务的<code>IP</code>地址就会是一个<code>虚拟IP</code>，当主机<code>M</code>宕机后，<code>虚拟IP</code>便会漂浮到备机上，继续提供服务。<br>​<br> 在这种情况下，<strong><code>虚拟IP</code>就不是与特定计算主机或者特定某个物理网卡对应</strong>，而是一种逻辑的概念。它是可以自由移动（自由漂浮）的，这样既对外屏蔽了系统内部的细节，又为系统内部的<strong>可维护性和扩展性</strong>提供了方便。</p>
+<h2 id="2-ARP协议"><a href="#2-ARP协议" class="headerlink" title="2. ARP协议"></a>2. ARP协议</h2><h3 id="2-1-ARP协议"><a href="#2-1-ARP协议" class="headerlink" title="2.1  ARP协议"></a>2.1  ARP协议</h3><p> <code>ARP</code>协议属于<code>TCP/IP</code>协议族里一种将<code>IP</code>地址解析为<code>MAC</code>地址的协议，位于<code>TCP/IP</code>五层模型中的<strong>网络层</strong>。该协议是用来在局域网内<strong>解析<code>IP地址</code>对应的物理地址</strong>。</p>
+<p><img src="http://img.blog.csdn.net/20171118164743381?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>通常一个主机<code>A</code>给另一个主机<code>B</code>通过网络发送一个<code>IP</code>数据报的时候，首先会发送到主机<code>A</code>所在网络的的<strong>路由器</strong>上面，然后<strong>路由器</strong>会判断目的地址是否在本网络内，是则直接转发到本网络内的目的主机；否则会继续传递到下一个路由，直到到达指定的网络的<strong>路由器</strong>，指定网络的路由器会将此数据报发送到<strong>目的主机</strong>。</p>
+<p>整个过程最后都会涉及到由某一个网络的<strong>路由器（或者网关）<strong>将数据发送到网内某一主机的过程。这个过程通常是由</strong>路由器</strong>发送一个<strong>ARP广播请求</strong>，请求<code>IP</code>地址和数据包目的<code>IP</code>地址一致的主机将它自己的<code>MAC</code>地址返回给<strong>路由器</strong>，因为<strong>数据链路层的数据传输是通过物理地址传输的</strong>。</p>
+<p><strong>ARP请求</strong>会广播到所有局域网内的主机，网内其他主机收到这个<strong>ARP请求</strong>后</p>
+<ol>
+<li><p>检查发送<strong>ARP请求</strong>的主机的<strong>IP地址</strong></p>
+</li>
+<li><p>将该<strong>IP地址</strong>和其对应的<strong>MAC</strong>地址存放在<strong>ARP缓存</strong>中</p>
+</li>
+<li><p>检查这个ARP请求中请求的<code>IP</code>地址是否为自己的<code>IP</code>地址，是则发送一个<code>ARP</code>应答，应答包含自己的<code>IP地址</code>和对应的<code>MAC</code>地址。</p>
+</li>
+</ol>
+<p>当网络内的路由器得到了<strong>MAC</strong>地址后，便可以通过数据链路层将数据包正确传输到目的主机上了。</p>
+<h3 id="2-2-ARP缓存"><a href="#2-2-ARP缓存" class="headerlink" title="2.2 ARP缓存"></a>2.2 ARP缓存</h3><p> <strong>ARP</strong>协议中比较重要的内容之一就是<strong>ARP缓存</strong>，主机操作系统会将<strong>IP地址</strong>与<strong>MAC地址</strong>的映射关系存放在主机的一片高速缓存中。</p>
+<ul>
+<li><p>缓存失效：该缓存会在一定时间内失效，失效后，请求该IP地址时需要广播<code>arp</code>请求重新获取<code>IP</code>地址对应的<code>MAC</code>地址</p>
+</li>
+<li><p>缓存更新：当收到<code>ARP</code>请求时，会将发送<code>ARP</code>请求的主机<code>IP</code>地址与<code>MAC</code>地址记录下来，然后去更新本机<code>ARP</code>缓存中对应的记录</p>
+</li>
+</ul>
+<h2 id="3-虚拟IP与ARP协议"><a href="#3-虚拟IP与ARP协议" class="headerlink" title="3. 虚拟IP与ARP协议"></a>3. 虚拟IP与ARP协议</h2><p>虚拟IP常用于系统高可用性的场景，那么虚拟IP实现的原理是什么?虚拟能够自由漂浮的原理是什么？</p>
+<p>从前文介绍arp协议里面来看，主机与主机的通信过程都会涉及到一个ip地址转换mac地址的过程，那么虚拟IP的通信也不会例外。因此，IP地址在主机通信的过程中其实就是一个逻辑地址。</p>
+<p>我们知道，每一个主机都存放着网络内一些主机的逻辑地址与物理地址（MAC地址）的映射，那么问题来了：</p>
+<p>当虚拟<code>IP</code>（简称<code>VIP</code>）在主机A上时，主机<code>A</code>的<code>MAC</code>地址为<code>MAC_A</code>，某主机<code>M</code>的<code>arp缓存</code>中存放着一个映射关系：<strong>VIP &lt;–&gt; MAC_A</strong>；当主机<code>A</code>宕机后, <code>VIP</code>漂浮到了主机<code>B</code>，主机<code>B</code>的<code>MAC</code>地址为<code>MAC_B</code>，那么此时主机<code>M</code>想与虚拟<code>IP</code>通信时，是做不到的；因为它的<code>arp</code>高速缓存中的<code>VIP</code>的映射还指向主机<code>A</code>的<code>MAC</code>地址。这个问题解决的思路就是当<code>虚拟IP</code>漂浮后，刷新所有其他主机的<code>arp缓存</code>。</p>
+<p>那么虚拟IP是如何实现漂浮后，是如何刷新所有其他主机的<strong>ARP缓存</strong>的呢？</p>
+<p> 这里就会引入另一个概念，<strong>GARP(简称无端ARP或者免费ARP)</strong>，主要是用来当某一个主机<code>C</code>开机时，用来确认自己的<code>IP</code>地址没有被人占用而做的一个检测。广播发送这个<code>arp</code>，请求得到本机<code>IP</code>地址的<code>MAC</code>地址，主机<code>C</code>并不希望此次<code>arp</code>请求会有<code>arp</code>应答，<strong>因为应答意味着IP地址冲突了</strong>。<strong>当其他主机收到这个arp请求后，会刷新关于这个arp请求源的主机IP地址的映射。</strong></p>
+<p><code>GARP</code>的作用主要有两个:</p>
+<ol>
+<li>检测IP地址是否有冲突</li>
+<li>刷新其他主机关于本次IP地址的映射关系</li>
+</ol>
+<p>集群管理软件<strong>Pacemaker</strong>里面的资源代理<code>ocf:heartbeat:IPaddr2</code>中，在<code>虚拟IP</code>漂浮后，会向网络内广播发送<code>garp</code>请求，以此来刷新其他主机的<code>arp</code>缓存。</p>
+<p>在配置<strong>OpenStack</strong>控制节点高可用性的时候，出现过虚拟IP切换时，某一个主机不能通信的问题，后来发现是arp缓存没有刷新，有时候由于网络的原因，某些主机没有接收到此<code>garp</code>请求，因此<code>ocf:heartbeat:IPaddr2</code>资源代理中可以配置发送<code>garp</code>的次数，这里建议次数配置得多一点，这样可以保证其他主机成功刷新<code>arp</code>缓存。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%99%9A%E6%8B%9FIP/" rel="tag"># 虚拟IP</a>
+              <a href="/tags/ARP%E5%8D%8F%E8%AE%AE/" rel="tag"># ARP协议</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2015/06/28/Java%20primitive%20type/" rel="prev" title="Java基本数据类型">
+                  <i class="fa fa-angle-left"></i> Java基本数据类型
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/09/13/Common%20Data%20Structure%20Stack's%20Applocation-Evaluate%20expression/" rel="next" title="常用数据结构栈的应用----表达式求值">
+                  常用数据结构栈的应用----表达式求值 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

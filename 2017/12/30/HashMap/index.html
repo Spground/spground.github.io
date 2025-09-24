@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. HashMap工作原理HashMap作为优秀的Java集合框架中的一个重要的成员，在很多编程场景下为我们所用。HashMap作为数据结构散列表的一种实现，就其工作原理来讲单独列出一篇博客来讲都是不过分的。由于本文主要是简单总结其扩容机制，因此对于HashMap的实现原理仅做简单的概述。 HashMap内部实现是一个桶数组，每个桶中存放着一个单链表的头结点。其中每个结点存储的是一个键值对整体（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HashMap工作原理和扩容机制">
+<meta property="og:url" content="https://spground.github.io/2017/12/30/HashMap/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. HashMap工作原理HashMap作为优秀的Java集合框架中的一个重要的成员，在很多编程场景下为我们所用。HashMap作为数据结构散列表的一种实现，就其工作原理来讲单独列出一篇博客来讲都是不过分的。由于本文主要是简单总结其扩容机制，因此对于HashMap的实现原理仅做简单的概述。 HashMap内部实现是一个桶数组，每个桶中存放着一个单链表的头结点。其中每个结点存储的是一个键值对整体（">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://spground.github.io/images/hashmap.png">
+<meta property="og:image" content="http://tech.meituan.com/img/java-hashmap/jdk1.8%20hashMap%E6%89%A9%E5%AE%B9%E4%BE%8B%E5%9B%BE.png">
+<meta property="article:published_time" content="2017-12-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.565Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="hash">
+<meta property="article:tag" content="hashCode">
+<meta property="article:tag" content="map">
+<meta property="article:tag" content="rehash">
+<meta property="article:tag" content="resize">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://spground.github.io/images/hashmap.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2017/12/30/HashMap/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2017/12/30/HashMap/","path":"2017/12/30/HashMap/","title":"HashMap工作原理和扩容机制"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>HashMap工作原理和扩容机制 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-HashMap%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">1. HashMap工作原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-HashMap%E6%89%A9%E5%AE%B9"><span class="nav-number">2.</span> <span class="nav-text">2. HashMap扩容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-HashMap%E7%9A%84%E6%89%A9%E5%AE%B9%E6%97%B6%E6%9C%BA"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 HashMap的扩容时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-HashMap%E7%9A%84%E6%89%A9%E5%AE%B9%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 HashMap的扩容过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E8%A1%A5%E5%85%85"><span class="nav-number">3.</span> <span class="nav-text">3. 补充</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%AE%B9%E9%87%8F%E5%BF%85%E9%A1%BB%E6%98%AF2%E7%9A%84%E5%B9%82"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 容量必须是2的幂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-rehash"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 rehash</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-References"><span class="nav-number">4.</span> <span class="nav-text">4 References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2017/12/30/HashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="HashMap工作原理和扩容机制 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HashMap工作原理和扩容机制
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-12-30 00:00:00" itemprop="dateCreated datePublished" datetime="2017-12-30T00:00:00+08:00">2017-12-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java%E6%BA%90%E7%A0%81/" itemprop="url" rel="index"><span itemprop="name">Java源码</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-HashMap工作原理"><a href="#1-HashMap工作原理" class="headerlink" title="1. HashMap工作原理"></a>1. HashMap工作原理</h2><p><code>HashMap</code>作为优秀的<code>Java</code>集合框架中的一个重要的成员，在很多编程场景下为我们所用。<code>HashMap</code>作为数据结构散列表的一种实现，就其工作原理来讲单独列出一篇博客来讲都是不过分的。由于本文主要是简单总结其扩容机制，因此对于<code>HashMap</code>的实现原理仅做简单的概述。</p>
+<p><code>HashMap</code>内部实现是一个<strong>桶数组</strong>，每个桶中存放着一个<strong>单链表</strong>的头结点。其中每个结点存储的是一个<strong>键值对</strong>整体（<code>Entry</code>），<code>HashMap</code>采用<strong>拉链法</strong>解决<strong>哈希冲突</strong>（关于哈希冲突后面会介绍）。</p>
+<p><em>由于<code>Java8</code>对<code>HashMap</code>的某些地方进行了优化，以下的总结和源码分析都是基于<code>Java7</code>。</em></p>
+<p>示意图如下：</p>
+<p><img src="/images/hashmap.png"></p>
+<p><code>HashMap</code>提供两个重要的基本操作，<code>put(K, V)</code>和<code>get(K)</code>。</p>
+<ul>
+<li>当调用<code>put</code>操作时，<code>HashMap</code>计算键值K的哈希值，然后将其对应到<code>HashMap</code>的某一个桶(<code>bucket</code>)上；此时找到以这个桶为头结点的一个单链表，然后顺序遍历该单链表找到某个节点的<code>Entry</code>中的<code>Key</code>是<strong>等于</strong>给定的参数K；若找到，则将其的<code>old V</code>替换为参数指定的<code>V</code>；否则直接在链表尾部插入一个新的<code>Entry</code>节点。</li>
+<li>对于<code>get(K)</code>操作类似于<code>put</code>操作，<code>HashMap</code>通过计算键的哈希值，先找到对应的桶，然后遍历桶存放的单链表通过比照<code>Entry</code>的键来找到对应的值。</li>
+</ul>
+<p>以上就是<code>HashMap</code>的基本工作原理，但是问题总是比我们看到的要复杂。由于哈希是一种压缩映射，换句话说就是每一个<code>Entry</code>节点无法对应到一个<strong>只属于</strong>自己的桶，那么必然会存在多个<code>Entry</code>共用一个桶，拉成一条链表的情况，这种情况叫做<strong>哈希冲突</strong>。当哈希冲突产生严重的情况，某一个桶后面挂着的链表就会特别长，我们知道<strong>查找</strong>最怕看见的就是顺序查找，那几乎就是无脑查找。</p>
+<p><strong>哈希冲突</strong>无法完全避免，因此为了提高<code>HashMap</code>的性能，<code>HashMap</code>不得尽量<strong>缓解</strong>哈希冲突以<strong>缩短</strong>每个桶的外挂链表长度。</p>
+<p>频繁产生哈希冲突最重要的原因就像是<strong>要存储的Entry太多，而桶不够</strong>，这和供不应求的矛盾类似。因此，当<code>HashMap</code>中的存储的<code>Entry</code>较多的时候，我们就要考虑<strong>增加桶的数量</strong>，这样对于后续要存储的<code>Entry</code>来讲，就会大大缓解哈希冲突。</p>
+<p>因此就涉及到<code>HashMap</code>的扩容，上面算是回答了为什么扩容，那么什么时候扩容？扩容多少？怎么扩容？便是第二部分要总结的了。</p>
+<h2 id="2-HashMap扩容"><a href="#2-HashMap扩容" class="headerlink" title="2. HashMap扩容"></a>2. HashMap扩容</h2><h3 id="2-1-HashMap的扩容时机"><a href="#2-1-HashMap的扩容时机" class="headerlink" title="2.1 HashMap的扩容时机"></a>2.1 HashMap的扩容时机</h3><p>在使用<code>HashMap</code>的过程中，我们经常会遇到这样一个带参数的构造方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">HashMap</span><span class="params">(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor)</span> ;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第一个参数：初始容量，指明初始的桶的个数；相当于桶数组的大小。</li>
+<li>第二个参数：装载因子，是一个0-1之间的系数，根据它来确定需要扩容的阈值，默认值是0.75。</li>
+</ul>
+<p>现在开始通过源码来寻找扩容的时机：</p>
+<p><code>put(K, V)</code>操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">put</span><span class="params">(K key, V value)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (key == <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> putForNullKey(value);</span><br><span class="line">        <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> hash(key);<span class="comment">//计算键的hash值</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> indexFor(hash, table.length);<span class="comment">//通过hash值对应到桶位置</span></span><br><span class="line">        <span class="keyword">for</span> (Entry&lt;K,V&gt; e = table[i]; e != <span class="literal">null</span>; e = e.next) &#123;<span class="comment">//顺序遍历桶外挂的单链表</span></span><br><span class="line">            Object k;</span><br><span class="line">            <span class="keyword">if</span> (e.hash == hash &amp;&amp; ((k = e.key) == key || key.equals(k))) &#123;<span class="comment">//注意这里的键的比较方式== 或者 equals()</span></span><br><span class="line">                <span class="type">V</span> <span class="variable">oldValue</span> <span class="operator">=</span> e.value;</span><br><span class="line">                e.value = value;</span><br><span class="line">                e.recordAccess(<span class="built_in">this</span>);</span><br><span class="line">                <span class="keyword">return</span> oldValue;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        modCount++;</span><br><span class="line">        addEntry(hash, key, value, i);<span class="comment">//遍历单链表完毕，没有找到与键相对的Entry，需要新建一个Entry换句话说就是桶i是一个空桶；</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>既然找到一个空桶，那么新建的<code>Entry</code>必然会是这个桶外挂单链表的第一个结点。通过<code>addEntry</code>，找到了扩容的时机。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Adds a new entry with the specified key, value and hash code to</span></span><br><span class="line"><span class="comment"> * the specified bucket.  It is the responsibility of this</span></span><br><span class="line"><span class="comment"> * method to resize the table if appropriate.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Subclass overrides this to alter the behavior of put method.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">addEntry</span><span class="params">(<span class="type">int</span> hash, K key, V value, <span class="type">int</span> bucketIndex)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> ((size &gt;= threshold) &amp;&amp; (<span class="literal">null</span> != table[bucketIndex])) &#123;<span class="comment">//当size大于等于某一个阈值thresholdde时候且该桶并不是一个空桶；</span></span><br><span class="line">      <span class="comment">/*这个这样说明比较好理解：因为size 已经大于等于阈值了，说明Entry数量较多，哈希冲突严重，那么若该Entry对应的桶不是一个空桶，这个Entry的加入必然会把原来的链表拉得更长，因此需要扩容；若对应的桶是一个空桶，那么此时没有必要扩容。*/</span></span><br><span class="line">        resize(<span class="number">2</span> * table.length);<span class="comment">//将容量扩容为原来的2倍</span></span><br><span class="line">        hash = (<span class="literal">null</span> != key) ? hash(key) : <span class="number">0</span>;</span><br><span class="line">        bucketIndex = indexFor(hash, table.length);<span class="comment">//扩容后的，该hash值对应的新的桶位置</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    createEntry(hash, key, value, bucketIndex);<span class="comment">//在指定的桶位置上，创建一个新的Entry</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Like addEntry except that this version is used when creating entries</span></span><br><span class="line"><span class="comment"> * as part of Map construction or &quot;pseudo-construction&quot; (cloning,</span></span><br><span class="line"><span class="comment"> * deserialization).  This version needn&#x27;t worry about resizing the table.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Subclass overrides this to alter the behavior of HashMap(Map),</span></span><br><span class="line"><span class="comment"> * clone, and readObject.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">createEntry</span><span class="params">(<span class="type">int</span> hash, K key, V value, <span class="type">int</span> bucketIndex)</span> &#123;</span><br><span class="line">    Entry&lt;K,V&gt; e = table[bucketIndex];</span><br><span class="line">    table[bucketIndex] = <span class="keyword">new</span> <span class="title class_">Entry</span>&lt;&gt;(hash, key, value, e);<span class="comment">//链表的头插法插入新建的Entry</span></span><br><span class="line">    size++;<span class="comment">//更新size</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>上面有几个重要成员变量：</p>
+<ul>
+<li>size</li>
+<li>threshold</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * The number of key-value mappings contained in this map.</span></span><br><span class="line"><span class="comment">  */</span>    </span><br><span class="line"><span class="keyword">transient</span> <span class="type">int</span> size;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * The next size value at which to resize (capacity * load factor).</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@serial</span></span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="type">int</span> threshold;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * The load factor for the hash table.</span></span><br><span class="line"><span class="comment">  *</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@serial</span></span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="keyword">final</span> <span class="type">float</span> loadFactor;</span><br></pre></td></tr></table></figure>
+
+<p>由注释可以知道：</p>
+<ul>
+<li><p>size记录的是map中包含的Entry的数量</p>
+</li>
+<li><p>而threshold记录的是需要resize的阈值 且 <code>threshold = loadFactor * capacity</code></p>
+</li>
+<li><p>capacity 其实就是桶的长度</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">threshold = (<span class="type">int</span>)Math.min(newCapacity * loadFactor, MAXIMUM_CAPACITY + <span class="number">1</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>因此现在总结出扩容的时机：</p>
+<p><strong>当<code>map</code>中包含的<code>Entry</code>的数量大于等于<code>threshold = loadFactor * capacity</code>的时候，且新建的<code>Entry</code>刚好落在一个非空的桶上，此刻触发扩容机制，将其容量扩大为2倍。</strong>（为什么2倍，而不是1.5倍，3倍，10倍；解释见最后的补充）</p>
+<p>当<code>size</code>大于等于<code>threshold</code>的时候，并不一定会触发扩容机制，但是会很可能就触发扩容机制，只要有一个新建的<code>Entry</code>出现哈希冲突，则立刻<code>resize</code>。</p>
+<p>  直到这里我们回答了什么时候扩容和扩容多少的问题，那么下面回答如何扩容的问题。</p>
+<h3 id="2-2-HashMap的扩容过程"><a href="#2-2-HashMap的扩容过程" class="headerlink" title="2.2 HashMap的扩容过程"></a>2.2 HashMap的扩容过程</h3><p>上面有一个很重要的方法，包含了几乎属于的扩容过程，这就是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">resize()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Rehashes the contents of this map into a new array with a</span></span><br><span class="line"><span class="comment"> * larger capacity.  This method is called automatically when the</span></span><br><span class="line"><span class="comment"> * number of keys in this map reaches its threshold.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * If current capacity is MAXIMUM_CAPACITY, this method does not</span></span><br><span class="line"><span class="comment"> * resize the map, but sets threshold to Integer.MAX_VALUE.</span></span><br><span class="line"><span class="comment"> * This has the effect of preventing future calls.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> newCapacity the new capacity, MUST be a power of two;</span></span><br><span class="line"><span class="comment"> *        must be greater than current capacity unless current</span></span><br><span class="line"><span class="comment"> *        capacity is MAXIMUM_CAPACITY (in which case value</span></span><br><span class="line"><span class="comment"> *        is irrelevant).</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">resize</span><span class="params">(<span class="type">int</span> newCapacity)</span> &#123;</span><br><span class="line">    Entry[] oldTable = table;</span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCapacity</span> <span class="operator">=</span> oldTable.length;</span><br><span class="line">    <span class="keyword">if</span> (oldCapacity == MAXIMUM_CAPACITY) &#123;<span class="comment">//最大容量为 1 &lt;&lt; 30</span></span><br><span class="line">        threshold = Integer.MAX_VALUE;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Entry[] newTable = <span class="keyword">new</span> <span class="title class_">Entry</span>[newCapacity];<span class="comment">//新建一个新表</span></span><br><span class="line">    <span class="type">boolean</span> <span class="variable">oldAltHashing</span> <span class="operator">=</span> useAltHashing;</span><br><span class="line">    useAltHashing |= sun.misc.VM.isBooted() &amp;&amp;</span><br><span class="line">            (newCapacity &gt;= Holder.ALTERNATIVE_HASHING_THRESHOLD);</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">rehash</span> <span class="operator">=</span> oldAltHashing ^ useAltHashing;<span class="comment">//是否再hash</span></span><br><span class="line">    transfer(newTable, rehash);<span class="comment">//完成旧表到新表的转移</span></span><br><span class="line">    table = newTable;</span><br><span class="line">    threshold = (<span class="type">int</span>)Math.min(newCapacity * loadFactor, MAXIMUM_CAPACITY + <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Transfers all entries from current table to newTable.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Entry[] newTable, <span class="type">boolean</span> rehash)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">newCapacity</span> <span class="operator">=</span> newTable.length;</span><br><span class="line">    <span class="keyword">for</span> (Entry&lt;K,V&gt; e : table) &#123;<span class="comment">//遍历同桶数组中的每一个桶</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="literal">null</span> != e) &#123;<span class="comment">//顺序遍历某个桶的外挂链表</span></span><br><span class="line">            Entry&lt;K,V&gt; next = e.next;<span class="comment">//引用next</span></span><br><span class="line">            <span class="keyword">if</span> (rehash) &#123;</span><br><span class="line">                e.hash = <span class="literal">null</span> == e.key ? <span class="number">0</span> : hash(e.key);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> indexFor(e.hash, newCapacity);<span class="comment">//找到新表的桶位置;原桶数组中的某个桶上的同一链表中的Entry此刻可能被分散到不同的桶中去了，有效的缓解了哈希冲突。</span></span><br><span class="line">            e.next = newTable[i];<span class="comment">//头插法插入新表中</span></span><br><span class="line">            newTable[i] = e;</span><br><span class="line">            e = next;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>resize</code>的过程，相对来讲是比较简单清晰易于理解的。<strong>旧桶数组中的某个桶的外挂单链表是通过头插法插入新桶数组中的，并且原链表中的Entry结点并不一定仍然在新桶数组的同一链表</strong>。</p>
+<p>示意图如下：</p>
+<p><img src="http://tech.meituan.com/img/java-hashmap/jdk1.8%20hashMap%E6%89%A9%E5%AE%B9%E4%BE%8B%E5%9B%BE.png"></p>
+<p>这里很容易就想到多线程情况下，隐约感觉这个<code>transfer</code>方法在多线程环境下会乱套。事实上也是这样的，由于<strong>缺乏同步机制</strong>，当多个线程同时<code>resize</code>的时候，某个线程<code>t</code>所持有的引用<code>next</code>（参考上面代码<code>next</code>指向原桶数组中某个桶外挂单链表的下一个需要转移的<code>Entry</code>），可能已经被转移到了新桶数组中，那么最后该线程<code>t</code>实际上在对新的桶数组进行<code>transfer</code>操作。</p>
+<p>如果有更多的线程出现这种情况，那很可能出现大量线程都在对<strong>新桶数组</strong>进行<code>transfer</code>，那么就会出现多个线程对同一链表<strong>无限进行链表反转</strong>的操作，极易造成死循环，数据丢失等等，因此<code>HashMap</code>不是线程安全的，考虑在多线程环境下使用并发工具包下的<code>ConcurrentHashMap</code>。</p>
+<h2 id="3-补充"><a href="#3-补充" class="headerlink" title="3. 补充"></a>3. 补充</h2><h3 id="3-1-容量必须是2的幂"><a href="#3-1-容量必须是2的幂" class="headerlink" title="3.1 容量必须是2的幂"></a>3.1 容量必须是2的幂</h3><p>在<code>resize()</code>，为什么容量需要时2倍这样扩张，而不是1.5倍，3倍，10倍，另外在<code>HashMap</code>中有如下的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The default initial capacity - MUST be a power of two.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">16</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">HashMap</span><span class="params">(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (initialCapacity &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Illegal initial capacity: &quot;</span> +</span><br><span class="line">                                               initialCapacity);</span><br><span class="line">        <span class="keyword">if</span> (initialCapacity &gt; MAXIMUM_CAPACITY)</span><br><span class="line">            initialCapacity = MAXIMUM_CAPACITY;</span><br><span class="line">        <span class="keyword">if</span> (loadFactor &lt;= <span class="number">0</span> || Float.isNaN(loadFactor))</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Illegal load factor: &quot;</span> +</span><br><span class="line">                                               loadFactor);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Find a power of 2 &gt;= initialCapacity 找到一个大于等于初始容量的且是2的幂的数作为实际容量</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">capacity</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (capacity &lt; initialCapacity)</span><br><span class="line">            capacity &lt;&lt;= <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.loadFactor = loadFactor;</span><br><span class="line">        threshold = (<span class="type">int</span>)Math.min(capacity * loadFactor, MAXIMUM_CAPACITY + <span class="number">1</span>);</span><br><span class="line">        table = <span class="keyword">new</span> <span class="title class_">Entry</span>[capacity];</span><br><span class="line">        useAltHashing = sun.misc.VM.isBooted() &amp;&amp;</span><br><span class="line">                (capacity &gt;= Holder.ALTERNATIVE_HASHING_THRESHOLD);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过以上我们知道<code>HashMap</code>的容量必须是2的幂，那么为什么要这么设计呢？答案当然是为了性能。在<code>HashMap</code>通过键的哈希值进行定位桶位置的时候，调用了一个<code>indexFor(hash, table.length);</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Returns index for hash code h.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">indexFor</span><span class="params">(<span class="type">int</span> h, <span class="type">int</span> length)</span> &#123;</span><br><span class="line">       <span class="keyword">return</span> h &amp; (length-<span class="number">1</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到这里是将哈希值<code>h</code>与桶数组的<code>length-1</code>（实际上也是<code>map</code>的容量-1）进行了一个与操作得出了对应的桶的位置，<code>h &amp; (length-1)</code>。</p>
+<p>但是为什么不采用<code>h % length</code>这种计算方式呢？</p>
+<p><a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4631373">https://bugs.java.com/bugdatabase/view_bug.do?bug_id&#x3D;4631373</a>中提出<code>Java</code>的<code>%</code>、<code>/</code>操作比<code>&amp;</code>慢10倍左右，因此采用<code>&amp;</code>运算会提高性能。</p>
+<p>**通过限制<code>length</code>是一个<code>2的幂</code>数，<code>h &amp; (length-1)</code>和<code>h % length</code>结果是一致的。**这就是为什么要限制容量必须是一个<code>2</code>的幂的原因。</p>
+<p>举个简单的例子说明这两个操作的结果一致性：</p>
+<p>假设有个<code>hashcode</code>是311，对应的二进制是(1 0011 0111)</p>
+<p><code>length</code>为16，对应的二进制位(1 0000)</p>
+<ul>
+<li><p><code>%</code>操作：311 &#x3D; 16*19 + 7；所以结果为7，二进制位(0111)；</p>
+</li>
+<li><p><code>&amp;</code>操作：(1 0011 0111) &amp; (0111) &#x3D; 0111 &#x3D; 7, 二进制位(0111)</p>
+<p> 1 0011 0111 &#x3D; (1 0011 0000) + (0111) &#x3D; (1*2^4 + 1* 2^5 + 0*2^6 + 0*2^7 + 1*2^8 ) + 7 &#x3D; <strong>2^4</strong>*(1 + 2 + 0 + 0 + 16) + 7 &#x3D; <strong>16</strong> * 19 + 7; 和<code>%</code>操作一致。</p>
+<p>如果<code>length</code>是一个2的幂的数，那么<code>length-1</code>就会变成一个<code>mask</code>, 它会将<code>hashcode</code>低位取出来，<code>hashcode</code>的<strong>低位实际就是余数</strong>，和取余操作相比，与操作会将性能提升很多。</p>
+</li>
+</ul>
+<h3 id="3-2-rehash"><a href="#3-2-rehash" class="headerlink" title="3.2 rehash"></a>3.2 rehash</h3><p>通过上面的分析可以看出，不同的键的的<code>hashcode</code>仅仅只能通过<strong>低位</strong>来区分。<strong>高位的信息</strong>没有被充分利用，举个例子：</p>
+<p>假设容量为为<code>16</code>，  二进制位(<code>10000</code>)。</p>
+<p><code>key1</code>的<code>hashcode</code>为<code>11111 10101</code>，另一个<code>key2</code>的<code>hashcode</code>为<code>00000 10101</code>，很明显这两个<code>hashcode</code>不是一样的，甚至连相似性（例如海明距离）也是很远的。但是直接进行<code>&amp;</code>操作得出的桶位置是同一个桶，这直接就产生了<strong>哈希冲突</strong>。</p>
+<p>由于键的<code>hashCode</code>是<code>HashMap</code>的使用者来设计的，主要也就是我们这群程序员，由于设计一个良好的<code>hashcode</code>分布，是比较困难的，因此会容易出现分布质量差的<code>hashcode</code>分布，<strong>极端情况就是：所有的<code>hashCode</code>低位全相等，而高位不相等</strong>，这大大加大了哈希冲突，降低了<code>HashMap</code>的性能。</p>
+<p>为了防止这种情况的出现，<code>HashMap</code>它使用一个<strong>supplemental hash function</strong>对键的<code>hashCode</code>再进行了一个<strong>supplemental hash</strong> ，将最终的<code>hash</code>值作为键的<code>hash</code>值来进行桶的位置映射（也就是说<code>JDK</code>团队在为我们这群程序员加性能保险<code>Orz</code>）。这个过程叫做再哈希(<code>rehash</code>)。</p>
+<p>经过一个<strong>supplemental hash</strong>过程后，能保证<strong>海明距离为常数</strong>的不同的<code>hashcode</code>有一个<strong>哈希冲突次数上界</strong>（装载因子为0.75的时候，大约是8次）。</p>
+<p>参见下段代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Retrieve object hash code and applies a supplemental hash function to the</span></span><br><span class="line"><span class="comment">    * result hash, which defends against poor quality hash functions.  This is</span></span><br><span class="line"><span class="comment">    * critical because HashMap uses power-of-two length hash tables, that</span></span><br><span class="line"><span class="comment">    * otherwise encounter collisions for hashCodes that do not differ</span></span><br><span class="line"><span class="comment">    * in lower bits. Note: Null keys always map to hash 0, thus index 0.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object k)</span> &#123;</span><br><span class="line">       <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">       <span class="keyword">if</span> (useAltHashing) &#123;</span><br><span class="line">           <span class="keyword">if</span> (k <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">               <span class="keyword">return</span> sun.misc.Hashing.stringHash32((String) k);</span><br><span class="line">           &#125;</span><br><span class="line">           h = hashSeed;</span><br><span class="line">       &#125;</span><br><span class="line">   </span><br><span class="line">       h ^= k.hashCode();</span><br><span class="line">   </span><br><span class="line">       <span class="comment">// This function ensures that hashCodes that differ only by</span></span><br><span class="line">       <span class="comment">// constant multiples at each bit position have a bounded</span></span><br><span class="line">       <span class="comment">// number of collisions (approximately 8 at default load factor).</span></span><br><span class="line">       h ^= (h &gt;&gt;&gt; <span class="number">20</span>) ^ (h &gt;&gt;&gt; <span class="number">12</span>);</span><br><span class="line">       <span class="keyword">return</span> h ^ (h &gt;&gt;&gt; <span class="number">7</span>) ^ (h &gt;&gt;&gt; <span class="number">4</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-References"><a href="#4-References" class="headerlink" title="4 References"></a>4 References</h2><ol>
+<li><a href="http://www.javarticles.com/2012/11/hashmap-faq.html">http://www.javarticles.com/2012/11/hashmap-faq.html</a></li>
+<li><a href="http://blog.csdn.net/u014532901/article/details/78573740">http://blog.csdn.net/u014532901/article/details/78573740</a></li>
+<li><a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4631373">https://bugs.java.com/bugdatabase/view_bug.do?bug_id&#x3D;4631373</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/hashCode/" rel="tag"># hashCode</a>
+              <a href="/tags/hash/" rel="tag"># hash</a>
+              <a href="/tags/map/" rel="tag"># map</a>
+              <a href="/tags/resize/" rel="tag"># resize</a>
+              <a href="/tags/rehash/" rel="tag"># rehash</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/12/16/Java%20Array%20to%20Collection%20and%20Vise%20Verse/" rel="prev" title="Java Array、List、Set互相转化">
+                  <i class="fa fa-angle-left"></i> Java Array、List、Set互相转化
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/01/04/Isolation%20level%20in%20MySQL%20transactions/" rel="next" title="数据库事务隔离级别">
+                  数据库事务隔离级别 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

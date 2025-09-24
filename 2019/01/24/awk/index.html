@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="awkawk是最有用的shell工具之一，名字的来源是三位工程师的名字首字母。 awk introduction awk主要被用在文字和字符处理领域，作为一个通用的可编程过滤器。  awk面向域（field）而sed面向行（line），awk支持以文件、重定向、管道和标准输入作为程序的输入。更准确的来讲，awk是一种仅需几行代码就能够处理复杂任务的编程语言，和sed一样，它是一种pattern-a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="awk">
+<meta property="og:url" content="https://spground.github.io/2019/01/24/awk/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="awkawk是最有用的shell工具之一，名字的来源是三位工程师的名字首字母。 awk introduction awk主要被用在文字和字符处理领域，作为一个通用的可编程过滤器。  awk面向域（field）而sed面向行（line），awk支持以文件、重定向、管道和标准输入作为程序的输入。更准确的来讲，awk是一种仅需几行代码就能够处理复杂任务的编程语言，和sed一样，它是一种pattern-a">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://spground.github.io/images/awk.png">
+<meta property="article:published_time" content="2019-01-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T15:37:51.013Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="awk">
+<meta property="article:tag" content="shell utility">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://spground.github.io/images/awk.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2019/01/24/awk/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2019/01/24/awk/","path":"2019/01/24/awk/","title":"awk"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>awk | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#awk"><span class="nav-number">1.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#awk-introduction"><span class="nav-number">3.</span> <span class="nav-text">awk introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pattern-action"><span class="nav-number">4.</span> <span class="nav-text">pattern &amp; action</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#patterns"><span class="nav-number">4.0.1.</span> <span class="nav-text">patterns</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#actions"><span class="nav-number">4.0.2.</span> <span class="nav-text">actions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#varaibles"><span class="nav-number">4.0.3.</span> <span class="nav-text">varaibles</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#records"><span class="nav-number">4.0.4.</span> <span class="nav-text">records</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fields"><span class="nav-number">4.0.5.</span> <span class="nav-text">fields</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#selectoins"><span class="nav-number">4.0.5.1.</span> <span class="nav-text">selectoins</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#computings"><span class="nav-number">4.0.5.1.1.</span> <span class="nav-text">computings</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#strings-manipulation"><span class="nav-number">4.0.5.2.</span> <span class="nav-text">strings manipulation</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#control-flow"><span class="nav-number">5.</span> <span class="nav-text">control flow</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#array"><span class="nav-number">5.1.</span> <span class="nav-text">array</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#awk-predefined-variales"><span class="nav-number">5.2.</span> <span class="nav-text">awk predefined variales</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#built-in-functions"><span class="nav-number">5.3.</span> <span class="nav-text">built-in functions</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#code-snippets"><span class="nav-number">6.</span> <span class="nav-text">code snippets</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2019/01/24/awk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="awk | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          awk
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-01-24 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-24T00:00:00+08:00">2019-01-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 23:37:51" itemprop="dateModified" datetime="2025-09-24T23:37:51+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Misc/" itemprop="url" rel="index"><span itemprop="name">Misc</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h1><p>awk是最有用的shell工具之一，名字的来源是三位工程师的名字首字母。</p>
+<h1 id=""><a href="#" class="headerlink" title=""></a><img src="/images/awk.png"></h1><h1 id="awk-introduction"><a href="#awk-introduction" class="headerlink" title="awk introduction"></a>awk introduction</h1><blockquote>
+<p>awk主要被用在文字和字符处理领域，作为一个通用的可编程过滤器。</p>
+</blockquote>
+<p>awk面向域（field）而sed面向行（line），awk支持以文件、重定向、管道和标准输入作为程序的输入。<br />更准确的来讲，awk是一种仅需几行代码就能够处理复杂任务的编程语言，和sed一样，它是一种pattern-action语言，看起来和C语言类似，但是比C语言简单，它能够自动处理输入、域分割、初始化和内存管理等。</p>
+<p>awk相比较于sed的特色：</p>
+<ul>
+<li>方便的数字处理</li>
+<li>在action中的变量和控制流</li>
+<li>更便于访问行中的域</li>
+<li>灵活的输出</li>
+<li>内置丰富的算术和字符串函数</li>
+<li>类C风格</li>
+</ul>
+<p>awk的程序结构</p>
+<p>一段awk程序包括：</p>
+<ul>
+<li>一段可选的BEGIN语句块（主要用于做一些预处理）</li>
+<li>一些pattern-action组合</li>
+<li>一段可选的END语句块（主要用于做一些后处理）</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BEGIN &#123;action&#125;</span><br><span class="line">pattern &#123;action&#125;</span><br><span class="line">...</span><br><span class="line">pattern &#123;action&#125;</span><br><span class="line">END &#123;action&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有几种方式运行一段awk程序：<br />a. awk ‘program’ input_files<br />b. awk ‘program’ 标准输入作为程序输入<br />c. awk -f ‘program_files’ input_files</p>
+<h1 id="pattern-action"><a href="#pattern-action" class="headerlink" title="pattern &amp; action"></a>pattern &amp; action</h1><p>awk从一系列输入文件中去搜索指定的pattern，然后执行特定的action当在遇到包含特定pattern的行或者域。<br />awk不会修改输入文件，一次只处理一行。</p>
+<p>一个awk程序至少有一个pattern或者action</p>
+<ul>
+<li>默认的pattern是匹配所有的lines</li>
+<li>默认的action是打印当前的record</li>
+<li>action包含在{}内，而pattern直接列出。</li>
+</ul>
+<h3 id="patterns"><a href="#patterns" class="headerlink" title="patterns"></a>patterns</h3><p>pattern是一个决定是否后面action是否被执行的选择器。<br />pattern可以是：</p>
+<ul>
+<li>特殊测token，例如BEGIN和END</li>
+<li>正则表达式 包含在&#x2F;&#x2F;里面 例如 &#x2F;[a-z]&#x2F;</li>
+<li>字符串匹配表达式</li>
+<li>!表达式取反</li>
+<li>以及通过&amp;&amp; 、|| 链接符连接的上述任意表达式<ul>
+<li>&#x2F;NYU&#x2F;</li>
+<li>x &gt; 0</li>
+<li>&#x2F;NYU&#x2F; &amp;&amp; (name &#x3D;&#x3D; ‘UNIX Tools’)</li>
+</ul>
+</li>
+</ul>
+<p>特殊的pattern token</p>
+<ul>
+<li>BEGIN：预处理，常用于初始化一些内置变量例如FS、RS等；</li>
+<li>END：后处理</li>
+</ul>
+<h3 id="actions"><a href="#actions" class="headerlink" title="actions"></a>actions</h3><p>action可能包含一系列的类C的代码语句，执行一些类似算术、字符串表达式、声明以及输出。<br />action当<strong>每一行</strong>匹配一个pattern就会被执行，如果不指定pattern，action无条件执行，如果action不被指定，默认action是输出到标准设备。</p>
+<p>例子：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span>|awk <span class="string">&#x27;BEGIN &#123;print &quot;List all C language source files.&quot;&#125;</span></span><br><span class="line"><span class="string">/\.c$/ &#123;print&#125;</span></span><br><span class="line"><span class="string">END &#123;print &quot;List has been done!&quot;&#125;</span></span><br><span class="line"><span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="varaibles"><a href="#varaibles" class="headerlink" title="varaibles"></a>varaibles</h3><p>作为一门语言，那么awk脚本当然可以定义和使用变量。<br />例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">BEGIN &#123;<span class="built_in">sum</span> = 0&#125;</span><br><span class="line">&#123;<span class="built_in">sum</span> ++&#125;</span><br><span class="line">END &#123;<span class="built_in">print</span> <span class="built_in">sum</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>后面会介绍到，awk预定义了一些有用变量。</p>
+<h3 id="records"><a href="#records" class="headerlink" title="records"></a>records</h3><p>预定义变量：</p>
+<ul>
+<li>RS Record Separator</li>
+<li>NR Number of Records</li>
+</ul>
+<p>默认record seprator是newline，默认的awk一次处理一行。<br />RS可以是任意正则表达式，可以在BEGIN action中更改。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> temp.txt|awk <span class="string">&#x27;&#123;print &quot;#&quot;NR, $0&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的$0表示该记录的第0个域，$开头的数字变量都表示域编号。</p>
+<h3 id="fields"><a href="#fields" class="headerlink" title="fields"></a>fields</h3><p>预定义变量：</p>
+<ul>
+<li>NF：Number of Field</li>
+<li>FS：Filed Separator</li>
+</ul>
+<p>输入中的每一行都按域分隔符被拆分。</p>
+<ul>
+<li>awk预定义变量FS Filed Separator默认是空格（一个或多个空格或者tab）</li>
+<li>awk -Fc可以设置FS为字符c</li>
+<li>$0是当前所有行</li>
+<li>$1是第一个域….，$NF是最后一个域，以此类推<ul>
+<li>{print $(NF-2)} 倒数第三个域</li>
+</ul>
+</li>
+<li>计算和打印<ul>
+<li>{print $1, $2*$3}</li>
+</ul>
+</li>
+</ul>
+<p>默认的由”,”连接的项会被print打印为由单个空格连接的项。</p>
+<p>格式化输出：</p>
+<ul>
+<li>printf(fmt, val1, val2, …)</li>
+<li>{printf(“%-8s %6.2f\n”, $1, $2)}</li>
+</ul>
+<h4 id="selectoins"><a href="#selectoins" class="headerlink" title="selectoins"></a>selectoins</h4><p>前面提到awk是用作一个可编程的过滤器，用于处理文本和字符串。<br />除了前面提到的pattern（正则、begin&amp;end等），更有用的的awk pattern还可以是如下这样的表达式pattern：</p>
+<ul>
+<li>比较: $2 &gt;&#x3D; 50 {print}</li>
+<li>计算: $2 * $3 &gt; 50 {printf(“%6.2f “, $1)}</li>
+<li>文本内容:<ul>
+<li>$1 &#x3D;&#x3D; “NYU”</li>
+<li>$2 ~ &#x2F;NYU&#x2F;</li>
+</ul>
+</li>
+<li>模式组合: $2 &gt;&#x3D; 4 || $3 &gt;&#x3D; 20</li>
+<li>行号 NR &gt;&#x3D; 10 &amp;&amp; NR &lt;&#x3D; 20</li>
+<li>….</li>
+</ul>
+<h5 id="computings"><a href="#computings" class="headerlink" title="computings"></a>computings</h5><p>awk可以方便的对域进行一些基本的计算，例如：</p>
+<ul>
+<li>counting</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$3</span> &gt; 15 &#123;emp = emp + 1&#125;</span><br><span class="line">END &#123;<span class="built_in">printf</span>(<span class="string">&quot;%d empoyess worked more than 15 hours.&quot;</span>, emp)&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>average and sum</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;pay = pay + <span class="variable">$2</span> * <span class="variable">$3</span>&#125;</span><br><span class="line">END &#123;<span class="built_in">print</span> NR, <span class="string">&quot;employes&quot;</span></span><br><span class="line">		 <span class="built_in">print</span> <span class="string">&quot;total pay is &quot;</span>, pay</span><br><span class="line">     <span class="built_in">print</span> <span class="string">&quot;average pay is &quot;</span>, pay / NR&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="strings-manipulation"><a href="#strings-manipulation" class="headerlink" title="strings manipulation"></a>strings manipulation</h4><p>awk内置一些函数，用于处理字符串。</p>
+<ul>
+<li>length(s)</li>
+<li>substr(s,m,n)</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;nc = nc + length(<span class="variable">$0</span>) + 1</span><br><span class="line">nw = nw + NF&#125;</span><br><span class="line">END &#123;</span><br><span class="line"><span class="built_in">print</span> NR, <span class="string">&quot;lines&quot;</span></span><br><span class="line"><span class="built_in">print</span> nc, <span class="string">&quot;chars&quot;</span></span><br><span class="line"><span class="built_in">print</span> nw, <span class="string">&quot;words&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="control-flow"><a href="#control-flow" class="headerlink" title="control flow"></a>control flow</h1><p>awk作为一门编程语言，提供几种基本的类C的流程控制结构。</p>
+<ul>
+<li>IF THEN ELSE结构</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$2</span> &gt; 6 &#123; n = n + 1&#125;</span><br><span class="line">END &#123;</span><br><span class="line"><span class="keyword">if</span> (n &gt; 0 &#125; </span><br><span class="line">	<span class="built_in">print</span> n</span><br><span class="line"><span class="keyword">else</span> </span><br><span class="line">	<span class="built_in">print</span> <span class="string">&quot;no employes.&quot;</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>WHILE </li>
+<li>DO WHILE</li>
+<li>FOR</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = 1; i &lt; 10; i = i + 1)</span><br><span class="line">	<span class="built_in">print</span> i</span><br></pre></td></tr></table></figure>
+
+<h2 id="array"><a href="#array" class="headerlink" title="array"></a>array</h2><ul>
+<li>array下标可以是数字和字符串，当下标是字符串的时候，可以当一个map使用</li>
+<li>example：a[“tom”] &#x3D; 0.3</li>
+</ul>
+<p>数组遍历：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (k <span class="keyword">in</span> array) &#123;</span><br><span class="line"><span class="built_in">print</span> k, <span class="string">&quot;==&gt;&quot;</span>, array[k]&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="awk-predefined-variales"><a href="#awk-predefined-variales" class="headerlink" title="awk predefined variales"></a>awk predefined variales</h2><ul>
+<li>$0 $1 $2 $NF</li>
+<li>NF NR NF</li>
+<li>FS RS</li>
+<li>FILENAME</li>
+<li>OFS:output field separator default is single space</li>
+</ul>
+<h2 id="built-in-functions"><a href="#built-in-functions" class="headerlink" title="built-in functions"></a>built-in functions</h2><ul>
+<li>arithmetic<ul>
+<li>sin, cos, tan, exp, log, sqrt</li>
+</ul>
+</li>
+<li>strings<ul>
+<li>length, substr, split</li>
+</ul>
+</li>
+<li>output<ul>
+<li>print, printf</li>
+</ul>
+</li>
+<li>special<ul>
+<li>system(“cmd”) eg: system(“clear”)</li>
+<li>exit -直接跳转到ENDpattern-action块</li>
+</ul>
+</li>
+</ul>
+<h1 id="code-snippets"><a href="#code-snippets" class="headerlink" title="code snippets"></a>code snippets</h1><ol>
+<li>filter blank lines while you want to count your code</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /path/to/yourcode/*.py | awk NF | <span class="built_in">wc</span> -l</span><br></pre></td></tr></table></figure>
+
+<p>因为NF表示Number of Filed，默认的FS为空格，当awk遇见空行的时候，作为pattern的NF值为0，因此该行不会被输出。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/awk/" rel="tag"># awk</a>
+              <a href="/tags/shell-utility/" rel="tag"># shell utility</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/01/14/Notes%EF%BC%9ATemporal%20Relational%20Reasoning%20in%20Videos/" rel="prev" title="Notes：Temporal Relational Reasoning in Videos">
+                  <i class="fa fa-angle-left"></i> Notes：Temporal Relational Reasoning in Videos
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

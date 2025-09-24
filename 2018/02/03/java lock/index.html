@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. 并发控制和锁在多处理器的时代，程序设计中经常采用多线程以充分利用处理器的性能。在多线程环境下，由于存在共享变量、共享资源等情况，因此有时候需要对多线程的并发访问进行控制。 同很多并发控制的问题类似（例如数据库的并发控制），程序中的并发控制也会使用到例如加悲观锁、乐观锁、多版本视图等技术来完成并发控制（或者称为多线程同步）。因此谈到并发控制，基本上会涉及到锁的概念，而涉及到锁的问题也基本是属于">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发中的锁">
+<meta property="og:url" content="https://spground.github.io/2018/02/03/java%20lock/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. 并发控制和锁在多处理器的时代，程序设计中经常采用多线程以充分利用处理器的性能。在多线程环境下，由于存在共享变量、共享资源等情况，因此有时候需要对多线程的并发访问进行控制。 同很多并发控制的问题类似（例如数据库的并发控制），程序中的并发控制也会使用到例如加悲观锁、乐观锁、多版本视图等技术来完成并发控制（或者称为多线程同步）。因此谈到并发控制，基本上会涉及到锁的概念，而涉及到锁的问题也基本是属于">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/An_illustration_of_the_dining_philosophers_problem.png/463px-An_illustration_of_the_dining_philosophers_problem.png">
+<meta property="article:published_time" content="2018-02-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.570Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="同步">
+<meta property="article:tag" content="并发">
+<meta property="article:tag" content="锁">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/An_illustration_of_the_dining_philosophers_problem.png/463px-An_illustration_of_the_dining_philosophers_problem.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2018/02/03/java%20lock/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2018/02/03/java%20lock/","path":"2018/02/03/java lock/","title":"Java并发中的锁"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java并发中的锁 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%E5%92%8C%E9%94%81"><span class="nav-number">1.</span> <span class="nav-text">1. 并发控制和锁</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Java%E4%B8%AD%E7%9A%84%E9%94%81"><span class="nav-number">2.</span> <span class="nav-text">2. Java中的锁</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E6%AD%BB%E9%94%81%E5%92%8C%E6%B4%BB%E9%94%81"><span class="nav-number">3.</span> <span class="nav-text">3. 死锁和活锁</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E6%AD%BB%E9%94%81"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 死锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E6%B4%BB%E9%94%81"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 活锁</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-reference"><span class="nav-number">4.</span> <span class="nav-text">4.reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2018/02/03/java%20lock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java并发中的锁 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java并发中的锁
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-02-03 00:00:00" itemprop="dateCreated datePublished" datetime="2018-02-03T00:00:00+08:00">2018-02-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="1-并发控制和锁"><a href="#1-并发控制和锁" class="headerlink" title="1. 并发控制和锁"></a>1. 并发控制和锁</h1><p>在多处理器的时代，程序设计中经常采用多线程以充分利用处理器的性能。在多线程环境下，由于存在共享变量、共享资源等情况，因此有时候需要对多线程的并发访问进行控制。</p>
+<p>同很多并发控制的问题类似（例如数据库的并发控制），程序中的并发控制也会使用到例如加<strong>悲观锁、乐观锁、多版本视图</strong>等技术来完成并发控制（或者称为多线程同步）。因此谈到并发控制，基本上会涉及到锁的概念，而涉及到锁的问题也基本是属于并发控制问题的范畴。</p>
+<h1 id="2-Java中的锁"><a href="#2-Java中的锁" class="headerlink" title="2. Java中的锁"></a>2. Java中的锁</h1><p>Java中涉及到很多锁的概念，而涉及到的使用层次也不同，因此这里做一个简单的总结。</p>
+<ol>
+<li><p><strong>内置锁&#x2F;隐式锁</strong></p>
+<p>Java的每一个对象都有一个<code>monitor</code>，且这个<code>monitor</code>每一次仅能被一个线程所拥有，这就是内置锁或者叫隐式锁。内置锁的获取、释放通常是如下的范式写的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span>(obj) &#123;</span><br><span class="line">  <span class="comment">//当线程获取到obj的内置锁--monitor时，线程会进入到此代码块</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>释放内置锁：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">obj.wait();<span class="comment">//当前线程放弃obj对象上的内置锁</span></span><br></pre></td></tr></table></figure>
+
+<p>或者退出<code>synchronized</code>代码块，也会自动释放获取的内置锁。</p>
+</li>
+<li><p><strong>显式锁</strong></p>
+<p>顾名思义，显式锁是显式定义的锁。例如并发工具包的<code>Lock</code>接口下的一些实现类。</p>
+<p>内置锁在<code>Java</code>的<code>synchronized</code>关键字的配合下使用起来十分的简单，但是简答的预定义的东西往往缺乏灵活性，因此为了补充内置锁，显示锁提供了一些额外的特性例如：<strong>可轮询</strong>、<strong>可超时</strong>、<strong>可中断锁</strong>等。这些特性在实际的编程中提供着很大的灵活性。</p>
+<p><code>Lock</code>类的实现类常见的主要是<code>ReentrantLock</code>类。</p>
+<p>该类提供了几个重要的方法：</p>
+<ul>
+<li><code>lock()</code> 语义同<code>synchronized</code></li>
+<li><code>tryLock()</code> 提供了可超时的特性，在某些情况下可以通过该特性<strong>避免死锁</strong>的发生</li>
+<li><code>lockInterruptibly() throws InterruptedException</code> 在获取锁失败被阻塞的时候可被<strong>中断</strong>，而采用<code>synchronized</code>获取内置锁的时候，无法被中断</li>
+</ul>
+<p>​</p>
+</li>
+<li><p><strong>可重入锁</strong>(Reentrant Lock)</p>
+<p>可重入锁指的是已经获取了某个锁的线程去尝试再一次该锁的时候，是可以直接获取到的，而不会阻塞。</p>
+<p>可重入锁避免了如下的死锁情况的产生:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">get</span><span class="params">()</span> &#123;</span><br><span class="line">  set();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">set</span><span class="params">()</span> &#123;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果锁不可重入，那么当线程A获取到了“保护”get方法的锁时，那么再进入set方法的时候，会无限期阻塞。而此时，除了线程A，没有任何线程拥有该锁，因此线程A相相等于握着锁去等锁，首尾相连形成死锁了。</p>
+</li>
+<li><p><strong>读写锁</strong>(Read Write Lock)</p>
+<p>通常的锁都为互斥锁，大多数被共享的变量都是由这种互斥锁保护。一个时刻只能有一个线程在访问该变量。这个在该变量<strong>读多写少</strong>的情况下显然效率不高。因为<strong>读读</strong>不需要并发控制，而<strong>读写、 写写</strong>才需要并发控制。那么显然应该同数据库的并发控制加锁的策略一样，应该提供两种锁，一个是共享锁（读锁）、另一个是互斥锁（写锁），当读取变量的时候，主需要获取共享锁，而写变量的时候才去获取互斥锁。</p>
+<p><code>Java</code>并发包中提供了常用的<code>ReentrantReadWriteLock</code>锁，该锁提供了<strong>读锁、写锁、以及锁降级</strong>等特性。</p>
+<ul>
+<li><code>readLock()</code> 返回该读写锁对应的读锁</li>
+<li><code>writeLock()</code> 返回该读写锁对应的写锁</li>
+</ul>
+<p>当线程获取写锁的时候，如果该读写锁的读锁、写锁被其他线程占有，则该线程获取锁失败；</p>
+<p>当线程获取读锁的时候，如果没有线程持有写锁，则获取读锁成功；否则，获取读锁失败；</p>
+<p>读写所允许<strong>锁降级</strong>：当一个线程持有写锁的时候，可以直接降级为读锁，而<strong>不支持锁升级</strong>，因为锁升级会可能会引发死锁（当两个持有读锁的线程，同时进行锁升级，那么这两个线程都不会释放自己的读锁，从而发生死锁）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="type">ReadWriteLock</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantReadWriteLock</span>(<span class="literal">true</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="type">Lock</span> <span class="variable">r</span> <span class="operator">=</span> lock.readLock(), w = lock.writeLock();</span><br><span class="line">...</span><br><span class="line">w.lock();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  sb.append(append); <span class="comment">//降级为read lock</span></span><br><span class="line">  r.lock();</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">  w.unlock();<span class="comment">//still hold read lock</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">...</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">  r.unlock();</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>​</p>
+</li>
+<li><p><strong>偏向锁</strong>(Biased Lock)</p>
+<p>偏向锁是<code>JDK1.6</code>引入的一项锁优化，指的是偏向锁会偏向第一个获得它的线程，如果在接下来的执行过程中，该锁没有被其他的线程获取，则持有偏向锁的线程将永远不需要同步。在某些情况下，锁不存在多线程竞争的情况，而总是由同一线程在获取、释放、获取、释放。因此，引入了偏向锁，让此种情况下的锁获取的代价变小，偏向锁可以提高<strong>带有同步但无竞争</strong>的程序性能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BiasLockDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">long</span> <span class="variable">t</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">		List&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">Vector</span>&lt;&gt;();<span class="comment">//选择Vector是由于其add方法是synchronized修饰的；</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">1000_0000</span>; i++) &#123;</span><br><span class="line">			list.add(i);</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(<span class="string">&quot;cost: &quot;</span> + (System.currentTimeMillis() - t) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>-XX:+UseBiasedLocking -XX:BiasedLockingStartupDelay=0</code>开启偏向锁后，运行时间：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cost: 340ms</span><br></pre></td></tr></table></figure>
+
+<p><code>-XX:-UseBiasedLocking</code>禁用偏向锁后，运行时间：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cost: 519ms</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>公平锁&#x2F;非公平锁</strong></p>
+<p>公平锁是指多个线程在等待同一个锁时，必须按照申请锁的先后顺序来获得锁。</p>
+<p>非公平锁是指多个线程在等待同一个锁时，是按按照不确定的顺序来选择某一个线程获取锁。</p>
+<p>通常来讲，<strong>公平锁的性能低于非公平锁，但是公平锁可以解决线程饥饿的问题</strong>。</p>
+<p><code>Java</code>中可以使用<code>new ReentrantLock(true)</code>构造得到公平锁，而<code>synchronized</code>则提供的内置锁是非公平的。</p>
+<p>ps: <code>Java</code>中提供的显式锁一般都提供Fair和Non-Fair模式，但是即便是公平模式也会提供一些允许<code>插队(barging)</code>的方法允许线程先于等待在前面的线程得到锁。</p>
+</li>
+<li><p><strong>悲观锁&#x2F;乐观锁</strong></p>
+<p>悲观锁：主要的并发控制策略之一，假设冲突总是发生，如果不采取同步措施，例如对共享的变量或者资源加锁，那么肯定会出现问题，类似于<strong>事前预防</strong>。因此无论共享的数据无论是是否出现竞争冲突，都会对它进行正确的同步。</p>
+<p>乐观锁：和悲观锁不一样，乐观并发控制策略先进行操作，如果操作的数据没出现竞争，那么操作成功；如果操作的数据出现竞争，那么再进行一些后续的弥补操作（常见的就是不断的重试、或者重试数次返回失败信息），类似<strong>事后弥补</strong>，实现乐观并发控制策略有多种常见的方式：</p>
+<ul>
+<li>CAS</li>
+<li>时间戳</li>
+<li>版本号</li>
+</ul>
+<p>存在即合理，悲观锁和乐观锁都有其应用的场景，当数据争用、冲突发生频繁的场景，悲观锁较适合；而数据争用、冲突不频繁的场景，乐观锁则更适合。</p>
+</li>
+<li><p><strong>自旋锁</strong>(Spinning Lock)</p>
+<p>互斥同步的时候，当线程获取锁失败的时候，通常会进入阻塞状态，<code>java</code>线程和操作系统线程是一一对应的，挂起和恢复线程操作需要由<strong>用户态转入核心态</strong>完成，这些操作<strong>耗时、耗资源</strong>。但是某些情况下，某一个线程只会将锁独占很短时间，或者是说很快 便完成了同步代码块的执行，因此其它线程为了这点时间选择将自己挂起、恢复十分没有必要。因此，特别是在多处理环境下，可以让后面请求独占锁失败的线程，进行<strong>自旋</strong>（忙循环）一会儿，而不是阻塞挂起线程。</p>
+<p>自旋锁的引入是为了解决锁被独占的时间很短的情况下，避免线程被挂起-恢复带来的<code>overhead</code>，因此当锁独占的时间本来就很长的，这种锁便没有存在的意义了。</p>
+<p><code>JVM</code>中可以通过参数：</p>
+<p><code>-XX:+UseSpinning</code>开启自旋锁功能；<code>JDK1.6</code>默认是开启的。</p>
+<p><code>-XX:PreBlockSpin</code>配置每次自旋的次数，默认是10次；</p>
+<p>​</p>
+</li>
+</ol>
+<h1 id="3-死锁和活锁"><a href="#3-死锁和活锁" class="headerlink" title="3. 死锁和活锁"></a>3. 死锁和活锁</h1><h2 id="3-1-死锁"><a href="#3-1-死锁" class="headerlink" title="3.1 死锁"></a>3.1 死锁</h2><p>并发中问题中的死锁最经典莫过于<a href="https://en.wikipedia.org/wiki/Dining_philosophers_problem"><strong>哲学家就餐</strong></a>问题，死锁常常发生在系统高负载环境下，多线程竞争某一共享数据的情况下。当线程A持有锁L的时候同时，线程B持有锁M并尝试获得L，那么这两个线程将永远等待下去。这种情况就是最简单的死锁形式，多个线程由于存在环路的依赖关系而永远的等待下去。</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/An_illustration_of_the_dining_philosophers_problem.png/463px-An_illustration_of_the_dining_philosophers_problem.png"></p>
+<p>死锁发生最常见的的根本原因就是：<strong>多个线程存在环路的依赖关系</strong>。</p>
+<p>比如<code>A</code>等待B，B等待C，C等待D, …, Z等待A，则A间接的等待A，形成环路，发生死锁。</p>
+<p>环路的产生具体有如下几种情况：</p>
+<ul>
+<li><strong>锁顺序死锁</strong>：加锁的顺序不一致导致的死锁；</li>
+<li><strong>动态的锁顺序死锁</strong>：方法内部加锁顺序是一致的，但是由于锁被参数化了，因此调用该方法时，锁的顺序取决于方法调用者传来的参数，因此也会动态的产生锁顺序死锁。</li>
+<li><strong>协作对象之间发生的死锁</strong></li>
+<li><strong>资源死锁</strong> 例如：线程A持有数据库连接D1并等待D2，而线程B持有数据库连接D2，等待D1则A、B之间出现死锁</li>
+</ul>
+<p>解决死锁问题通常有两个角度来解决，<strong>死锁避免和死锁解除</strong>，一个属于事前预防，另一个是事后弥补；</p>
+<p>数据库系统中，为避免死锁，有一个著名的<strong>两阶段加锁协议</strong>，同时，事务管理器可以通过环路判断死锁的存在，并取消一个代价小的事务以达到死锁的解除。</p>
+<p><code>Java</code>没有数据库事务管理器那么强大，<code>Java</code>中也有一些方法可以避免死锁，但是当死锁发生的时候，除了重启应用别无他法。</p>
+<p><code>Java</code>中的死锁避免：</p>
+<ul>
+<li><strong>加锁顺序保持相同</strong>（synchronized提供的内置锁只能通过此种方式来避免死锁的发生）</li>
+<li><strong>采用可轮询的、可超时的锁</strong>(显式锁Lock提供<code>tryLock(long timeout)</code>轮询和超时的特性，因此不会无限的等待下去，当超时的时候，程序可以简单的重试，或者放弃获取该锁，释放已有的锁。同时这种方式通过引入<strong>随机因素</strong>也可以有限的解决<strong>活锁的问题</strong>)</li>
+</ul>
+<h2 id="3-2-活锁"><a href="#3-2-活锁" class="headerlink" title="3.2 活锁"></a>3.2 活锁</h2><p>死锁是形成死锁的线程全部处于无限等待状态，而<strong>活锁则是线程不断的重复执行相同的操作，而且总是失败</strong>。就相当于线程在执行一个循环的操作序列，周而复始，无穷无尽，导致系统的状态整体停滞不前。</p>
+<p>最形象的例子便是：</p>
+<blockquote>
+<p>两个过于礼貌的人甲乙，相向走在一个狭窄的巷子里面，甲和乙同时让对方先走，然后甲乙同时准备接受对方的谦让自己先走，然后两人又同时让对方先走…，如此循环往复，两人没有等待，始终处于活动状态，但是两人始终都无法通过巷子。</p>
+</blockquote>
+<p>同样的类似活锁的例子就是，以太网的共享介质传输信息时，也会出现活锁的问题，以太网技术采用了一种叫做<strong>载波多路访问-冲突检测（CSMA-CD）<strong>的技术，该技术引入了一些</strong>随机因素</strong>来避免活锁。</p>
+<p>同样的，解决活锁的问题，可以在<strong>重试机制中以引入随机性</strong>，这样可以有效的避免活锁问题。</p>
+<h1 id="4-reference"><a href="#4-reference" class="headerlink" title="4.reference"></a>4.reference</h1><p>[1]. Java并发编程实践</p>
+<p>[2]. 深入理解JVM虚拟机</p>
+<p>[3]. <a href="http://www.importnew.com/19472.html">http://www.importnew.com/19472.html</a></p>
+<p> [4]. <a href="https://www.cnblogs.com/qifengshi/p/6831055.html">https://www.cnblogs.com/qifengshi/p/6831055.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
+              <a href="/tags/%E5%90%8C%E6%AD%A5/" rel="tag"># 同步</a>
+              <a href="/tags/%E9%94%81/" rel="tag"># 锁</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/01/27/Morris%20binary-tree%20traverse/" rel="prev" title="Morris 遍历">
+                  <i class="fa fa-angle-left"></i> Morris 遍历
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/02/25/Summary%20for%20a%20try%20to%20lightweight%20RPC%20framework/" rel="next" title="初试轻量级RPC框架总结">
+                  初试轻量级RPC框架总结 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

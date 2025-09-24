@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Collections类简介Collections类是java集合框架的一个类，其主要是一些通用的作用于Collection的 算法，如排序，求极值，混淆(shuffle)等。引用Java官方文档的介绍  The polymorphic algorithms described here are pieces of reusable functionality provided by the Ja">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Collections类中常用算法之Rotate">
+<meta property="og:url" content="https://spground.github.io/2016/10/23/Collections%20Rotate/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="Collections类简介Collections类是java集合框架的一个类，其主要是一些通用的作用于Collection的 算法，如排序，求极值，混淆(shuffle)等。引用Java官方文档的介绍  The polymorphic algorithms described here are pieces of reusable functionality provided by the Ja">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.blog.csdn.net/20161023141425837">
+<meta property="article:published_time" content="2016-10-23T06:26:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.564Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="Collections">
+<meta property="article:tag" content="JDK">
+<meta property="article:tag" content="源码分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20161023141425837">
+
+
+<link rel="canonical" href="https://spground.github.io/2016/10/23/Collections%20Rotate/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2016/10/23/Collections%20Rotate/","path":"2016/10/23/Collections Rotate/","title":"Collections类中常用算法之Rotate"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Collections类中常用算法之Rotate | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Collections%E7%B1%BB%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">Collections类简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rotate%E6%96%B9%E6%B3%95%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">Rotate方法使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rotate%E6%96%B9%E6%B3%95%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">Rotate方法源码分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2016/10/23/Collections%20Rotate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Collections类中常用算法之Rotate | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Collections类中常用算法之Rotate
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-10-23 14:26:00" itemprop="dateCreated datePublished" datetime="2016-10-23T14:26:00+08:00">2016-10-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="Collections类简介"><a href="#Collections类简介" class="headerlink" title="Collections类简介"></a>Collections类简介</h2><p><code>Collections</code>类是java集合框架的一个类，其主要是一些通用的作用于<code>Collection</code>的 算法，如排序，求极值，混淆(shuffle)等。<br>引用<a href="http://docs.oracle.com/javase/tutorial/collections/algorithms/index.html">Java官方文档</a>的介绍</p>
+<blockquote>
+<p>The polymorphic algorithms described here are pieces of reusable functionality provided by the Java platform. All of them come from the Collections class, and all take the form of static methods whose first argument is the collection on which the operation is to be performed. The great majority of the algorithms provided by the Java platform operate on List instances, but a few of them operate on arbitrary Collection instances. </p>
+</blockquote>
+<p><code>Collections</code>类的方法都是静态方法，每一种方法都对应一种集合算法的实现，且每一种实现都有两种，一种是适用于实现了<code>RandomAccess</code>接口的集合类（例如<code>ArrayList</code>），另一种是适用于序列存储的，例如（<code>LinkedList</code>）。</p>
+<p><code>Collections</code>类包含的算法实现大致如下：</p>
+<ul>
+<li>排序<br> 排序采用归并排序，所以排序算法是稳定的，时间复杂度是确定的。</li>
+<li>混淆</li>
+<li>常规的集合数据操作（适用于<code>List</code>）<br>包括<code>reverse</code>、<code>fill</code>、<code>copy</code>、<code>swap</code>、<code>addAll</code>等</li>
+<li>搜索（适用于<code>List</code>）<br>  <code>binarySearch</code></li>
+<li>极值<br>求集合的最大元素、最小元素</li>
+</ul>
+<p><code>Collections</code>中的大多数算法都只是适用于<code>List</code>，接下来讨论的<code>Rotate</code>方法就是只适用于<code>List</code>的。<br>使用与<code>List</code>的算法主要有：</p>
+<ul>
+<li>sort</li>
+<li>shuffle</li>
+<li>reverse</li>
+<li>rotate</li>
+<li>swap</li>
+<li>replaceAll</li>
+<li>fill</li>
+<li>copy</li>
+<li>binarySearch</li>
+<li>indexOfSubList</li>
+<li>lastIndexofSubList</li>
+</ul>
+<h2 id="Rotate方法使用"><a href="#Rotate方法使用" class="headerlink" title="Rotate方法使用"></a>Rotate方法使用</h2><p><code>Rotate</code>方法需要一个参数<code>distance</code>，该方法将一个<code>List</code>旋转多少长度为<code>distance</code>。假如有个序列列<code>list</code>是<code>[a,b,c,d]</code>，调用方法<code>Collections.rotate(list, 1)</code>后，得到的<code>list</code>就变为了<code>[d,a,b,c]</code>。<br>调用此方法后，位置<code>i</code>上的元素将变为位置<code>(i - distance) mod list.size()</code>的元素，<code>0 &lt;= i &lt; list.size()</code>。<code>distance</code>可以为正数、0、负数。正数代表向前（下标值变大的方向）旋转，负数代表向后旋转。调用方法<code>Collections.rotate(list, -1)</code>后，得到的<code>list</code>就变为了<code>[b,c,d,a]</code>。</p>
+<p>这个方法常常和<code>List</code>的<code>subList</code>方法结合使用，用于将一个<code>list</code>的某个或多个元素进行移动，而不破坏其余元素的顺序。例如为了将某个<code>list</code>的位置<code>j</code>的元素向前移动到<code>k</code>的位置。（设移动的距离为<code>d</code>（<code>d &gt;= 0</code>），<code>k = j + d + 1</code>）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Collections.rotate(list.subList(j, k+<span class="number">1</span>), -<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>举个栗子，例如<code>[a,b,c,d,e]</code>，将<code>b</code>元素向前移动三个位置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Collections.rotate(list.subList(<span class="number">1</span>, <span class="number">5</span>), -<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>调用后得到<code>list</code>为<code>[a,c,d,e,b]</code>。</p>
+<h2 id="Rotate方法源码分析"><a href="#Rotate方法源码分析" class="headerlink" title="Rotate方法源码分析"></a>Rotate方法源码分析</h2><p><code>Rotate</code>方法的方法原型为</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">rotate</span><span class="params">(List&lt;?&gt; list, <span class="type">int</span> distance)</span> </span><br></pre></td></tr></table></figure>
+<p><code>Rotate</code>方法有两种实现，一种适用于实现了<code>RandomAccess</code>接口的<code>List</code>（类似数组的随机访问性质）或者<code>size</code>小于阈值的序列存储的<code>List</code>，另一种是<code>size</code>大于阈值的序列存储（通常是指链表的形式存储的）的<code>List</code>。  </p>
+<p>关于该方法的源码为</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">rotate</span><span class="params">(List&lt;?&gt; list, <span class="type">int</span> distance)</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (list <span class="keyword">instanceof</span> RandomAccess || list.size() &lt; ROTATE_THRESHOLD)</span><br><span class="line">          rotate1(list, distance);</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">          rotate2(list, distance);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>rotate1</code>对应于第一种的实现，<code>rotate2</code>对应于第二种的实现。  </p>
+<p>对于<code>rotate1</code>的实现具体的做法是，将序列的第一个元素交换至正确的位置<code>i</code>，此时原来在位置<code>i</code>的元素就是一个错误放置的元素<code>displaced</code>，然后计算该元素正确放置的位置<code>i</code>，并将其放置到位置<code>i</code>，此时又得到一个错误放置的元素<code>displaced</code>，重复此过程直到错误放置的元素<code>displaced</code>被放置到了第一个位置。（即<code>i == 0</code>）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> &lt;T&gt; <span class="keyword">void</span> <span class="title function_">rotate1</span><span class="params">(List&lt;T&gt; list, <span class="type">int</span> distance)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> list.size();</span><br><span class="line">    <span class="keyword">if</span> (size == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    distance = distance % size;</span><br><span class="line">    <span class="keyword">if</span> (distance &lt; <span class="number">0</span>)</span><br><span class="line">        distance += size;<span class="comment">//将distance化为到范围为0到size - 1的区间</span></span><br><span class="line">    <span class="keyword">if</span> (distance == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">cycleStart</span> <span class="operator">=</span> <span class="number">0</span>, nMoved = <span class="number">0</span>; nMoved != size; cycleStart++) &#123;</span><br><span class="line">        <span class="type">T</span> <span class="variable">displaced</span> <span class="operator">=</span> list.get(cycleStart);</span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> cycleStart;</span><br><span class="line">        <span class="comment">//从cycleStart开始，迭代式的将错误放置的元素放置到正确的位置，直到某个元素被放置到了cycleStart</span></span><br><span class="line">        <span class="comment">//此时，应该结束do...while循环，因为如果继续循环得到的结果就是啥也没干，因为上一轮的循环已经</span></span><br><span class="line">        <span class="comment">//将此次循环访问到的位置的元素放正确了，此时应该换下一个位置作为起点cycleStart，继续执行直到</span></span><br><span class="line">        <span class="comment">//被正确放置的元素的个数nMoved达到了size个</span></span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            i += distance;</span><br><span class="line">          <span class="comment">//此处i的范围是 0 ~ 2*size</span></span><br><span class="line">          <span class="comment">//当i大于size且小于2 * size的时候，此时i= i mod size 等价于 i = i - size</span></span><br><span class="line">            <span class="keyword">if</span> (i &gt;= size)</span><br><span class="line">                i -= size;</span><br><span class="line">            <span class="comment">//此时i的范围为0 ~ size - 1</span></span><br><span class="line">            displaced = list.set(i, displaced);</span><br><span class="line">            nMoved ++;<span class="comment">//记录已经被正确放置的元素的个数</span></span><br><span class="line">        &#125; <span class="keyword">while</span> (i != cycleStart);<span class="comment">//当i回到起点后，退出本次循环</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>rotate2</code>的实现与上面的实现完全不一样，因为考虑到<code>rotate2</code>适用于的是类似于采用链表存储的<code>List</code>，因此不具有随机访问的特性。因此该实现采用的是将原<code>list</code>在<code>-distance mod size</code>处使用<code>subList</code>方法拆分为两个子列表<code>s1</code>，<code>s2</code>，并分别反转俩链表<code>revese(s1)</code>，<code>reverse(s2)</code>，最后再将整个链表反转，<code>reverse(list)</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">rotate2</span><span class="params">(List&lt;?&gt; list, <span class="type">int</span> distance)</span> &#123;</span><br><span class="line">      <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> list.size();</span><br><span class="line">      <span class="keyword">if</span> (size == <span class="number">0</span>)</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">      <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span>  -distance % size;</span><br><span class="line">      <span class="keyword">if</span> (mid &lt; <span class="number">0</span>)</span><br><span class="line">          mid += size;<span class="comment">//确保mid位于0 ~ size的区间</span></span><br><span class="line">      <span class="keyword">if</span> (mid == <span class="number">0</span>)</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line"><span class="comment">//分别反转两个子链表</span></span><br><span class="line">      reverse(list.subList(<span class="number">0</span>, mid));</span><br><span class="line">      reverse(list.subList(mid, size));</span><br><span class="line">      <span class="comment">//最后反转整个链表 两次反转确保俩子链表的元素的的相对位置不变</span></span><br><span class="line">      reverse(list);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p><img src="http://img.blog.csdn.net/20161023141425837" alt="示意图">  </p>
+<p>示意图中<code>(1) (2) (3)</code>分别对应三次链表反转。由示意图中大致可以看出，前两次反转子链表的目的是为了将原链表的首末连在一起，并将<code>mid</code>指向的的元素和其逆时针方向的旁边的元素断开。最后整个链表的反转是为了恢复俩子链表的元素的原始相对顺序。</p>
+<p>链表的反转通常采用<code>头插法</code>反转。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li><code>rotate</code>方法是将链表旋转一定的<code>distance</code>，该方法常常与<code>subList</code>方法结合用户在<code>List</code>中移动某个元素到指定的位置，而不影响其他元素的顺序</li>
+<li><code>rotate</code>有两种实现，一种针对于随机存取的，另一种针对链表式存取的。</li>
+<li>两种实现的思想也不一样，一种是通过迭代式的交换，另一种是通过链表的反转实现的。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Collections/" rel="tag"># Collections</a>
+              <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag"># 源码分析</a>
+              <a href="/tags/JDK/" rel="tag"># JDK</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/09/30/Common%20Sort%20Algorithm%20merge%20sort%20and%20quick%20sort/" rel="prev" title="常用排序算法——合并排序和快速排序">
+                  <i class="fa fa-angle-left"></i> 常用排序算法——合并排序和快速排序
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/12/13/Java%20singleton%20design%20pattern/" rel="next" title="java中单例的几种写法">
+                  java中单例的几种写法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

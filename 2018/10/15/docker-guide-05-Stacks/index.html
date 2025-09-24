@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="5. Stacks介绍在第4部分，你已经学会如何配置一个蜂群，蜂群是一个运行着docker的集群，然后你将app部署到这个蜂群上，容器运行在多个机器上。 在第5部分，我们马上介绍分布式应用层级的最上层的概念stack。一个stack是一组共享依赖的内部相关的服务，这些服务能够被一起编排和伸缩。单独的一个stack能够定义和协调整个应用的功能，一些复杂的应用可能需要定义多个stack。 不要慌，从第">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5. Stacks">
+<meta property="og:url" content="https://spground.github.io/2018/10/15/docker-guide-05-Stacks/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="5. Stacks介绍在第4部分，你已经学会如何配置一个蜂群，蜂群是一个运行着docker的集群，然后你将app部署到这个蜂群上，容器运行在多个机器上。 在第5部分，我们马上介绍分布式应用层级的最上层的概念stack。一个stack是一组共享依赖的内部相关的服务，这些服务能够被一起编排和伸缩。单独的一个stack能够定义和协调整个应用的功能，一些复杂的应用可能需要定义多个stack。 不要慌，从第">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539420836418-9e3fa932-e4ce-44fa-8372-1d3a8ffa9b85.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539421054678-b9ed74ba-f5a9-48df-a7f9-cdec97eb1f84.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539423680343-888c4a8e-b9a2-4191-b71e-48dccd8d6889.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539423713437-0db8df27-530f-4c70-8379-44dd578f126f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539423864155-f892f899-dd76-4610-8d1b-4f57001c0b74.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539425828919-4cf6c4b4-9e42-40cc-bfd8-1f9a6575f698.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539425867050-37028b3d-04a9-406d-a57c-e9386afef266.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539425911437-ba23e171-b8b9-4e4b-86a5-6902ba874082.png">
+<meta property="article:published_time" content="2018-10-15T11:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.569Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="docker guide">
+<meta property="article:tag" content="infrastructure">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1539420836418-9e3fa932-e4ce-44fa-8372-1d3a8ffa9b85.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2018/10/15/docker-guide-05-Stacks/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2018/10/15/docker-guide-05-Stacks/","path":"2018/10/15/docker-guide-05-Stacks/","title":"5. Stacks"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>5. Stacks | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Stacks"><span class="nav-number">1.</span> <span class="nav-text">5. Stacks</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AAService-%E9%87%8D%E6%96%B0%E9%83%A8%E7%BD%B2"><span class="nav-number">1.2.</span> <span class="nav-text">增加一个Service 重新部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96%E6%95%B0%E6%8D%AE"><span class="nav-number">1.3.</span> <span class="nav-text">持久化数据</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2018/10/15/docker-guide-05-Stacks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="5. Stacks | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          5. Stacks
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-10-15 19:00:00" itemprop="dateCreated datePublished" datetime="2018-10-15T19:00:00+08:00">2018-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="5-Stacks"><a href="#5-Stacks" class="headerlink" title="5. Stacks"></a>5. Stacks</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在第4部分，你已经学会如何配置一个蜂群，蜂群是一个运行着docker的集群，然后你将app部署到这个蜂群上，容器运行在多个机器上。</p>
+<p>在第5部分，我们马上介绍分布式应用层级的最上层的概念stack。一个stack是一组共享依赖的内部相关的服务，这些服务能够被一起编排和伸缩。单独的一个stack能够定义和协调整个应用的功能，一些复杂的应用可能需要定义多个stack。</p>
+<p>不要慌，从第3部分开始，我们就已经接触到了stack，前面我们创建compose文件，然后运行docker stack deploy，这些都是和stack相关的内容。但是前面我们接触的都是运行在单台机器上的包含单个服务的stack，这个在生产环境中不常见。接下来，运用之前学到的知识，我们来创建多个相关的服务，然后运行在多台机器上。</p>
+<h2 id="增加一个Service-重新部署"><a href="#增加一个Service-重新部署" class="headerlink" title="增加一个Service 重新部署"></a>增加一个Service 重新部署</h2><p>修改docker-compose.yml文件很容易添加一个服务。首先我们增加一个免费的可视化服务，这个服务可以让我们看我们的蜂群是如何调度我们的容器的。</p>
+<ol>
+<li>打开docker-compose.yml文件，修改为如下内容：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">version: <span class="string">&quot;3&quot;</span></span><br><span class="line">services:</span><br><span class="line">  web:</span><br><span class="line">    <span class="comment"># replace username/repo:tag with your name and image details</span></span><br><span class="line">    image: dockerjie/get-started:part2</span><br><span class="line">    deploy:</span><br><span class="line">      replicas: 5</span><br><span class="line">      resources:</span><br><span class="line">        limits:</span><br><span class="line">          cpus: <span class="string">&quot;0.1&quot;</span></span><br><span class="line">          memory: 50M</span><br><span class="line">      restart_policy:</span><br><span class="line">        condition: on-failure</span><br><span class="line">    ports:</span><br><span class="line">      - <span class="string">&quot;4000:80&quot;</span></span><br><span class="line">    networks:</span><br><span class="line">      - webnet</span><br><span class="line">  visualizer:</span><br><span class="line">    image: dockersamples/visualizer:stable</span><br><span class="line">    ports:</span><br><span class="line">      - <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line">    volumes:</span><br><span class="line">      - <span class="string">&quot;/var/run/docker.sock:/var/run/docker.sock&quot;</span></span><br><span class="line">    deploy:</span><br><span class="line">      placement:</span><br><span class="line">        constraints: [node.role == manager]</span><br><span class="line">    networks:</span><br><span class="line">      - webnet  </span><br><span class="line">networks:</span><br><span class="line">  webnet:</span><br></pre></td></tr></table></figure>
+
+<p>注意上面有两个新的配置项，volumes，运行可视化服务访问宿主机的Docker的socket文件，placement则确保服务被部署在蜂群管理器swarm manager上面，而不是worker上，因为可视化服务是显示蜂群概览信息的，仅仅管理器才有权限获取到这些信息。</p>
+<ol>
+<li>确保你的shell连接到myvm1机器上。docker-machine start $(docker-machine ls -q)启动所有机器<ol>
+<li>运行docker-machine ls确保你连接到myvm1上。如果出现ip地址对应的cert不对应，则重新运行命令生成cert，docker-machine regenerate-certs $(docker-machine ls -q)</li>
+</ol>
+</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539420836418-9e3fa932-e4ce-44fa-8372-1d3a8ffa9b85.png" alt="image.png | left | 625x59"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2. 如有必要运行 eval \$(docker-machine env myvm1)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539421054678-b9ed74ba-f5a9-48df-a7f9-cdec97eb1f84.png" alt="image.png | left | 625x72"></p>
+<ol>
+<li>在蜂窝管理器上重新运行 docker stack deploy</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack deploy -c docker-compose-yml getstartedlab</span><br></pre></td></tr></table></figure>
+
+<p>部署完成后查看服务：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539423680343-888c4a8e-b9a2-4191-b71e-48dccd8d6889.png" alt="image.png | left | 681x47"></p>
+<p>访问可视化服务：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539423713437-0db8df27-530f-4c70-8379-44dd578f126f.png" alt="image.png | left | 681x666"></p>
+<p>可以看到两个服务：visualizer和web均已经启动，且web服务的副本数量为5，分布为：</p>
+<ul>
+<li>myvm1*1</li>
+<li>myvm2*2</li>
+<li>myvm3*2</li>
+</ul>
+<p>也可以使用docker命令查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack ps getstartedlab</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539423864155-f892f899-dd76-4610-8d1b-4f57001c0b74.png" alt="image.png | left | 681x75"></p>
+<h2 id="持久化数据"><a href="#持久化数据" class="headerlink" title="持久化数据"></a>持久化数据</h2><p>到现在为止，我们的web服务中依赖的redis服务还没有配置。</p>
+<ol>
+<li>修改docker-compose文件，增加redis服务</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">version: <span class="string">&quot;3&quot;</span></span><br><span class="line">services:</span><br><span class="line">  web:</span><br><span class="line">    <span class="comment"># replace username/repo:tag with your name and image details</span></span><br><span class="line">    image: dockerjie/get-started:part2</span><br><span class="line">    deploy:</span><br><span class="line">      replicas: 5</span><br><span class="line">      resources:</span><br><span class="line">        limits:</span><br><span class="line">          cpus: <span class="string">&quot;0.1&quot;</span></span><br><span class="line">          memory: 50M</span><br><span class="line">      restart_policy:</span><br><span class="line">        condition: on-failure</span><br><span class="line">    ports:</span><br><span class="line">      - <span class="string">&quot;4000:80&quot;</span></span><br><span class="line">    networks:</span><br><span class="line">      - webnet</span><br><span class="line">  visualizer:</span><br><span class="line">    image: dockersamples/visualizer:stable</span><br><span class="line">    ports:</span><br><span class="line">      - <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line">    volumes:</span><br><span class="line">      - <span class="string">&quot;/var/run/docker.sock:/var/run/docker.sock&quot;</span></span><br><span class="line">    deploy:</span><br><span class="line">      placement:</span><br><span class="line">        constraints: [node.role == manager]</span><br><span class="line">    networks:</span><br><span class="line">      - webnet  </span><br><span class="line">  redis:</span><br><span class="line">    image: redis</span><br><span class="line">    ports:</span><br><span class="line">      - <span class="string">&quot;6379:6379&quot;</span></span><br><span class="line">    volumes:</span><br><span class="line">      - <span class="string">&quot;/home/docker/data:/data&quot;</span></span><br><span class="line">    deploy:</span><br><span class="line">      placement:</span><br><span class="line">        constraints: [node.role == manager]</span><br><span class="line">    <span class="built_in">command</span>: redis-server --appendonly <span class="built_in">yes</span></span><br><span class="line">    networks:</span><br><span class="line">      - webnet</span><br><span class="line">networks:</span><br><span class="line">  webnet:</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>redis有官方的镜像，因此具有一个short name redis。6379是redis容器预先配置的端口，需要对外暴露的，我们也暴露这个端口给宿主机。有两个额外的配置只得注意：</p>
+<ul>
+<li>redis一直运行在manager上，因此它一直运行在相同的文件系统上，因为是同一个宿主机。</li>
+<li>redis访问宿主机上的文件夹作为&#x2F;data目录，redis将数据存储到这里。</li>
+</ul>
+<p>redis需要持久化数据到容器里的&#x2F;data目录，而容器启动， 停止后，里面的数据都没有了。因此为了持久化数据，需要将容器的某些目录映射到宿主机上，这样数据才会被真正的持久化。</p>
+<ol>
+<li>在manager宿主机上创建data目录</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ssh myvm1 <span class="string">&quot;mkdir ./data&quot;</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>部署</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack deploy -c docker-compose.yml getstartedlab</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539425828919-4cf6c4b4-9e42-40cc-bfd8-1f9a6575f698.png" alt="image.png | left | 681x61"></p>
+<p>查看浏览器验证：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539425867050-37028b3d-04a9-406d-a57c-e9386afef266.png" alt="image.png | left | 747x698"></p>
+<p>查看持久化生效：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1539425911437-ba23e171-b8b9-4e4b-86a5-6902ba874082.png" alt="image.png | left | 681x214"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker-guide/" rel="tag"># docker guide</a>
+              <a href="/tags/infrastructure/" rel="tag"># infrastructure</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/10/15/docker-guide-04-Swarms/" rel="prev" title="4. Swarms">
+                  <i class="fa fa-angle-left"></i> 4. Swarms
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/10/15/docker-guide-06-Deploy%20your%20app/" rel="next" title="6. Deploy your app">
+                  6. Deploy your app <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. 数据分布不一致 训练集和测试集（包含开发集）数据分布不一致被称为Data Mismatch。  我们知道机器学习模型会存在两种异常情况：  高方差：过拟合 高偏差：欠拟合  数据集一般划分为：train、dev、test。其中当dev&#x2F;test 和 train的数据分布存在不一致（data mismatch）的时候，则模型的高方差可能来源于两个原因：  过拟合 数据分布不一致  1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes：Deep Learning-structure your machine learning-week2">
+<meta property="og:url" content="https://spground.github.io/2018/11/21/notes-of-stucture-your-machine-learning/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. 数据分布不一致 训练集和测试集（包含开发集）数据分布不一致被称为Data Mismatch。  我们知道机器学习模型会存在两种异常情况：  高方差：过拟合 高偏差：欠拟合  数据集一般划分为：train、dev、test。其中当dev&#x2F;test 和 train的数据分布存在不一致（data mismatch）的时候，则模型的高方差可能来源于两个原因：  过拟合 数据分布不一致  1">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1542806599420-46ed2a52-d315-4b8e-9066-472e6ce3c9cb.png">
+<meta property="article:published_time" content="2018-11-21T15:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.570Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="data mismatch">
+<meta property="article:tag" content="deep learning">
+<meta property="article:tag" content="transfer learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1542806599420-46ed2a52-d315-4b8e-9066-472e6ce3c9cb.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2018/11/21/notes-of-stucture-your-machine-learning/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2018/11/21/notes-of-stucture-your-machine-learning/","path":"2018/11/21/notes-of-stucture-your-machine-learning/","title":"Notes：Deep Learning-structure your machine learning-week2"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Notes：Deep Learning-structure your machine learning-week2 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E5%88%86%E5%B8%83%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="nav-number">1.</span> <span class="nav-text">1. 数据分布不一致</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E9%AB%98%E6%96%B9%E5%B7%AE%E6%9D%A5%E6%BA%90%E4%BA%8Edata-mismatch%E5%91%A2%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 如何判断高方差来源于data mismatch呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3Data-Mismatch%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 如何解决Data Mismatch问题？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0"><span class="nav-number">2.</span> <span class="nav-text">2. 迁移学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%A4%9A%E4%BB%BB%E5%8A%A1%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.</span> <span class="nav-text">3. 多任务学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E7%AB%AF%E5%88%B0%E7%AB%AF%E5%AD%A6%E4%B9%A0"><span class="nav-number">4.</span> <span class="nav-text">4. 端到端学习</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2018/11/21/notes-of-stucture-your-machine-learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Notes：Deep Learning-structure your machine learning-week2 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Notes：Deep Learning-structure your machine learning-week2
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-11-21 23:00:00" itemprop="dateCreated datePublished" datetime="2018-11-21T23:00:00+08:00">2018-11-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/machine-learning/" itemprop="url" rel="index"><span itemprop="name">machine learning</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="1-数据分布不一致"><a href="#1-数据分布不一致" class="headerlink" title="1. 数据分布不一致"></a>1. 数据分布不一致</h1><blockquote>
+<p>训练集和测试集（包含开发集）数据分布不一致被称为Data Mismatch。</p>
+</blockquote>
+<p>我们知道机器学习模型会存在两种异常情况：</p>
+<ul>
+<li>高方差：过拟合</li>
+<li>高偏差：欠拟合</li>
+</ul>
+<p>数据集一般划分为：train、dev、test。<br>其中当dev&#x2F;test 和 train的数据分布存在不一致（data mismatch）的时候，则模型的高方差可能来源于两个原因：</p>
+<ul>
+<li>过拟合</li>
+<li>数据分布不一致</li>
+</ul>
+<h2 id="1-1-如何判断高方差来源于data-mismatch呢？"><a href="#1-1-如何判断高方差来源于data-mismatch呢？" class="headerlink" title="1.1 如何判断高方差来源于data mismatch呢？"></a>1.1 如何判断高方差来源于data mismatch呢？</h2><p>将train划分一部分作为train-dev，并在train-dev上对模型进行评价。这样我们可以得到：</p>
+<ul>
+<li>train</li>
+<li>train-dev</li>
+<li>dev</li>
+<li>test</li>
+</ul>
+<p>如果高方差问题主要源于data mismatch，就错误率来讲，train 约等于 train-dev，而train则远小于 dev&#x2F;test。</p>
+<h2 id="1-2-如何解决Data-Mismatch问题？"><a href="#1-2-如何解决Data-Mismatch问题？" class="headerlink" title="1.2 如何解决Data Mismatch问题？"></a>1.2 如何解决Data Mismatch问题？</h2><p>Data Mismatch的解决方法自然是让train和dev&#x2F;test的分布一致。<br>首先进行错误分析，观察dev&#x2F;test上错误的样本和训练集上的样本的差别，然后采用人工合成数据来尽量让训练集与dev&#x2F;test集合相似，保持相同或相似的分布。</p>
+<p>例如对于一个图像分类任务中，被错误分类的dev&#x2F;test的图像大多都有雾气背景，则可以将train中的一些样本进行雾气背景的人工合成。</p>
+<h1 id="2-迁移学习"><a href="#2-迁移学习" class="headerlink" title="2. 迁移学习"></a>2. 迁移学习</h1><blockquote>
+<p>将在数据集A上训练的模型运用在数据集B上的过程叫做迁移学习。</p>
+</blockquote>
+<p>迁移学习包含两个重要的概念：</p>
+<ul>
+<li>pre-training：预先在某个数据集上进行模型的训练。</li>
+<li>fine-tuning：在目标数据集上对预训练模型进行训练，微微调整其模型参数。</li>
+</ul>
+<p>迁移学习的目的是为了让一些任务相关的模型可以共享一些低层次的特征，这样即减少了模型的训练时间，也降低了对海量数据集的要求。</p>
+<blockquote>
+<p>ps：马克思主义中国化历程其实可以看做是一次迁移学习，中国共产党人将得到验证的马克思主义理论（pre-training）运用到中国，并对其改革创新、继承发展（fine-tuning），最终创造了毛泽东思想，中国特色社会主义理论体系，习近平新时代中国特色社会主义思想等理论成果。</p>
+</blockquote>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1542806599420-46ed2a52-d315-4b8e-9066-472e6ce3c9cb.png" alt="transfer-learning.png | center | 747x166"></p>
+<p>对于一个预训练模型，如上图所示，对其进行迁移学习和微调的做法不拘一格。</p>
+<ul>
+<li>固定前面n-1层权重不变，将输出层替换为满足自己任务需求的输出层，然后在自己的数据集上进行训练，只调整替换的输出层的权重。</li>
+<li>前面的n-1层的权重作为新模型的初始化权重，并对新模型的n层网络进行训练。</li>
+</ul>
+<p>选择保留哪些网络层，新增多少网络层以及权重的更新策略等都是视具体任务而定的。</p>
+<p>迁移学习的应用场景：</p>
+<ul>
+<li>任务A和任务B有相同的输入，例如输入都是图像、文本等；</li>
+<li>任务A的数据集大于任务B的数据集；</li>
+<li>任务A的低层次的特征对提升任务B的性能大有帮助；</li>
+</ul>
+<p>例子：一个在海量红绿灯数据集上训练的__识别红绿灯__的模型，可以采用迁移学习去训练一个__识别黄灯__的模型，因为都是交通灯，仅仅是颜色不同，这两个任务非常相近。</p>
+<h1 id="3-多任务学习"><a href="#3-多任务学习" class="headerlink" title="3. 多任务学习"></a>3. 多任务学习</h1><p>多任务学习和迁移学习不一样，多任务学习不是先学习一个模型，然后再去训练另一个模型，而是同时进行多个模型的训练（多个任务的学习）。</p>
+<p>例如：检测一个图片中是否有行人、汽车、停止标志和红绿灯，在一个神经网络中，这些任务都可以同时进行学习。不像softmax作为输出层，该任务的预测结果不是每张图片具有多个label，而是是否存在该label。同时，对于一些标注样本，如果某个样本在某个label上缺失，也不影响整个训练，其同样可以作为有效的样本存在于训练集中。</p>
+<p>多任务学习的使用场景没有迁移学习常见，适合多任务学习的场景主要是：在一系列相关的任务中，这些任务有共享的低层次的特征，例如计算机视觉领域的对象检测。</p>
+<h1 id="4-端到端学习"><a href="#4-端到端学习" class="headerlink" title="4. 端到端学习"></a>4. 端到端学习</h1><p>传统的一些计算机任务例如语音识别，需要手动的设计特征（hand-craft feature），例如MFCC，然后人为的划分很多个步骤，每个步骤都有特定的研究者在该领域耕耘数十年。我们在采用这种pipline的方式进行机器学习的时候，很多时候我们强迫算法去学习我们人为定义的概念，例如语音识别中的音素。</p>
+<p>端到端的学习则不是采用这一套pipline的方式，而是利用原始的数据去学习原始输入和输出之间复杂的映射。端到端的学习没有引入人类的一些强迫的概念，而是从数据本身去发现潜在的输入和输出的关系。端到端的学习的成功很大部分取决于海量的数据，而传统的方法并不是一无是处，在一些数据量小的情况下，传统方法具有明显的优势。</p>
+<p>在数据量小的时候，传统的方法可能更适合，在数据量巨大的时候，端到端的学习方法更可取，然而，现实世界中，没有足够的数据去进行端到端的学习，因此在数据量适中的情况下，我们通常将端到端的学习拆分为多个步骤，并同时采用一些传统的方法，相当于除了数据之外，我们还为模型注入一些人类的知识，这样整个模型表达知识的能力才会到达最优。</p>
+<p>例如：人脸识别门禁。</p>
+<ul>
+<li>端到端的方案：输入是一张站着的人的图片，输出是这个人的id，显然站着的人的脸的大小会随着人距离摄像头的远近不同，还有角度等因素，因此采集海量的数据是十分困难的，因此端到端的学习在这不太实用。</li>
+<li>多步骤分开建模方案：首先利用成熟的模型将人脸抠出来，然后再resize的固定的大小进行人脸识别，这样就将人脸识别的大问题拆分为两个易于解决的子问题，而每个子问题可利用的数据集也是巨大的，可以单独的采用端到端的方案去学习。</li>
+</ul>
+<p>端到端学习的优缺点：</p>
+<ul>
+<li>优点<ul>
+<li>充分发挥数据的价值</li>
+<li>花费很少的精力去设计特征</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>要求海量数据</li>
+<li>对于一些很有用的人工特征没有充分利用</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>端到端的学习不是万能的，传统方法并不是一无是处。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/data-mismatch/" rel="tag"># data mismatch</a>
+              <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+              <a href="/tags/transfer-learning/" rel="tag"># transfer learning</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/11/12/hexo-backup-config/" rel="prev" title="配置MacBook Pro Hexo博客源文件备份">
+                  <i class="fa fa-angle-left"></i> 配置MacBook Pro Hexo博客源文件备份
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/12/04/Notes-Learning%20Spatiotemporal%20Features%20with%203D%20Convolutional%20Networks/" rel="next" title="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks">
+                  Notes：Learning Spatiotemporal Features with 3D Convolutional Networks <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.简介Union-Find算法又称并查集算法，是一种作用于并查集数据结构的算法。包含两个主要的操作：  Find 用于查找某个元素属于哪个集合，可以用来确定两个元素是否在同一个集合中； Union 用于合并两个不同的集合；  2.原理并查集数据结构是一种树形结构，树形结构对于有规律的数据组织方式，进行修改和查找十分高效。具体结构如下图一所示：       图一           图二   图一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Union-Find算法">
+<meta property="og:url" content="https://spground.github.io/2017/09/30/Union-Find%20algorithm/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1.简介Union-Find算法又称并查集算法，是一种作用于并查集数据结构的算法。包含两个主要的操作：  Find 用于查找某个元素属于哪个集合，可以用来确定两个元素是否在同一个集合中； Union 用于合并两个不同的集合；  2.原理并查集数据结构是一种树形结构，树形结构对于有规律的数据组织方式，进行修改和查找十分高效。具体结构如下图一所示：       图一           图二   图一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.blog.csdn.net/20171120115417274?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171120115447499?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171120115528182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171120115617437?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171120115646901?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20171120115718144?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="article:published_time" content="2017-09-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.568Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="并查集">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20171120115417274?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+
+
+<link rel="canonical" href="https://spground.github.io/2017/09/30/Union-Find%20algorithm/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2017/09/30/Union-Find%20algorithm/","path":"2017/09/30/Union-Find algorithm/","title":"Union-Find算法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Union-Find算法 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">1.简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2.原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%94%B9%E8%BF%9B"><span class="nav-number">3.</span> <span class="nav-text">3.改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%BA%94%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">4.应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-References"><span class="nav-number">5.</span> <span class="nav-text">5.References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2017/09/30/Union-Find%20algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Union-Find算法 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Union-Find算法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-09-30 00:00:00" itemprop="dateCreated datePublished" datetime="2017-09-30T00:00:00+08:00">2017-09-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h2><p><code>Union-Find</code>算法又称并查集算法，是一种作用于<code>并查集</code>数据结构的算法。包含两个主要的操作：</p>
+<ul>
+<li><code>Find</code> 用于查找某个元素属于哪个集合，可以用来确定两个元素是否在同一个集合中；</li>
+<li><code>Union</code> 用于合并两个不同的集合；</li>
+</ul>
+<h2 id="2-原理"><a href="#2-原理" class="headerlink" title="2.原理"></a>2.原理</h2><p>并查集数据结构是一种树形结构，树形结构对于有规律的数据组织方式，进行修改和查找十分高效。<br>具体结构如下图一所示：</p>
+<p align="center">
+  <img src="http://img.blog.csdn.net/20171120115417274?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"/>
+  <P align="center">图一</p>
+</p>
+
+<br/>
+
+<p align="center">
+  <img src="http://img.blog.csdn.net/20171120115447499?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"/>
+  <P align="center">图二</p>
+</p>
+
+<p>图一展示了并查集的树形结构，每一棵独立的树都代表一个独立的集合，在同一棵树下的所有节点自然就是属于同一个集合。<br>图二表示了并查集的存储结构，并查集数据结构采用数据对树进行存储，元素<code>i</code>的值<code>id[i]</code>存储的是其在树形结构上对应的<strong>父节点</strong>的标号，而根节点元素<code>root</code>的值<code>id[root]</code>是本身的标号，即<code>root = id[root]</code>;</p>
+<p>有了上述的树形结构和数据的组织形式后，一些基本的操作就变得简单了。</p>
+<ul>
+<li><code>root(x)</code> 返回元素<code>x</code>所在树的根节点，从当前元素<code>x</code>的父节点<code>id[i]</code>不断的向上递推求父节点，直到<code>id[i] == i</code>成立。</li>
+<li><code>connected(x, y)</code>判断<code>x</code>和<code>y</code>元素是否是连通的（直接或间接）,只需要判断两个节点是否有相同的根节点（即是否在同一棵树中）；</li>
+<li><code>count(x)</code> 获取元素<code>x</code>所在集合（树）的元素（节点）的个数,以根节点来分别统计每棵树的节点的数目；</li>
+<li><code>find(x)</code> 返回元素<code>x</code>的根节点</li>
+<li><code>union(x,y)</code> 将元素<code>x</code>和<code>y</code>连通，将<code>x</code>所在的树的拼接到<code>y</code>所在树种，（反之亦可）即将<code>x</code>的根节点父节点设置为<code>y</code>的根节点。</li>
+</ul>
+<p>上述的操作基本上覆盖了并查集数据结构以及算法中的大部分操作，由此可以写出一个基本的并查集算法雏形：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind</span> &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span>[] id;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">UnionFind</span><span class="params">(<span class="type">int</span> size)</span> &#123;</span><br><span class="line">		id = <span class="keyword">new</span> <span class="title class_">int</span>[size];</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">			id[i] = i;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">connected</span><span class="params">(<span class="type">int</span> i, <span class="type">int</span> j)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> root(i) == root(j);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> <span class="title function_">root</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="type">int</span> root;</span><br><span class="line">		<span class="keyword">while</span> ((root = id[i]) != i)</span><br><span class="line">			i = id[i];	</span><br><span class="line">		<span class="keyword">return</span> root;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">find</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> root(i);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> i, <span class="type">int</span> j)</span> &#123;</span><br><span class="line">		<span class="type">int</span> rootI, rootJ;</span><br><span class="line">		<span class="keyword">if</span> ((rootI = root(i)) == (rootJ = root(j)))</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">     id[rootI] = rootJ;<span class="comment">//将i节点所在树移接到j节点所在树</span></span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		Map&lt;Integer, List&lt;Integer&gt;&gt; group = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span> ; i &lt; <span class="built_in">this</span>.id.length; i++) &#123;</span><br><span class="line">			<span class="type">int</span> <span class="variable">root</span> <span class="operator">=</span> root(i);</span><br><span class="line">			<span class="keyword">if</span> (group.get(root) == <span class="literal">null</span>) &#123;</span><br><span class="line">				List&lt;Integer&gt; tmp = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">				tmp.add(i);</span><br><span class="line">				group.put(root, tmp);</span><br><span class="line">			&#125; <span class="keyword">else</span> </span><br><span class="line">				group.get(root).add(i);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> group.toString();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-改进"><a href="#3-改进" class="headerlink" title="3.改进"></a>3.改进</h2><p>对上述<code>Union-Find</code>的两个主要操作<code>find</code>和<code>union</code>的时间复杂度进行分析易得出</p>
+<ul>
+<li>union(i,j) — O(1)</li>
+<li>find(i) — O(h) 其中h是节点<code>i</code>所在树的高度</li>
+</ul>
+<p>由于在进行对两个节点进行<code>union</code>操作的时候，我们总是不加选择的将节点<code>i</code>所在的树拼接到节点<code>j</code>所在的树下，这样可能会导致某一棵树特别的<strong>瘦高</strong>，即其<code>h</code>很大，几乎可以接近于<code>n</code>，从而可能导致<code>find</code>操作可能需要遍历整个集合。</p>
+<p align="center">
+  <img src="http://img.blog.csdn.net/20171120115528182?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"/>
+  <P align="center">图三</p>
+</p>
+
+<p>由于这个原因，我们需要不断的调整树，使其变得稍微<strong>矮胖</strong>一些，如图四。</p>
+<p align="center">
+  <img src="http://img.blog.csdn.net/20171120115617437?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"/>
+  <P align="center">图四</p>
+</p>
+
+<p>为了将树摊平，存在两个改进的地方：</p>
+<ul>
+<li><p>带权的<code>union</code>操作  即在进行<code>union</code>操作的时候，可以先判断节点所在树的大小，将size小的树接到size大的树；</p>
+</li>
+<li><p>路径压缩 即在进行<code>find</code>操作的时候，在找到根节点后，循环将该路径下的所有节点都拼接到根节点下，如图五所示；</p>
+<p>​</p>
+</li>
+</ul>
+<p align="center">
+  <img src="http://img.blog.csdn.net/20171120115646901?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"/>
+  <P align="center">图五</p>
+</p>
+
+
+<p align="center">
+  <img src="http://img.blog.csdn.net/20171120115718144?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"/>
+  <P align="center">图六</p>
+</p>
+
+<p>改进后<code>union-find</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind</span> &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> Map&lt;Integer, Integer&gt; memSize;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span>[] id;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">UnionFind</span><span class="params">(<span class="type">int</span> size)</span> &#123;</span><br><span class="line">		memSize = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">		id = <span class="keyword">new</span> <span class="title class_">int</span>[size];</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">			id[i] = i;</span><br><span class="line">			memSize.put(i, <span class="number">1</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">connected</span><span class="params">(<span class="type">int</span> i, <span class="type">int</span> j)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> root(i) == root(j);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> <span class="title function_">root</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="type">int</span> root;</span><br><span class="line">		<span class="keyword">while</span> ((root = id[i]) != i) &#123;</span><br><span class="line">			<span class="comment">//优化二：路径压缩，将当前非root节点i 拼接到爷节点下面，将爷节点作为自己的父节点</span></span><br><span class="line">			<span class="comment">//这样为后续查找节点i的root节点压缩路径深度，节约了时间。</span></span><br><span class="line">			id[i] = id[id[i]];</span><br><span class="line">			i = id[i];	</span><br><span class="line">		&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//或者另一种路径压缩方式</span></span><br><span class="line">    <span class="comment">/* while (id[i] != i) &#123;</span></span><br><span class="line"><span class="comment">      id[i] = root;</span></span><br><span class="line"><span class="comment">      i = id[i];</span></span><br><span class="line"><span class="comment">    &#125; */</span></span><br><span class="line">    </span><br><span class="line">		<span class="keyword">return</span> root;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">find</span><span class="params">(<span class="type">int</span> i)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> root(i);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> i, <span class="type">int</span> j)</span> &#123;</span><br><span class="line">		<span class="type">int</span> rootI, rootJ;</span><br><span class="line">		<span class="keyword">if</span> ((rootI = root(i)) == ( rootJ = root(j)))</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		<span class="type">int</span> iSize, jSize;</span><br><span class="line">		<span class="comment">//优化一：带权union, 小树接大树，避免新树过高；</span></span><br><span class="line">		<span class="keyword">if</span> ((iSize = memSize.get(rootI)) &gt; (jSize = memSize.get(rootJ))) &#123;</span><br><span class="line">			id[rootJ] = rootI;</span><br><span class="line">			memSize.put(rootI, iSize + jSize);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			id[rootI] = rootJ;</span><br><span class="line">			memSize.put(rootJ, iSize + jSize);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		Map&lt;Integer, List&lt;Integer&gt;&gt; group = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span> ; i &lt; <span class="built_in">this</span>.id.length; i++) &#123;</span><br><span class="line">			<span class="type">int</span> <span class="variable">root</span> <span class="operator">=</span> root(i);</span><br><span class="line">			<span class="keyword">if</span> (group.get(root) == <span class="literal">null</span>) &#123;</span><br><span class="line">				List&lt;Integer&gt; tmp = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">				tmp.add(i);</span><br><span class="line">				group.put(root, tmp);</span><br><span class="line">			&#125; <span class="keyword">else</span> </span><br><span class="line">				group.get(root).add(i);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> group.toString();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-应用"><a href="#4-应用" class="headerlink" title="4.应用"></a>4.应用</h2><ul>
+<li>Percolation.</li>
+<li>Games (Go, Hex).</li>
+<li>Dynamic connectivity.</li>
+<li>Least common ancestor.</li>
+<li>Equivalence of finite state automata.</li>
+<li>Hoshen-Kopelman algorithm in physics.</li>
+<li>Hinley-Milner polymorphic type inference.</li>
+<li>Kruskal’s minimum spanning tree algorithm.</li>
+<li>Compiling equivalence statements in Fortran.</li>
+<li>Morphological attribute openings and closings.</li>
+<li>Matlab’s bwlabel() function in image processing.</li>
+</ul>
+<h2 id="5-References"><a href="#5-References" class="headerlink" title="5.References"></a>5.References</h2><p>[1] Algorithms - Robert Sedgewick, Kevin Wayne</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%B6%E6%9F%A5%E9%9B%86/" rel="tag"># 并查集</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/08/04/IO%20model/" rel="prev" title="IO模型">
+                  <i class="fa fa-angle-left"></i> IO模型
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/12/01/JVM%20Memory%20Area%20I/" rel="next" title="JVM 内存区域（一）">
+                  JVM 内存区域（一） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

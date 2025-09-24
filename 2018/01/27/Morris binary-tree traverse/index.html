@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. 二叉树遍历树是最重要的数据结构之一，而树的遍历是树最基本的操作。 二叉树的遍历一般来说有三种遍历次序：  前序遍历  中序遍历 后序遍历  而这三种遍历次序都可以采用递归和非递归的方式来完成。 就时间、空间的复杂度来讲，因为非递归需要借助额外的Stack来完成操作，所以递归和非递归的时间复杂度都是O(n)，O(logn)。 那么有没有另外的不同的二叉树遍历方法，在时间或空间能做到更优的呢？答">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Morris 遍历">
+<meta property="og:url" content="https://spground.github.io/2018/01/27/Morris%20binary-tree%20traverse/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. 二叉树遍历树是最重要的数据结构之一，而树的遍历是树最基本的操作。 二叉树的遍历一般来说有三种遍历次序：  前序遍历  中序遍历 后序遍历  而这三种遍历次序都可以采用递归和非递归的方式来完成。 就时间、空间的复杂度来讲，因为非递归需要借助额外的Stack来完成操作，所以递归和非递归的时间复杂度都是O(n)，O(logn)。 那么有没有另外的不同的二叉树遍历方法，在时间或空间能做到更优的呢？答">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://spground.github.io/images/tree_traversal.png">
+<meta property="og:image" content="https://spground.github.io/images/morris_in_order.jpg">
+<meta property="og:image" content="https://spground.github.io/images/morris_in_order.jpg">
+<meta property="og:image" content="https://spground.github.io/images/morris_post_order.jpg">
+<meta property="article:published_time" content="2018-01-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.567Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="树">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="遍历">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://spground.github.io/images/tree_traversal.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2018/01/27/Morris%20binary-tree%20traverse/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2018/01/27/Morris%20binary-tree%20traverse/","path":"2018/01/27/Morris binary-tree traverse/","title":"Morris 遍历"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Morris 遍历 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%81%8D%E5%8E%86"><span class="nav-number">1.</span> <span class="nav-text">1. 二叉树遍历</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Morris-%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86"><span class="nav-number">2.</span> <span class="nav-text">2. Morris 中序遍历</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Morris-%E5%89%8D%E5%BA%8F%E9%81%8D%E5%8E%86"><span class="nav-number">3.</span> <span class="nav-text">3. Morris 前序遍历</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Morris-%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86"><span class="nav-number">4.</span> <span class="nav-text">4. Morris 后序遍历</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-References"><span class="nav-number">5.</span> <span class="nav-text">5. References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2018/01/27/Morris%20binary-tree%20traverse/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Morris 遍历 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Morris 遍历
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-01-27 00:00:00" itemprop="dateCreated datePublished" datetime="2018-01-27T00:00:00+08:00">2018-01-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="1-二叉树遍历"><a href="#1-二叉树遍历" class="headerlink" title="1. 二叉树遍历"></a>1. 二叉树遍历</h1><p>树是最重要的数据结构之一，而树的遍历是树最基本的操作。</p>
+<p>二叉树的遍历一般来说有三种遍历次序：</p>
+<ul>
+<li>前序遍历 </li>
+<li>中序遍历</li>
+<li>后序遍历</li>
+</ul>
+<p>而这三种遍历次序都可以采用<strong>递归</strong>和<strong>非递归</strong>的方式来完成。</p>
+<p>就时间、空间的复杂度来讲，因为非递归需要借助额外的<code>Stack</code>来完成操作，所以递归和非递归的时间复杂度都是<code>O(n)</code>，<code>O(logn)</code>。</p>
+<p>那么有没有另外的不同的二叉树遍历方法，在时间或空间能做到更优的呢？答案是：<strong>Morris 遍历</strong>。</p>
+<p>由于在遍历的时候，我们需要记住某种遍历次序的的<strong>后驱</strong>或者<strong>前驱</strong>结点，常见的递归和非递归都是采用<strong>栈</strong>的方式完成这个过程，有没有内部空间来记录这些后驱或者前驱结点呢？有，那就是叶结点的左，右孩子结点，因为叶结点的两个孩子结点都是空指针，如果利用好这些空间，我们就可以在<code>O(1)</code> 的空间完成遍历。</p>
+<p>利用叶结点的左、右孩子指向遍历的前驱或者后驱结点，这些指针叫做<strong>线索</strong>，对应的二叉树叫做<strong>线索二叉树</strong>。</p>
+<p><img src="/images/tree_traversal.png"></p>
+<p><a href="https://en.wikipedia.org/wiki/Tree_traversal#Morris_in-order_traversal_using_threading"><strong>Morris遍历</strong>是使用线索二叉树进行中序遍历的一种实现</a>，其可以在<code>O(n)</code>的时间，<code>O(1)</code>的空间完成遍历， 对其稍加修改可以推广到<strong>先序、后序遍历</strong>，其遍历过程包含三个部分：</p>
+<ol>
+<li>创建指向<strong>中序后驱</strong>结点的线索；</li>
+<li>遍历输出结点；</li>
+<li>删除线索，恢复树的结构；</li>
+</ol>
+<h1 id="2-Morris-中序遍历"><a href="#2-Morris-中序遍历" class="headerlink" title="2. Morris 中序遍历"></a>2. Morris 中序遍历</h1><p><strong>Morris 中序遍历过程如下：</strong></p>
+<ol>
+<li><p>当前结点的左孩子是否为空，若是则输出当前结点，更当前结点为当前结点的右孩子；否则进入2；</p>
+</li>
+<li><p>在当前结点的左子树中寻找中序遍历下的前驱结点（左子树中最右结点）</p>
+<p>a. 若前驱结点的右孩子为空，则将前驱结点的右孩子指向当前结点，当前结点更新为当前结点的左孩子；进入3；</p>
+<p>b. 若前驱结点的右孩子为当前结点（不为空），将前驱结点的右孩子置NULL，输出当前结点，当前结点更新为当前结点的右孩子，进入3；</p>
+</li>
+<li><p>若当前结点不为空，进入1；否则程序结束；</p>
+</li>
+</ol>
+<p><strong>伪代码如下：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cur = root</span><br><span class="line">repeat until cur != NULL:</span><br><span class="line">	if cur.left != NULL:</span><br><span class="line">		pre = cur.left;</span><br><span class="line">		while pre.right == NULL &amp;&amp; pre.right != cur://找到前驱结点pre</span><br><span class="line">			pre = pre.right</span><br><span class="line">		if pre.right == NULL:</span><br><span class="line">			pre.right = cur</span><br><span class="line">			cur = cur.left</span><br><span class="line">		else:</span><br><span class="line">			print(cur)</span><br><span class="line">			pre.right = NULL</span><br><span class="line">			cur = cur.right</span><br><span class="line">	else:</span><br><span class="line">		print(cur)</span><br><span class="line">		cur = cur.right</span><br></pre></td></tr></table></figure>
+
+
+
+<p>下图为每一步迭代的结果（从左至右，从上到下），<code>cur</code>代表当前节点，深色节点表示该节点已输出。</p>
+<p><img src="/images/morris_in_order.jpg"></p>
+<p>以下为<code>Java</code>的实现:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">inOrder</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">	<span class="type">TreeNode</span> <span class="variable">cur</span> <span class="operator">=</span> root, pre = <span class="literal">null</span>;</span><br><span class="line">	<span class="keyword">for</span> (; cur != <span class="literal">null</span>;) &#123;</span><br><span class="line">		<span class="keyword">if</span> (cur.left != <span class="literal">null</span>) &#123;</span><br><span class="line">			pre = cur.left;</span><br><span class="line">			<span class="comment">// find predecessor</span></span><br><span class="line">			<span class="keyword">while</span> (pre.right != <span class="literal">null</span> &amp;&amp; pre.right != cur)</span><br><span class="line">				pre = pre.right;</span><br><span class="line">			<span class="keyword">if</span> (pre.right == <span class="literal">null</span>) &#123;<span class="comment">// create thread</span></span><br><span class="line">				pre.right = cur;</span><br><span class="line">				cur = cur.left;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				print(cur);</span><br><span class="line">				pre.right = <span class="literal">null</span>;</span><br><span class="line">				cur = cur.right;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			print(cur);</span><br><span class="line">			cur = cur.right;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="3-Morris-前序遍历"><a href="#3-Morris-前序遍历" class="headerlink" title="3. Morris 前序遍历"></a>3. Morris 前序遍历</h1><p>对于前序遍历，只需要在中序遍历的基础上稍加修改便可以完成。</p>
+<p><strong>Morris 前序遍历的流程如下：</strong></p>
+<ol>
+<li><p>当前结点的左孩子是否为空，若是则输出当前结点，并更新当前结点为当前结点的右孩子；否则进入2；</p>
+</li>
+<li><p>在当前结点的左子树中寻找中序遍历下的前驱结点（左子树中最右结点）</p>
+<p>a. 若前驱结点的右孩子为空，则将前驱结点的右孩子指向当前结点，输出当前结点（<strong>在这里输出，和中序遍历不同的地方</strong>），当前结点更新为当前结点的左孩子；进入3；</p>
+<p>b.  若前驱结点的右孩子为当前结点（不为空），将前驱结点的右孩子置NULL，当前结点更新为当前结点的右孩子，进入3；</p>
+</li>
+<li><p>若当前结点不为空，进入1；否则程序结束；</p>
+</li>
+</ol>
+<p>伪代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cur = root;</span><br><span class="line">repeat until cur != NULL:</span><br><span class="line">	if cur.left != NULL:</span><br><span class="line">		pre = cur.left;</span><br><span class="line">		while pre.right == NULL &amp;&amp; pre.right != cur://找到前驱结点pre</span><br><span class="line">			pre = pre.right</span><br><span class="line">		if pre.right == NULL:</span><br><span class="line">			pre.right = cur</span><br><span class="line">			print(cur)//此处和中序遍历不同</span><br><span class="line">			cur = cur.left</span><br><span class="line">		else:</span><br><span class="line">			pre.right = NULL</span><br><span class="line">			cur = cur.right</span><br><span class="line">	else:</span><br><span class="line">		print(cur)</span><br><span class="line">		cur = cur.right</span><br></pre></td></tr></table></figure>
+
+
+
+<p>下图为每一步迭代的结果（从左至右，从上到下），<code>cur</code>代表当前节点，深色节点表示该节点已输出。</p>
+<p><img src="/images/morris_in_order.jpg"></p>
+<p>以下为<code>Java</code>的实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">preOrder</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">	<span class="type">TreeNode</span> <span class="variable">cur</span> <span class="operator">=</span> root, pre = <span class="literal">null</span>;</span><br><span class="line">	<span class="keyword">for</span> (;cur != <span class="literal">null</span>;) &#123;</span><br><span class="line">		<span class="keyword">if</span> (cur.left != <span class="literal">null</span>) &#123;</span><br><span class="line">			pre = cur.left;</span><br><span class="line">			<span class="comment">// find predecessor</span></span><br><span class="line">			<span class="keyword">while</span> (pre.right != <span class="literal">null</span> &amp;&amp; pre.right != cur)</span><br><span class="line">				pre = pre.right;</span><br><span class="line">			<span class="keyword">if</span> (pre.right == <span class="literal">null</span>) &#123;<span class="comment">// create thread</span></span><br><span class="line">				print(cur);<span class="comment">// print node here </span></span><br><span class="line">				pre.right = cur;</span><br><span class="line">				cur = cur.left;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				pre.right = <span class="literal">null</span>;<span class="comment">//delete thread</span></span><br><span class="line">				cur = cur.right;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			print(cur);</span><br><span class="line">			cur = cur.right;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="4-Morris-后序遍历"><a href="#4-Morris-后序遍历" class="headerlink" title="4. Morris 后序遍历"></a>4. Morris 后序遍历</h1><p>后序遍历的流程如下：</p>
+<ol start="0">
+<li><p>新建一个<code>Dummy</code>结点，该结点的左孩子指向树根<code>root</code>，将<code>Dummy</code>作为当前结点；</p>
+</li>
+<li><p>当前结点的左孩子是否为空，更新当前结点为当前结点的右孩子；否则进入2；</p>
+</li>
+<li><p>在当前结点的左子树中寻找中序遍历下的前驱结点（左子树中最右结点）：</p>
+<p>a. 若前驱结点的右孩子为空，则将前驱结点的右孩子指向当前结点，当前结点更新为当前结点的左孩子，进入3；</p>
+<p>b. 若前驱结点的右孩子为当前结点（不为空），<strong>反转当前结点到前驱结点之间的路径，输出该路径所有结点；反转当前结点到前驱结点之间的路径，恢复原状</strong>。将前驱结点的右孩子置NULL，当前结点更新为当前结点的右孩子，进入3；</p>
+</li>
+<li><p>若当前结点不为空，进入1；否则程序结束；</p>
+</li>
+</ol>
+<p>伪代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">dummy = Node(-1)</span><br><span class="line">dummy.left = root</span><br><span class="line">cur = dummy</span><br><span class="line">repeat until cur != NULL:</span><br><span class="line">	if cur.left != NULL:</span><br><span class="line">		pre = cur.left;</span><br><span class="line">		while pre.right == NULL &amp;&amp; pre.right != cur://找到前驱结点pre</span><br><span class="line">			pre = pre.right</span><br><span class="line">		if pre.right == NULL:</span><br><span class="line">			pre.right = cur</span><br><span class="line">			cur = cur.left</span><br><span class="line">		else:</span><br><span class="line">			reverse(cur.left, pre)</span><br><span class="line">			print(pre, cur.left)</span><br><span class="line">			reverse(pre, cur.left)//再次反转，恢复原状</span><br><span class="line">			pre.right = NULL</span><br><span class="line">			cur = cur.right</span><br><span class="line">	else:</span><br><span class="line">		cur = cur.right</span><br></pre></td></tr></table></figure>
+
+
+
+<p>下图为每一步迭代的结果（从左至右，从上到下），<code>cur</code>代表当前节点，深色节点表示该节点已输出。</p>
+<p><img src="/images/morris_post_order.jpg"></p>
+<p>以下为<code>Java</code>的实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">postOrder</span><span class="params">(TreeNode root)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">TreeNode</span> <span class="variable">dummy</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(-<span class="number">1</span>);</span><br><span class="line">		dummy.left = root;</span><br><span class="line">		<span class="type">TreeNode</span> <span class="variable">cur</span> <span class="operator">=</span> dummy, pre = <span class="literal">null</span>;</span><br><span class="line">		<span class="keyword">for</span> (;cur != <span class="literal">null</span>;) &#123;</span><br><span class="line">			<span class="keyword">if</span> (cur.left != <span class="literal">null</span>) &#123;</span><br><span class="line">				pre = cur.left;</span><br><span class="line">				<span class="comment">// find predecessor</span></span><br><span class="line">				<span class="keyword">while</span> (pre.right != <span class="literal">null</span> &amp;&amp; pre.right != cur)</span><br><span class="line">					pre = pre.right;</span><br><span class="line">				<span class="keyword">if</span> (pre.right == <span class="literal">null</span>) &#123;<span class="comment">// create thread</span></span><br><span class="line">					pre.right = cur;</span><br><span class="line">					cur = cur.left;</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;<span class="comment">//print here</span></span><br><span class="line">					reverse(cur.left, pre);</span><br><span class="line">					print(pre, cur.left);</span><br><span class="line">					reverse(pre, cur.left);</span><br><span class="line">					pre.right = <span class="literal">null</span>;</span><br><span class="line">					cur = cur.right;</span><br><span class="line">				&#125;</span><br><span class="line">				</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				cur = cur.right;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">print</span><span class="params">(TreeNode from, TreeNode to)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="keyword">for</span> (;;from = from.right) &#123;</span><br><span class="line">			print(from);</span><br><span class="line">			<span class="keyword">if</span> (from == to) <span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">reverse</span><span class="params">(TreeNode from, TreeNode to)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="keyword">if</span> (from == to) <span class="keyword">return</span>;</span><br><span class="line">		<span class="type">TreeNode</span> <span class="variable">x</span> <span class="operator">=</span> from, y = from.right, z= <span class="literal">null</span>;</span><br><span class="line">		x.right = <span class="literal">null</span>;</span><br><span class="line">		<span class="keyword">for</span> (;;) &#123;</span><br><span class="line">			z = y.right;</span><br><span class="line">			y.right = x;</span><br><span class="line">			x = y;</span><br><span class="line">			<span class="keyword">if</span> (y == to) <span class="keyword">break</span>;</span><br><span class="line">			y = z;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整的代码：详见</p>
+<p><a href="https://github.com/Spground/archive/blob/master/misc/code/MorrisTraversalDemo.java">https://github.com/Spground/archive/blob/master/misc/code/MorrisTraversalDemo.java</a></p>
+<h1 id="5-References"><a href="#5-References" class="headerlink" title="5. References"></a>5. References</h1><ol>
+<li><a href="http://www.cnblogs.com/AnnieKim/archive/2013/06/15/MorrisTraversal.html">http://www.cnblogs.com/AnnieKim/archive/2013/06/15/MorrisTraversal.html</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Tree_traversal#Morris_in-order_traversal_using_threading">https://en.wikipedia.org/wiki/Tree_traversal#Morris_in-order_traversal_using_threading</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Threaded_binary_tree#The_array_of_Inorder_traversal">https://en.wikipedia.org/wiki/Threaded_binary_tree#The_array_of_Inorder_traversal</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%81%8D%E5%8E%86/" rel="tag"># 遍历</a>
+              <a href="/tags/%E6%A0%91/" rel="tag"># 树</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/01/17/Threads%20and%20Thread%20pools/" rel="prev" title="Java线程池">
+                  <i class="fa fa-angle-left"></i> Java线程池
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/02/03/java%20lock/" rel="next" title="Java并发中的锁">
+                  Java并发中的锁 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

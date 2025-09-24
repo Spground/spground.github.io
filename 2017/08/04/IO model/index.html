@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. IO复用 进程需要这样一种功能：内核一旦发现进程指定的一个或多个IO条件（事件）就绪（输入准备好被读取或者输出准备好被输出），它通知进程，这个就叫做I&#x2F;O复用。  IO复用的典型使用场景  客户处理多个描述符号（通常是交互式输入和网络套接字）时候，必须使用I&#x2F;O复用，例如实际的网络聊天，进程既要等待用户的输入，又要处理来自网络套接字的输入，采用I&#x2F;O复用可以大幅">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO模型">
+<meta property="og:url" content="https://spground.github.io/2017/08/04/IO%20model/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. IO复用 进程需要这样一种功能：内核一旦发现进程指定的一个或多个IO条件（事件）就绪（输入准备好被读取或者输出准备好被输出），它通知进程，这个就叫做I&#x2F;O复用。  IO复用的典型使用场景  客户处理多个描述符号（通常是交互式输入和网络套接字）时候，必须使用I&#x2F;O复用，例如实际的网络聊天，进程既要等待用户的输入，又要处理来自网络套接字的输入，采用I&#x2F;O复用可以大幅">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-08-04T12:41:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.565Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="IO">
+<meta property="article:tag" content="同步异步IO">
+<meta property="article:tag" content="多路复用">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://spground.github.io/2017/08/04/IO%20model/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2017/08/04/IO%20model/","path":"2017/08/04/IO model/","title":"IO模型"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IO模型 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-IO%E5%A4%8D%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">1. IO复用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-I-O%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">2. I&#x2F;O模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E9%98%BB%E5%A1%9EIO"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 阻塞IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%9D%9E%E9%98%BB%E5%A1%9EIO"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 非阻塞IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-IO%E5%A4%8D%E7%94%A8"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 IO复用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E4%BF%A1%E5%8F%B7%E9%A9%B1%E5%8A%A8IO"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 信号驱动IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%BC%82%E6%AD%A5IO"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 异步IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E5%90%8C%E6%AD%A5IO%E4%B8%8E%E5%BC%82%E6%AD%A5IO"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 同步IO与异步IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-5%E7%A7%8DIO%E6%A8%A1%E5%9E%8B%E7%9A%84Java%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 5种IO模型的Java示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">3. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-References"><span class="nav-number">4.</span> <span class="nav-text">4. References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2017/08/04/IO%20model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="IO模型 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IO模型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-08-04 20:41:00" itemprop="dateCreated datePublished" datetime="2017-08-04T20:41:00+08:00">2017-08-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">编程基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-IO复用"><a href="#1-IO复用" class="headerlink" title="1. IO复用"></a>1. IO复用</h2><blockquote>
+<p>进程需要这样一种功能：内核一旦发现进程指定的一个或多个IO条件（事件）就绪（输入准备好被读取或者输出准备好被输出），它通知进程，这个就叫做I&#x2F;O复用。</p>
+</blockquote>
+<p>IO复用的典型使用场景</p>
+<ul>
+<li><p>客户处理多个描述符号（通常是交互式输入和网络套接字）时候，必须使用I&#x2F;O复用，例如实际的网络聊天，进程既要等待用户的输入，又要处理来自网络套接字的输入，采用I&#x2F;O复用可以大幅度提高并发度和节省资源；</p>
+</li>
+<li><p>TCP服务器既要处理监听套接字，又要处理已经连接的套接字，这时候需要I&#x2F;O复用以提高并发性能；实际上常见的并发连接的客户数多，但是每个连接的任务轻（CPU时间短）比如多人在线聊天室；连接并发数多，但是每个连接不都是长期处于活跃状态，可能是偶尔I&#x2F;O一些数据，这时候需要I&#x2F;O复用，让系统别被这些Lazy的客户端拖垮；</p>
+</li>
+<li><p>如果一个服务器需要同时处理多个服务或协议，一般使用IO复用；</p>
+</li>
+</ul>
+<p>其实，不难看出I&#x2F;O复用的目的是为了让计算机的资源得到尽可能最大化的利用，提高并行化程度达到这种目的的一种有效途径。</p>
+<p>I&#x2F;O复用在某种程度上和操作系统的<strong>中断处理机制</strong>何其的相似。</p>
+<p>操作系统作为计算机的核心软件，管理着众多的硬件设备，具有极大的并发性能，我们可以同时听音乐，同时拷文件，同时跑程序等等；如此高的并发能力得益与中断机制给操作系统带来的<strong>异步能力</strong>，当某个硬件设备特定的事件发生时（比如磁盘就绪），就引发一个硬件中断，操作系统能捕获到这些中断，将当前运行的进程挂起，然后转而执行该中断对应的中断处理程序。</p>
+<p>这种机制有点<strong>贪心</strong>的思想，操作系统总是尽可能的少等待，有活就干，没活就离开；这种机制中，众多硬件设备就类似与IO复用里面的众多<strong>Lazy</strong>的客户，他们需要与服务器（这里是操作系统）保持连接（做到随叫随到），但是又总是需要操作系统。中断是操作系统运行的动力源泉，这是一个典型的异步模型。<strong>I&#x2F;O复用依赖于内核提供的异步能力</strong>，其抽象程度与操作系统和硬件设备的模型相似，这样能充分利用计算机的资源（<strong>软件充分利用操作系统，操作系统充分利用硬件</strong>）。</p>
+<h2 id="2-I-O模型"><a href="#2-I-O模型" class="headerlink" title="2. I&#x2F;O模型"></a>2. I&#x2F;O模型</h2><ul>
+<li>阻塞IO</li>
+<li>非阻塞IO</li>
+<li>IO复用</li>
+<li>信号驱动IO</li>
+<li>异步IO</li>
+</ul>
+<p>应用程序典型的I&#x2F;O包含<strong>两个不同的阶段：</strong></p>
+<p>以输入为例</p>
+<ol>
+<li><strong>IO请求就绪阶段</strong> 应用程序向内核发出请求，检查硬件设备是否准备好数据（例如等待数据从网络到达、用户键盘敲击）；若硬件设备就绪，产生中断； </li>
+<li><strong>IO实际读写阶段</strong> 内核捕获处理中断，然后内核空间将数据拷贝到用户的进程空间中，CPU切换到用户态；</li>
+</ol>
+<p>这两个阶段的产生主要是由于计算机目前的体系结构决定的（最顶层用户程序运行在用户态，中间层内核工作在内核态，最底层是硬件）；这两个阶段都有可能产生阻塞，在内核与硬件之间，应付这种阻塞采用了基于事件的中断机制以提高并发性；而在内核与用户进程之间，异步IO机制也将为用户进程并发程度提高带来曙光。</p>
+<h3 id="2-1-阻塞IO"><a href="#2-1-阻塞IO" class="headerlink" title="2.1 阻塞IO"></a>2.1 阻塞IO</h3><p>最普遍的IO模型都是阻塞模型，这种模型在IO的的第一阶段（向内核发出I&#x2F;O请求的系统调用）时，被阻塞直到<strong>I&#x2F;O就绪</strong>，再执行实际<strong>I&#x2F;O操作</strong>；</p>
+<h3 id="2-2-非阻塞IO"><a href="#2-2-非阻塞IO" class="headerlink" title="2.2 非阻塞IO"></a>2.2 非阻塞IO</h3><p>进程通知内核，进程所发起的<strong>IO请求</strong>在<strong>I&#x2F;O未就绪</strong>的条件下，也不能把进程阻塞（挂起），而是返回一个错误；该模型可能需要进程不断的去轮询某个<code>FD</code>是否<code>IO</code>就绪，这样的轮询模型比较少见，轮询会额外的浪费大量的<code>CPU</code>资源。</p>
+<h3 id="2-3-IO复用"><a href="#2-3-IO复用" class="headerlink" title="2.3 IO复用"></a>2.3 IO复用</h3><p>该模型本质上属于非阻塞模型I&#x2F;O，常见的是<code>select</code>和<code>poll</code>机制。对于普通的非阻塞模型，一个进程或者线程始终轮询同一个<code>FD</code>，这样效率较低，特别是对于同时需要处理很多FD的程序；</p>
+<p>而IO复用模型，可以让进程或者线程<strong>同时</strong>管理（轮询）<strong>多个FD</strong>，以<code>select</code>为例，<code>select</code>能够管理许多<code>FD</code>上的不同事件，<code>select</code>调用在所有<code>FD</code>都没有<code>IO</code>事件(就绪、可读、可写等)产生时会阻塞，虽然<code>select</code>调用会阻塞，但是其管理轮询的<code>FD</code>不是阻塞的，因此该模型依然算是<strong>非阻塞IO模型</strong>；</p>
+<p>该模型通常和<strong>阻塞IO模型+多线程</strong>作对比，在典型的<code>socket</code>服务器端，该模型和<strong>阻塞IO模型+多线程</strong>可以实现相同的功能，大多数情况下效果性能也不会差太离谱；</p>
+<p>但是考虑在某些特定的场景下，例如客户端连接数目众多，但是每个连接今次进行IO次数比较多，IO的数据比较少（典型的就是多人在线聊天，大量的客户端同服务器保持连接，但是每一个连接“走走停停”，隔一会来几个字节的数据），在<strong>阻塞IO模型+多线程</strong>模型中，每一个连接对应于一个线程，大量的长连接会很快<strong>消耗掉</strong>计算机中（也可能是<strong>线程池</strong>）中所有线程资源，从而拒绝了额外的新的客户连接请求，但是此时计算机的CPU却是闲置的，因为很多线程其实是在阻塞状态，因此这种场景下，该模型没有很好的提高系统的并发性；</p>
+<p>而采用<strong>I&#x2F;O复用</strong>模型，用一个或多个线程去select或者poll检查多个连接上的IO事件，当IO事件(可读、可写等)发生，就利用新开线程池中的线程来处理IO，由于每一次的IO的任务很轻，并且IO数据已经来到了内核或者进程的缓冲区，这样新开的线程很快就会被线程池回收，这样当新来的客户连接请求进来，系统仍然有足够的线程资源来处理请求，极大的提高了该场景下系统的吞吐量，<strong>IO复用模型</strong>要远优于<strong>阻塞IO模型+多线程</strong>；</p>
+<p>实际应用中，辨证的选择<strong>IO复用模型</strong>和<strong>阻塞IO模型+多线程</strong>。</p>
+<h3 id="2-4-信号驱动IO"><a href="#2-4-信号驱动IO" class="headerlink" title="2.4 信号驱动IO"></a>2.4 信号驱动IO</h3><p>进程不会阻塞在第一阶段，当IO就绪时，内核会通过信号的形式通知进程；</p>
+<h3 id="2-5-异步IO"><a href="#2-5-异步IO" class="headerlink" title="2.5 异步IO"></a>2.5 异步IO</h3><p>进程在整个IO过程（IO请求和IO读写阶段）都不会阻塞，而是在IO完成后由内核通知进程；</p>
+<h3 id="2-6-同步IO与异步IO"><a href="#2-6-同步IO与异步IO" class="headerlink" title="2.6 同步IO与异步IO"></a>2.6 同步IO与异步IO</h3><p>在某些术语中，阻塞和非阻塞用于区分IO的第一个阶段，即IO的<strong>请求阶段</strong>；<br>同步和异步用于区分IO的第二个阶段，即IO的<strong>读写阶段</strong>；</p>
+<p>因此，按照这个来重新分类上述五种IO模型，就可以分为</p>
+<ul>
+<li><p><strong>同步IO</strong></p>
+<ul>
+<li>阻塞IO <em>(最普遍的同步阻塞BIO)</em></li>
+<li>非阻塞IO <em>（Java NIO， 需要轮询，不停的轮询某个FD是否就绪）</em></li>
+<li>IO复用 <em>(Java NIO的Select机制，同时监听多个FD，虽然单个FD不阻塞，但是当所有FD都没有就绪时，select调用会阻塞；一个阻塞换来多个不阻塞)</em></li>
+<li>信号驱动IO <em>(同同步非阻塞IO，不用轮询，而是直接接收内核发来的IO信号)</em></li>
+</ul>
+</li>
+<li><p><strong>异步IO</strong>  <em>（Java AIO， IO的两个阶段都不会阻塞，进程只需要发起IO请求，在IO完成两个阶段后，由内核负责通知进程，期间进程都不会挂起）</em></p>
+</li>
+</ul>
+<h3 id="2-7-5种IO模型的Java示例"><a href="#2-7-5种IO模型的Java示例" class="headerlink" title="2.7 5种IO模型的Java示例"></a>2.7 5种IO模型的Java示例</h3><ul>
+<li>（1）阻塞IO + 多线程</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> iomodel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStreamReader;</span><br><span class="line"><span class="keyword">import</span> java.io.Reader;</span><br><span class="line"><span class="keyword">import</span> java.net.ServerSocket;</span><br><span class="line"><span class="keyword">import</span> java.net.Socket;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executor;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BIODemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">Executor</span> <span class="variable">pools</span> <span class="operator">=</span> Executors.newFixedThreadPool(<span class="number">5</span>);</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="type">ServerSocket</span> <span class="variable">sS</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ServerSocket</span>(<span class="number">8888</span>);</span><br><span class="line">			<span class="keyword">for</span> (;;) &#123;</span><br><span class="line">				<span class="type">Socket</span> <span class="variable">s</span> <span class="operator">=</span> sS.accept();<span class="comment">//blocking</span></span><br><span class="line">				pools.execute(<span class="keyword">new</span> <span class="title class_">BIOWorker</span>(s));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BIOWorker</span> <span class="keyword">implements</span> <span class="title class_">Runnable</span> &#123;</span><br><span class="line">	<span class="type">Socket</span> <span class="variable">client</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">BIOWorker</span><span class="params">(Socket client)</span> &#123;</span><br><span class="line">		<span class="built_in">super</span>();</span><br><span class="line">		<span class="built_in">this</span>.client = client;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="type">BufferedReader</span> <span class="variable">is</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedReader</span>(<span class="keyword">new</span> <span class="title class_">InputStreamReader</span>(client.getInputStream()));</span><br><span class="line">			<span class="type">String</span> <span class="variable">line</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">			<span class="keyword">while</span> ((line = is.readLine()) != <span class="literal">null</span>)<span class="comment">//blocking</span></span><br><span class="line">				System.out.println(line);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>（2）非阻塞IO模型</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> iomodel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"><span class="keyword">import</span> java.net.ServerSocket;</span><br><span class="line"><span class="keyword">import</span> java.nio.ByteBuffer;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.ServerSocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.SocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.charset.Charset;</span><br><span class="line"><span class="keyword">import</span> java.nio.charset.CharsetDecoder;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NBIODemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="type">Charset</span> <span class="variable">ascii</span> <span class="operator">=</span> Charset.forName(<span class="string">&quot;us-ascii&quot;</span>);</span><br><span class="line">			<span class="type">CharsetDecoder</span> <span class="variable">decoder</span> <span class="operator">=</span> ascii.newDecoder();</span><br><span class="line">			<span class="type">ServerSocketChannel</span> <span class="variable">ssc</span> <span class="operator">=</span> ServerSocketChannel.open();</span><br><span class="line">			ssc.configureBlocking(<span class="literal">false</span>);</span><br><span class="line">			<span class="type">ServerSocket</span> <span class="variable">ss</span> <span class="operator">=</span> ssc.socket();</span><br><span class="line">			ss.bind(<span class="keyword">new</span> <span class="title class_">InetSocketAddress</span>(<span class="string">&quot;localhost&quot;</span>, <span class="number">8888</span>));</span><br><span class="line"></span><br><span class="line">			<span class="type">SocketChannel</span> <span class="variable">sC</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">while</span> ((sC = ssc.accept()) == <span class="literal">null</span>)</span><br><span class="line">				System.out.println(<span class="string">&quot;i am pooling for new connection!&quot;</span>);<span class="comment">// poll until new connection was established.non-blocking</span></span><br><span class="line">			sC.configureBlocking(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">			<span class="type">ByteBuffer</span> <span class="variable">buffer</span> <span class="operator">=</span> ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">		</span><br><span class="line">			<span class="keyword">while</span> (<span class="literal">true</span>) &#123;<span class="comment">//pool for reading</span></span><br><span class="line">				<span class="type">int</span> <span class="variable">r</span> <span class="operator">=</span> sC.read(buffer);<span class="comment">//non-blocking</span></span><br><span class="line">				System.out.println(<span class="string">&quot;i am pooling for new data!&quot;</span>);</span><br><span class="line">				<span class="keyword">if</span> (r &gt; <span class="number">0</span>) &#123;</span><br><span class="line">					buffer.flip();</span><br><span class="line">					System.err.println(<span class="string">&quot;recv &quot;</span> + r +<span class="string">&quot; bytes from &quot;</span> + sC);</span><br><span class="line">					System.err.print(decoder.decode(buffer));</span><br><span class="line">					buffer.compact();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>（3）I&#x2F;O复用</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> iomodel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"><span class="keyword">import</span> java.net.ServerSocket;</span><br><span class="line"><span class="keyword">import</span> java.nio.ByteBuffer;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.SelectionKey;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.Selector;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.ServerSocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.SocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.charset.Charset;</span><br><span class="line"><span class="keyword">import</span> java.nio.charset.CharsetDecoder;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executor;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MultiplexingIODemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">Executor</span> <span class="variable">pool</span> <span class="operator">=</span> Executors.newFixedThreadPool(<span class="number">5</span>);</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="type">Selector</span> <span class="variable">selector</span> <span class="operator">=</span> Selector.open();</span><br><span class="line">			<span class="type">ServerSocketChannel</span> <span class="variable">ssc</span> <span class="operator">=</span> ServerSocketChannel.open();</span><br><span class="line">			ssc.configureBlocking(<span class="literal">false</span>);<span class="comment">// listening socket channel is</span></span><br><span class="line">											<span class="comment">// non-blocking for accept()</span></span><br><span class="line"></span><br><span class="line">			<span class="type">ServerSocket</span> <span class="variable">ss</span> <span class="operator">=</span> ssc.socket();</span><br><span class="line">			ss.bind(<span class="keyword">new</span> <span class="title class_">InetSocketAddress</span>(<span class="string">&quot;localhost&quot;</span>, <span class="number">8888</span>));</span><br><span class="line"></span><br><span class="line">			ssc.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line"></span><br><span class="line">			<span class="keyword">for</span> (;;) &#123;</span><br><span class="line"></span><br><span class="line">				<span class="comment">// System.out.println(&quot;I am selecting..&quot;);</span></span><br><span class="line">				selector.select();<span class="comment">// may block until there occurred at least one</span></span><br><span class="line">									<span class="comment">// IO event.</span></span><br><span class="line"></span><br><span class="line">				Set&lt;SelectionKey&gt; selectKeys = selector.selectedKeys();</span><br><span class="line">				Iterator&lt;SelectionKey&gt; iterator = selectKeys.iterator();</span><br><span class="line"></span><br><span class="line">				<span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">					<span class="type">SelectionKey</span> <span class="variable">key</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">					<span class="keyword">if</span> ((key.readyOps() &amp; SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) &#123;</span><br><span class="line">						<span class="type">ServerSocketChannel</span> <span class="variable">ssc1</span> <span class="operator">=</span> (ServerSocketChannel) key.channel();</span><br><span class="line">						<span class="type">SocketChannel</span> <span class="variable">sc</span> <span class="operator">=</span> ssc1.accept();</span><br><span class="line">						sc.configureBlocking(<span class="literal">false</span>);</span><br><span class="line">						sc.register(selector, SelectionKey.OP_READ);</span><br><span class="line">						iterator.remove();</span><br><span class="line">						System.out.println(<span class="string">&quot;Got connection from &quot;</span> + sc);</span><br><span class="line">					&#125; <span class="keyword">else</span> <span class="keyword">if</span> ((key.readyOps() &amp; SelectionKey.OP_READ) == SelectionKey.OP_READ) &#123;</span><br><span class="line">						<span class="type">SocketChannel</span> <span class="variable">sc</span> <span class="operator">=</span> (SocketChannel) key.channel();</span><br><span class="line">						<span class="keyword">if</span> (key.attachment() == <span class="literal">null</span>) &#123;</span><br><span class="line">							<span class="type">ByteBuffer</span> <span class="variable">buff</span> <span class="operator">=</span> ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">							key.attach(buff);</span><br><span class="line">							System.out.println(<span class="string">&quot;first recv data from &quot;</span> + sc);</span><br><span class="line">						&#125;</span><br><span class="line">						pool.execute(<span class="keyword">new</span> <span class="title class_">IOWorker</span>(sc, (ByteBuffer) key.attachment()));</span><br><span class="line">						iterator.remove();</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">IOWorker</span> <span class="keyword">implements</span> <span class="title class_">Runnable</span> &#123;</span><br><span class="line">	<span class="type">ByteBuffer</span> <span class="variable">buffer</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">	<span class="type">SocketChannel</span> <span class="variable">sC</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">	<span class="type">Charset</span> <span class="variable">gb2312</span> <span class="operator">=</span> Charset.forName(<span class="string">&quot;gb2312&quot;</span>);</span><br><span class="line">	<span class="type">CharsetDecoder</span> <span class="variable">decoder</span> <span class="operator">=</span> gb2312.newDecoder();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">IOWorker</span><span class="params">(SocketChannel sC, ByteBuffer buffer)</span> &#123;</span><br><span class="line">		<span class="built_in">super</span>();</span><br><span class="line">		<span class="built_in">this</span>.sC = sC;</span><br><span class="line">		<span class="built_in">this</span>.buffer = buffer;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">int</span> r;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			r = <span class="built_in">this</span>.sC.read(buffer);</span><br><span class="line">			<span class="keyword">if</span> (r &gt; <span class="number">0</span>) &#123;</span><br><span class="line">				System.err.println(<span class="string">&quot;recv &quot;</span> + r + <span class="string">&quot; new bytes from &quot;</span> + sC);</span><br><span class="line">				buffer.flip();</span><br><span class="line">				<span class="comment">// get first byte</span></span><br><span class="line">				<span class="comment">// decode bytes stream</span></span><br><span class="line">				<span class="keyword">for</span> (; buffer.hasRemaining();) &#123;</span><br><span class="line">					<span class="type">byte</span> <span class="variable">fisrt</span> <span class="operator">=</span> buffer.get(<span class="number">0</span>);</span><br><span class="line">					<span class="keyword">if</span> (Byte.toUnsignedInt(fisrt) &lt;= <span class="number">127</span>) &#123;<span class="comment">// 高字节的大小判断</span></span><br><span class="line">						fisrt = buffer.get();</span><br><span class="line">						System.err.println(<span class="string">&quot;[to &quot;</span> + sC.socket().getPort() + <span class="string">&quot; ] &quot;</span>+ (<span class="type">char</span>) fisrt);</span><br><span class="line">					&#125; <span class="keyword">else</span> <span class="keyword">if</span> (buffer.remaining() &gt;= <span class="number">2</span>) &#123;</span><br><span class="line">						<span class="type">byte</span>[] b = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">2</span>];</span><br><span class="line">						b[<span class="number">0</span>] = buffer.get();</span><br><span class="line">						b[<span class="number">1</span>] = buffer.get();</span><br><span class="line">						<span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(b, <span class="string">&quot;gbk&quot;</span>);</span><br><span class="line">						System.err.println(<span class="string">&quot;[to &quot;</span> + sC.socket().getPort() + <span class="string">&quot; ] &quot;</span> + s);</span><br><span class="line">					&#125; <span class="keyword">else</span></span><br><span class="line">						<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">				buffer.compact();</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>（4）异步I&#x2F;O</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> iomodel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"><span class="keyword">import</span> java.nio.ByteBuffer;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.AsynchronousFileChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.AsynchronousServerSocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.AsynchronousSocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.CompletionHandler;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Path;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Paths;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.StandardOpenOption;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Future;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AIODemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="type">AsynchronousFileChannel</span> <span class="variable">aFC</span> <span class="operator">=</span> AsynchronousFileChannel.open(Paths.get(<span class="string">&quot;a.txt&quot;</span>), StandardOpenOption.READ);</span><br><span class="line">			System.out.println(<span class="string">&quot;main &quot;</span> + Thread.currentThread().getId());</span><br><span class="line">			<span class="type">ByteBuffer</span> <span class="variable">buffer</span> <span class="operator">=</span> ByteBuffer.allocate((<span class="type">int</span>) <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;a.txt&quot;</span>).length());</span><br><span class="line">			Future&lt;Integer&gt; result = aFC.read(buffer, <span class="number">0</span>);	</span><br><span class="line">			<span class="keyword">while</span> (!result.isDone()) &#123;</span><br><span class="line">				System.out.println(<span class="string">&quot;i am doing other useful work...&quot;</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			buffer.flip();</span><br><span class="line">			System.out.println(result.get());</span><br><span class="line">		</span><br><span class="line">			System.out.println(<span class="string">&quot;read is done&quot;</span>);</span><br><span class="line">			</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">			<span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FileReadHandler</span> <span class="keyword">implements</span> <span class="title class_">CompletionHandler</span>&lt;Integer, AsynchronousFileChannel&gt; &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">completed</span><span class="params">(Integer result, AsynchronousFileChannel attachment)</span> &#123;</span><br><span class="line">		System.out.println(<span class="string">&quot;new connection from &quot;</span> + result);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">failed</span><span class="params">(Throwable exc, AsynchronousFileChannel attachment)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><ul>
+<li>几种IO模型的优缺点，模型的阻塞、非阻塞以及同步、异步指的是什么？</li>
+<li>select模型与阻塞+多线程模型的区别以及使用场景；</li>
+</ul>
+<h2 id="4-References"><a href="#4-References" class="headerlink" title="4. References"></a>4. References</h2><p>[1] 史蒂文斯，芬纳，鲁道夫.UNIX网络编程卷一[M].北京:人民邮电出版社,2015:122-148</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/IO/" rel="tag"># IO</a>
+              <a href="/tags/%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" rel="tag"># 多路复用</a>
+              <a href="/tags/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5IO/" rel="tag"># 同步异步IO</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/07/19/Java%20getClass()%20VS%20instanceof%20VS%20==/" rel="prev" title="Java getClass()  VS  instanceof  VS  &#x3D;&#x3D;">
+                  <i class="fa fa-angle-left"></i> Java getClass()  VS  instanceof  VS  ==
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/09/30/Union-Find%20algorithm/" rel="next" title="Union-Find算法">
+                  Union-Find算法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

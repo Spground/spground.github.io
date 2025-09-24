@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="3. Services介绍在本部分，我们伸缩我们的应用，并且完成负载均衡功能。为了完成这个，我们必须在前面提到的层级结构中上移一层：service。  stack service container  什么是服务？在一个分布式应用中，应用的不同功能部分被称为服务。例如如果你想像一个视频分享网站，它可能包含存储数据在数据库的服务，视频转码的后台服务以及前段用户上传视频的服务。 在docker情景中，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3. Services">
+<meta property="og:url" content="https://spground.github.io/2018/10/15/docker-guide-03-Services/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="3. Services介绍在本部分，我们伸缩我们的应用，并且完成负载均衡功能。为了完成这个，我们必须在前面提到的层级结构中上移一层：service。  stack service container  什么是服务？在一个分布式应用中，应用的不同功能部分被称为服务。例如如果你想像一个视频分享网站，它可能包含存储数据在数据库的服务，视频转码的后台服务以及前段用户上传视频的服务。 在docker情景中，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980074729-2c871eb7-db40-4d71-a89a-19da7f241fa7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980316450-4c4d2db1-81c8-4f55-9790-9fb9c03d4a12.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980594067-63659640-6942-4e54-8da7-c8c57626de3b.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980825620-7503aa0b-85d9-4e3e-8935-beec61199d8c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980859826-af72a019-f5b9-4d33-a8ad-d9accffe8e72.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980899519-398a54ef-c42e-43de-adc3-dacad9e96dad.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538981277225-4bf4a4f2-ecf1-4803-89fe-675c140558c6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538981383650-c138e2bf-2815-4e9c-955f-27ba7ddb5d28.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538983037754-0e482b9d-ae9a-41ba-a740-2de0eb808c57.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538983076164-3c943142-e378-48d7-b78d-fe023ee9de7e.png">
+<meta property="article:published_time" content="2018-10-15T09:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.569Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="docker guide">
+<meta property="article:tag" content="infrastructure">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980074729-2c871eb7-db40-4d71-a89a-19da7f241fa7.png">
+
+
+<link rel="canonical" href="https://spground.github.io/2018/10/15/docker-guide-03-Services/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2018/10/15/docker-guide-03-Services/","path":"2018/10/15/docker-guide-03-Services/","title":"3. Services"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>3. Services | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Services"><span class="nav-number">1.</span> <span class="nav-text">3. Services</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%9C%8D%E5%8A%A1%EF%BC%9F"><span class="nav-number">1.2.</span> <span class="nav-text">什么是服务？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-compose-ymls%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.</span> <span class="nav-text">docker-compose.ymls文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E5%8F%AF%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%9A%84app"><span class="nav-number">1.4.</span> <span class="nav-text">运行可负载均衡的app</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%AE%B9on-the-fly"><span class="nav-number">1.5.</span> <span class="nav-text">扩容on-the-fly</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2app%E5%92%8Cswarm"><span class="nav-number">1.6.</span> <span class="nav-text">停止app和swarm</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2018/10/15/docker-guide-03-Services/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="3. Services | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          3. Services
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-10-15 17:00:00" itemprop="dateCreated datePublished" datetime="2018-10-15T17:00:00+08:00">2018-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="3-Services"><a href="#3-Services" class="headerlink" title="3. Services"></a>3. Services</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在本部分，我们伸缩我们的应用，并且完成负载均衡功能。为了完成这个，我们必须在前面提到的层级结构中上移一层：service。</p>
+<ul>
+<li>stack</li>
+<li><strong>service</strong></li>
+<li>container</li>
+</ul>
+<h2 id="什么是服务？"><a href="#什么是服务？" class="headerlink" title="什么是服务？"></a>什么是服务？</h2><p>在一个分布式应用中，应用的不同功能部分被称为服务。例如如果你想像一个视频分享网站，它可能包含存储数据在数据库的服务，视频转码的后台服务以及前段用户上传视频的服务。</p>
+<p>在docker情景中，简单来说__服务就是生产环境中运行的容器__。一个服务仅仅运行一个镜像，但是它组织镜像如何运行，使用哪个端口，运行多少个副本等等。伸缩一个服务，仅仅需要指定更多的计算资源到每个进程中的服务，从而改变容器实例的数量。</p>
+<p>在docker平台上，很容易定义、运行和伸缩服务，通过使用docker-compose.yml文件。</p>
+<h2 id="docker-compose-ymls文件"><a href="#docker-compose-ymls文件" class="headerlink" title="docker-compose.ymls文件"></a>docker-compose.ymls文件</h2><p>一个docker-compose.yml文件是一个YAML文件，用来定义生产环境中容器的运行方式。</p>
+<p>新建一个docker-compose.yml文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">version: <span class="string">&quot;3&quot;</span></span><br><span class="line">services:</span><br><span class="line">  web:</span><br><span class="line">    <span class="comment"># replace username/repo:tag with your name and image details</span></span><br><span class="line">    image: dockerjie/get-started:part2</span><br><span class="line">    deploy:</span><br><span class="line">      replicas: 5</span><br><span class="line">      resources:</span><br><span class="line">        limits:</span><br><span class="line">          cpus: <span class="string">&quot;0.1&quot;</span></span><br><span class="line">          memory: 50M</span><br><span class="line">      restart_policy:</span><br><span class="line">        condition: on-failure</span><br><span class="line">    ports:</span><br><span class="line">      - <span class="string">&quot;4000:80&quot;</span></span><br><span class="line">    networks:</span><br><span class="line">      - webnet</span><br><span class="line">networks:</span><br><span class="line">  webnet:</span><br></pre></td></tr></table></figure>
+
+<p>上面的docker-compose.yml文件描述了：</p>
+<ul>
+<li>从什么地方去拉取需要的镜像文件</li>
+<li>运行含有5个实例的镜像作为一个web服务，限制每个实例使用的cpu比例和内存大小</li>
+<li>重启策略：如果容器fail，立即重启该容器。</li>
+<li>端口映射：宿主机的4000端口到容器的80端口</li>
+<li>构建web服务的容器们共享80端口，通过一个被称为webnet的负载均衡的网络。</li>
+<li>使用默认配置定义webnet网络。</li>
+</ul>
+<h2 id="运行可负载均衡的app"><a href="#运行可负载均衡的app" class="headerlink" title="运行可负载均衡的app"></a>运行可负载均衡的app</h2><p>在使用docker stack deploy命令之前，先运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker swarm init</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980074729-2c871eb7-db40-4d71-a89a-19da7f241fa7.png" alt="image.png | left | 681x102"></p>
+<p>现在运行app</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack deploy -c docker-compose.yml getstartedlab</span><br></pre></td></tr></table></figure>
+
+<p>这个服务stack正在一个宿主机上运行我们部署的镜像的5个容器实例。</p>
+<p>查看服务列表：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker service <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980316450-4c4d2db1-81c8-4f55-9790-9fb9c03d4a12.png" alt="image.png | left | 681x39"></p>
+<p>上面的输出是关于web服务的信息，分别是服务ID，服务名字，模式，副本的数量，镜像以及暴露的端口信息。</p>
+<p>运行服务里面的单个容器叫做task。每一个task有一个递增的数字ID。</p>
+<p>列出服务包含的tasks。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker service ps getstarted_web</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980594067-63659640-6942-4e54-8da7-c8c57626de3b.png" alt="image.png | left | 681x60"></p>
+<p>同样的查看容器列表也能观察到web服务包m含的task：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker container <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980825620-7503aa0b-85d9-4e3e-8935-beec61199d8c.png" alt="image.png | left | 681x65"></p>
+<p>测试效果：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980859826-af72a019-f5b9-4d33-a8ad-d9accffe8e72.png" alt="image.png | left | 681x192"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538980899519-398a54ef-c42e-43de-adc3-dacad9e96dad.png" alt="image.png | left | 681x171"></p>
+<p>可以看到每次访问对应的hostname都不相同，因此部署的web服务已经具有负载均衡的能力。</p>
+<h2 id="扩容on-the-fly"><a href="#扩容on-the-fly" class="headerlink" title="扩容on-the-fly"></a>扩容on-the-fly</h2><p>修改docker-compose.yml文件中的replicas的值，重新运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack deploy -c docker-compose.yml getstartedlab</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538981277225-4bf4a4f2-ecf1-4803-89fe-675c140558c6.png" alt="image.png | left | 681x49"></p>
+<p>docker执行一个in-place的更新，没必要停止stack或者停止任何容器。</p>
+<p>现在重新查看容器列表：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker container <span class="built_in">ls</span> -q</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538981383650-c138e2bf-2815-4e9c-955f-27ba7ddb5d28.png" alt="image.png | left | 681x203"></p>
+<p>同样的，如果我们扩容了，除了容器增加了，服务包含的task也会相应的增加。</p>
+<h2 id="停止app和swarm"><a href="#停止app和swarm" class="headerlink" title="停止app和swarm"></a>停止app和swarm</h2><ul>
+<li>停止app</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stack  <span class="built_in">rm</span> getstartedlab</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538983037754-0e482b9d-ae9a-41ba-a740-2de0eb808c57.png" alt="image.png | left | 636x108"></p>
+<ul>
+<li>停止swarm</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker swarm leave --force</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.nlark.com/yuque/0/2018/png/168795/1538983076164-3c943142-e378-48d7-b78d-fe023ee9de7e.png" alt="image.png | left | 576x76"></p>
+<p>使用Docker很容易构建app和扩缩容。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker stack <span class="built_in">ls</span>                                            <span class="comment"># List stacks or apps</span></span><br><span class="line">docker stack deploy -c &lt;composefile&gt; &lt;appname&gt;  <span class="comment"># Run the specified Compose file</span></span><br><span class="line">docker service <span class="built_in">ls</span>                 <span class="comment"># List running services associated with an app</span></span><br><span class="line">docker service ps &lt;service&gt;                  <span class="comment"># List tasks associated with an app</span></span><br><span class="line">docker inspect &lt;task or container&gt;                   <span class="comment"># Inspect task or container</span></span><br><span class="line">docker container <span class="built_in">ls</span> -q                                      <span class="comment"># List container IDs</span></span><br><span class="line">docker stack <span class="built_in">rm</span> &lt;appname&gt;                             <span class="comment"># Tear down an application</span></span><br><span class="line">docker swarm leave --force      <span class="comment"># Take down a single node swarm from the manager</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker-guide/" rel="tag"># docker guide</a>
+              <a href="/tags/infrastructure/" rel="tag"># infrastructure</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/10/15/docker-guide-02-Container/" rel="prev" title="2. Container">
+                  <i class="fa fa-angle-left"></i> 2. Container
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/10/15/docker-guide-04-Swarms/" rel="next" title="4. Swarms">
+                  4. Swarms <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

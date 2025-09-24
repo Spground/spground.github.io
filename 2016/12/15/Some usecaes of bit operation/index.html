@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="位运算几乎每种编程语言都为我们提供一种运算，它直接操作二进制数据，这种运算叫做位运算。 位运算分为移位、取反、与、或、异或、非，其中移位又包括左移位、右移位、左无符号移位、右无符号移位。    含义 Java写法    与 a &amp; b   或 a | b   异或 a ^ b   非（取反） ~a   左移 a&lt;&lt;b   右移 a&gt;&gt;b   无符号左移 a &lt;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="位运算的一些用例">
+<meta property="og:url" content="https://spground.github.io/2016/12/15/Some%20usecaes%20of%20bit%20operation/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="位运算几乎每种编程语言都为我们提供一种运算，它直接操作二进制数据，这种运算叫做位运算。 位运算分为移位、取反、与、或、异或、非，其中移位又包括左移位、右移位、左无符号移位、右无符号移位。    含义 Java写法    与 a &amp; b   或 a | b   异或 a ^ b   非（取反） ~a   左移 a&lt;&lt;b   右移 a&gt;&gt;b   无符号左移 a &lt;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-12-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.568Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="位运算">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://spground.github.io/2016/12/15/Some%20usecaes%20of%20bit%20operation/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2016/12/15/Some%20usecaes%20of%20bit%20operation/","path":"2016/12/15/Some usecaes of bit operation/","title":"位运算的一些用例"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>位运算的一些用例 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%8D%E8%BF%90%E7%AE%97"><span class="nav-number">1.</span> <span class="nav-text">位运算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%8D%E8%BF%90%E7%AE%97%E7%9A%84%E7%94%A8%E4%BE%8B%E4%B8%80%E2%80%94%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6"><span class="nav-number">2.</span> <span class="nav-text">位运算的用例一—权限控制</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2016/12/15/Some%20usecaes%20of%20bit%20operation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="位运算的一些用例 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          位运算的一些用例
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-12-15 00:00:00" itemprop="dateCreated datePublished" datetime="2016-12-15T00:00:00+08:00">2016-12-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">编程基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="位运算"><a href="#位运算" class="headerlink" title="位运算"></a>位运算</h2><p>几乎每种编程语言都为我们提供一种运算，它直接操作二进制数据，这种运算叫做<strong>位运算</strong>。</p>
+<p>位运算分为移位、取反、与、或、异或、非，其中移位又包括左移位、右移位、左无符号移位、右无符号移位。</p>
+<table>
+<thead>
+<tr>
+<th>含义</th>
+<th>Java写法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>与</td>
+<td>a &amp; b</td>
+</tr>
+<tr>
+<td>或</td>
+<td>a | b</td>
+</tr>
+<tr>
+<td>异或</td>
+<td>a ^ b</td>
+</tr>
+<tr>
+<td>非（取反）</td>
+<td>~a</td>
+</tr>
+<tr>
+<td>左移</td>
+<td>a&lt;&lt;b</td>
+</tr>
+<tr>
+<td>右移</td>
+<td>a&gt;&gt;b</td>
+</tr>
+<tr>
+<td>无符号左移</td>
+<td>a &lt;&lt;&lt; b</td>
+</tr>
+<tr>
+<td>无符号右移</td>
+<td>a&gt;&gt;&gt;b</td>
+</tr>
+</tbody></table>
+<p>可能大多数时候觉得，这些位运算除了平时刷题用到，好像并没有什么用。当时当我们去看一些源代码的时候，比如JDK、Android SDK等源代码的时候，我们会发现有很多地方都会看见一些位运算的影子。这些使用位运算的例子都会有某个命令为mask的变量，这个mask就是用来存储某几种状态的信息。</p>
+<p>那么什么是位掩码呢？根据维基百科的定义：</p>
+<blockquote>
+<p>In computer science, a mask is data that is used for bitwise operations, particularly in a bit field.</p>
+</blockquote>
+<p>位掩码是一种用来方便进行位运算的数据，可以帮助我们在读取或者修改某个特定的位上的值，而不会修改其他位的值。</p>
+<h2 id="位运算的用例一—权限控制"><a href="#位运算的用例一—权限控制" class="headerlink" title="位运算的用例一—权限控制"></a>位运算的用例一—权限控制</h2><p>假设有这么一个场景，需要对某个文件设置权限，假设有三种权限需要设置：读、写、执行。那么通常的做法可能就是采用三个布尔值来存储当前的权限。<br>那么写法通常可能是这样：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Permission</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">boolean</span> <span class="variable">is_allowed_read</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">boolean</span> <span class="variable">is_allowed_write</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">boolean</span> <span class="variable">is_allowed_execution</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Permission</span><span class="params">()</span> &#123;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Permission</span><span class="params">(<span class="type">boolean</span> is_allowed_read, <span class="type">boolean</span> is_allowed_write, <span class="type">boolean</span> is_allowed_execution)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.is_allowed_read = is_allowed_read;</span><br><span class="line">        <span class="built_in">this</span>.is_allowed_write = is_allowed_write;</span><br><span class="line">        <span class="built_in">this</span>.is_allowed_execution = is_allowed_execution;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setIsAllowedRead</span><span class="params">(<span class="type">boolean</span> is_allowed_read)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.is_allowed_read = is_allowed_read;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">getIsAllowedRead</span><span class="params">()</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.is_allowed_read;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setIsAllowedWrite</span><span class="params">(<span class="type">boolean</span> is_allowed_write)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.is_allowed_write = is_allowed_write;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">getIsAllowedWrite</span><span class="params">()</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.is_allowed_write;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setIsAllowedExecution</span><span class="params">(<span class="type">boolean</span> is_allowed_execution)</span> &#123;</span><br><span class="line">      <span class="built_in">this</span>.is_allowed_execution = is_allowed_execution;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">getIsAllowedExecution</span><span class="params">()</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.is_allowed_execution;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<p>上面这种写法可能是比较常见的，比较符合我们的思维习惯，但是使用位运算中掩码的概念来改写这个例子，会使得更加简洁、高效。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Permission</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">byte</span> <span class="variable">Allowe_Read</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; <span class="number">0</span>;<span class="comment">//00000001</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">byte</span> <span class="variable">Allowe_Write</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; <span class="number">1</span>;<span class="comment">//00000010</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">byte</span> <span class="variable">Allow_Execution</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; <span class="number">2</span>;<span class="comment">//00000100</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="type">byte</span> <span class="variable">permissionMask</span> <span class="operator">=</span> <span class="number">0x00</span>;<span class="comment">//默认没有任何权限</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Permission</span><span class="params">()</span> &#123;</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Permission</span><span class="params">(<span class="type">byte</span> permission)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.permissionMask = permission;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//增加一项或者多项权限</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">enable</span><span class="params">(<span class="type">byte</span> permission)</span> &#123;</span><br><span class="line">         <span class="built_in">this</span>.permissionMask |= permission;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//禁用一项或多项的权限</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">disable</span><span class="params">(<span class="type">byte</span> permission)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.permissionMask &amp;= ~permission;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//查询一项或多项权限是否被启用</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isAllowed</span><span class="params">(<span class="type">byte</span> permission)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.permissionMask &amp; permission == permission;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="comment">//查询一项或多项权限是否被禁用</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isDisAllowed</span><span class="params">(<span class="type">byte</span> permission)</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">this</span>.permissionMask &amp; permission == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+<p>这种写法明显表达的信息量要多于第一种写法，举个例子：现在要同时启用三种权限，那么第一种写法就是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">setIsAllowedRead(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">setIsAllowedWrite(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">setIsAllowedExecution(<span class="literal">true</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>而第二种写法就是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">enable(Permission.ALLOW_READ | Permission.ALLOW_WRITE | Permission.ALLOW_EXECUTION);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这种写法对于使用<code>Permission</code>类的时候来说，方便许多。在<code>Linux</code>系统中设置权限时通常会用到</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> 777 file</span><br></pre></td></tr></table></figure>
+
+<p> 其中<code>777</code>就是<code>1111111 | 1111111 | 1111111</code>，可见<code>Linux</code>里面也是采用位运算中的掩码来设置文件权限的。</p>
+<p> 用位运算的方式来实现这个权限控制的优点是：高效，位运算比较接近与机器的运算方式；简洁，无论试编写还是使用都比较方便简洁。<br> 缺点：代码不够直观，可读性差，当维护这段代码的时候可能比较恼火， 不如第一种写法一目了然。</p>
+<p> 通常如果需要维护<code>n</code>个开关变量（二值变量）的时候，只需要<code>n</code>位二进制的整数和数个<code>mask</code>即可，完成状态的保存和查询。这种写法在<code>Android SDK</code>里面是非常常见的。<br> 可以加以推广，如果需要保存<code>n</code>个具有<code>m</code>种状态的变量，那么需要一个<code>n</code>位<code>m</code>进制的数即可完成。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" rel="tag"># 位运算</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/12/13/Java%20long%20double%20vaiables%20atomic%20problem/" rel="prev" title="Java的long、double类型的原子性读取问题">
+                  <i class="fa fa-angle-left"></i> Java的long、double类型的原子性读取问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/12/31/NO_DELAY%20option%20in%20TCP%20protocal/" rel="next" title="TCP中的NO_DELAY">
+                  TCP中的NO_DELAY <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

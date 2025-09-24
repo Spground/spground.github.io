@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="JVM内存区域（二）1. 对象的创建1.1Java是一种面向对象的语言，在使用java的日常，我们常常和对象打交道。在JVM内存区域中也存在专门的堆内存来存储管理对象。因此就堆内存和对象之间的关系，做简单的阐述。 虚拟机遇到一条new指令后，虚拟机就会新建一个对象，整个过程虚拟机大致会做如下工作：  检查对象对应的类是否被加载、解析和初始化过 为对象在堆内存上分配内存 初始化新分配的内存为零值 虚">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM内存区域（二）">
+<meta property="og:url" content="https://spground.github.io/2017/12/03/JVM%20Memory%20Area%20II/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="JVM内存区域（二）1. 对象的创建1.1Java是一种面向对象的语言，在使用java的日常，我们常常和对象打交道。在JVM内存区域中也存在专门的堆内存来存储管理对象。因此就堆内存和对象之间的关系，做简单的阐述。 虚拟机遇到一条new指令后，虚拟机就会新建一个对象，整个过程虚拟机大致会做如下工作：  检查对象对应的类是否被加载、解析和初始化过 为对象在堆内存上分配内存 初始化新分配的内存为零值 虚">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-12-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.566Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="Java Memory Model">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://spground.github.io/2017/12/03/JVM%20Memory%20Area%20II/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2017/12/03/JVM%20Memory%20Area%20II/","path":"2017/12/03/JVM Memory Area II/","title":"JVM内存区域（二）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JVM内存区域（二） | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%EF%BC%88%E4%BA%8C%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">JVM内存区域（二）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">1. 对象的创建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80"><span class="nav-number">1.2.</span> <span class="nav-text">2. 对象的内存布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AF%B9%E8%B1%A1%E7%9A%84%E8%AE%BF%E9%97%AE%E5%AE%9A%E4%BD%8D"><span class="nav-number">1.3.</span> <span class="nav-text">3. 对象的访问定位</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2017/12/03/JVM%20Memory%20Area%20II/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="JVM内存区域（二） | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JVM内存区域（二）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-12-03 00:00:00" itemprop="dateCreated datePublished" datetime="2017-12-03T00:00:00+08:00">2017-12-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="JVM内存区域（二）"><a href="#JVM内存区域（二）" class="headerlink" title="JVM内存区域（二）"></a><code>JVM</code>内存区域（二）</h2><h3 id="1-对象的创建"><a href="#1-对象的创建" class="headerlink" title="1. 对象的创建"></a>1. 对象的创建</h3><h4 id="1-1"><a href="#1-1" class="headerlink" title="1.1"></a>1.1</h4><p><code>Java</code>是一种面向对象的语言，在使用<code>java</code>的日常，我们常常和对象打交道。在<code>JVM</code>内存区域中也存在专门的堆内存来存储管理对象。因此就堆内存和对象之间的关系，做简单的阐述。</p>
+<p>虚拟机遇到一条<code>new</code>指令后，虚拟机就会新建一个对象，整个过程虚拟机大致会做如下工作：</p>
+<ul>
+<li>检查对象对应的类是否被加载、解析和初始化过</li>
+<li>为对象在堆内存上分配内存</li>
+<li>初始化新分配的内存为零值</li>
+<li>虚拟机对对象进行必要的设置（信息存放对象头）</li>
+</ul>
+<p>在上面的工作都完成之后，从虚拟机的角度来看，一个新的对象已经产生了。但从java程序角度来看，对象创建才刚刚开始——<code>&lt;init&gt;</code>方法还没执行，所有的字段都还为零。执行完new指令后接着执行<code>init</code>方法，把对象按照程序员的意图进行初始化，这样一个真正可用对象才算完全产生出来。</p>
+<h4 id="1-2"><a href="#1-2" class="headerlink" title="1.2"></a>1.2</h4><p>虚拟机遇到一条<code>new</code>指令后，首先会去检查该对象对应的类是否被加载、解析和初始化过（通常称为类加载过程），如果类没有加载进来，则首先进行类加载。类加载也是一个重要的过程，后面的博客会详细介绍。</p>
+<p>在类加载通过虚拟机的检查后，虚拟机会首先在堆内存中为新生对象分配空间。值得注意的是，对象所需要的内存空间大小在类加载后是可以完全确定的（如何确定的本文第2节会介绍）。</p>
+<p>在为对象分配堆上内存空间的时候，存在两个主要的问题：</p>
+<ul>
+<li>a. 内存块连续性的问题</li>
+<li>b. 多线程同步的问题</li>
+</ul>
+<p>a. 线程运行过程中，需要经常向堆内存申请内存分配，但是通常来讲申请的内存需要是连续的（例如新建数组）。内存中有<strong>空闲区</strong>和<strong>占用区</strong>。根据空闲区和占用区的位置之间的不同，可以分为两种内存分配方式：</p>
+<ul>
+<li>指针碰撞 bump the pointer: 堆内存是规整的，一边是占用区，另一边是空闲区；中间采用指针指示，需要申请新的内存时候，只需要将指示器指针移动一定的距离即可</li>
+<li>空闲列表：如果堆内存不是规整的，即占用区和空闲去交错分布；因此通操作系统的存储管理一样，虚拟机需要维护一个空闲去列表记录哪些空闲区可用；在申请内存分配的时候，从空闲区寻找到一个大小合适的区域分配出去。</li>
+</ul>
+<p>采用何种方式进行内存分配取决于堆内存的规整性；而堆内存的规整性取决于虚拟机采用的垃圾回收算法是否带有压缩整理功能决定的。因此在使用<code>Serial</code>，<code>ParNew</code>等带<code>Compact</code>过程的垃圾回收器，虚拟机内存分配采用<code>bump the pointer</code>;而在使用<code>CMS</code>这种基于<code>Mark-Sweep</code>算法的垃圾回收器时，通常采用空闲列表这种方式。</p>
+<p>b. 除了以何种方式从堆内存空间分配空间以外，还存在另一个线程安全的问题；当多个线程申请内存分配的时候，可能虚拟机正在使用内存指针给线程A分配内存的时候，线程B用采用原来的内存指针来进行内存分配了。这是典型的多线程问题，解决方法有两种：</p>
+<ul>
+<li>对分配内存空间进行同步处理，保证分配操作是线程安全的、原子性的；实际上虚拟机采用的是W<code>CAS</code>（Compare and Set）配上失败重试的方法保证指针更新操作的原子性；</li>
+<li>线程封闭的方式；把内存分配的动作按照线程划分在不同的空间中进行，即每个线程在堆中预先分配一小块内存称为本地线程分配缓冲（Thread Local Allocation Buffer TLAB）。哪个线程需要分配内存，就在对应的TLAB上分配，只有TLAB用完并分配新的TLAB的时候，才需要同步锁定。同步需要额外的花销。</li>
+</ul>
+<h4 id="1-3"><a href="#1-3" class="headerlink" title="1.3"></a>1.3</h4><p>以下代码片段来自于<a href="http://hg.openjdk.java.net/jdk7/jdk7/hotspot/archive/9b0ca45cd756.zip/src/">http://hg.openjdk.java.net/jdk7/jdk7/hotspot/archive/9b0ca45cd756.zip/src/</a>上下载<code>openjdk7</code>的源代码中的<code>bytecodeInterpreter.cpp</code>文件。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="built_in">CASE</span>(_new): &#123;<span class="comment">//遇到new指令</span></span><br><span class="line">      u2 index = Bytes::<span class="built_in">get_Java_u2</span>(pc<span class="number">+1</span>);<span class="comment">//根据下一个pc找到一个index，其实就是new SomeClass()中的SomeClass</span></span><br><span class="line">      constantPoolOop constants = istate-&gt;<span class="built_in">method</span>()-&gt;<span class="built_in">constants</span>();<span class="comment">//获取方法区的常量池</span></span><br><span class="line">      <span class="keyword">if</span> (!constants-&gt;<span class="built_in">tag_at</span>(index).<span class="built_in">is_unresolved_klass</span>()) &#123;<span class="comment">//如果需要新建对象的类被解析过</span></span><br><span class="line">        <span class="comment">// Make sure klass is initialized and doesn&#x27;t have a finalizer</span></span><br><span class="line">        oop entry = constants-&gt;<span class="built_in">slot_at</span>(index).<span class="built_in">get_oop</span>();<span class="comment">//根据index在常量池中找到对应oop(ordinary object pointer),oop指向加载解析过的类对象的指针</span></span><br><span class="line">        <span class="built_in">assert</span>(entry-&gt;<span class="built_in">is_klass</span>(), <span class="string">&quot;Should be resolved klass&quot;</span>);</span><br><span class="line">        klassOop k_entry = (klassOop) entry;</span><br><span class="line">        <span class="built_in">assert</span>(k_entry-&gt;<span class="built_in">klass_part</span>()-&gt;<span class="built_in">oop_is_instance</span>(), <span class="string">&quot;Should be instanceKlass&quot;</span>);</span><br><span class="line">        instanceKlass* ik = (instanceKlass*) k_entry-&gt;<span class="built_in">klass_part</span>();</span><br><span class="line">        <span class="keyword">if</span> ( ik-&gt;<span class="built_in">is_initialized</span>() &amp;&amp; ik-&gt;<span class="built_in">can_be_fastpath_allocated</span>() ) &#123;</span><br><span class="line">          <span class="type">size_t</span> obj_size = ik-&gt;<span class="built_in">size_helper</span>();<span class="comment">//确定对象的大小的；第2节会介绍；</span></span><br><span class="line">          oop result = <span class="literal">NULL</span>;</span><br><span class="line">          <span class="comment">// If the TLAB isn&#x27;t pre-zeroed then we&#x27;ll have to do it</span></span><br><span class="line">          <span class="type">bool</span> need_zero = !ZeroTLAB;<span class="comment">//是否需要将内存区域0值化</span></span><br><span class="line">          <span class="keyword">if</span> (UseTLAB) &#123;<span class="comment">//判断是否是TLAB的方式</span></span><br><span class="line">            result = (oop) THREAD-&gt;<span class="built_in">tlab</span>().<span class="built_in">allocate</span>(obj_size);</span><br><span class="line">          &#125;</span><br><span class="line">          </span><br><span class="line">          <span class="comment">//以下是内存分配多线程同步的CAS加失败重试的方案</span></span><br><span class="line">          <span class="keyword">if</span> (result == <span class="literal">NULL</span>) &#123;<span class="comment">//result为NULl，表示不是采用TLAB解决内存分配多线程的问题</span></span><br><span class="line">            need_zero = <span class="literal">true</span>;</span><br><span class="line">            <span class="comment">// Try allocate in shared eden</span></span><br><span class="line">            <span class="comment">//直接在堆内存中的eden代中分配</span></span><br><span class="line">      retry:</span><br><span class="line">            HeapWord* compare_to = *Universe::<span class="built_in">heap</span>()-&gt;<span class="built_in">top_addr</span>();</span><br><span class="line">            HeapWord* new_top = compare_to + obj_size;</span><br><span class="line">            <span class="keyword">if</span> (new_top &lt;= *Universe::<span class="built_in">heap</span>()-&gt;<span class="built_in">end_addr</span>()) &#123;</span><br><span class="line">              <span class="comment">//Atomic::cmpxchg_ptr是一个采用CAS的原子操作，用于将compare_to指针更新；</span></span><br><span class="line">              <span class="keyword">if</span> (Atomic::<span class="built_in">cmpxchg_ptr</span>(new_top, Universe::<span class="built_in">heap</span>()-&gt;<span class="built_in">top_addr</span>(), compare_to) != compare_to) &#123;</span><br><span class="line">                <span class="keyword">goto</span> retry;</span><br><span class="line">              &#125;</span><br><span class="line">              result = (oop) compare_to;<span class="comment">//内存分配成功</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">if</span> (result != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">// Initialize object (if nonzero size and need) and then the header</span></span><br><span class="line">            <span class="keyword">if</span> (need_zero ) &#123;</span><br><span class="line">              HeapWord* to_zero = (HeapWord*) result + <span class="built_in">sizeof</span>(oopDesc) / oopSize;</span><br><span class="line">              obj_size -= <span class="built_in">sizeof</span>(oopDesc) / oopSize;</span><br><span class="line">              <span class="keyword">if</span> (obj_size &gt; <span class="number">0</span> ) &#123;</span><br><span class="line">                <span class="built_in">memset</span>(to_zero, <span class="number">0</span>, obj_size * HeapWordSize);<span class="comment">//内存初始化为零</span></span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//以下在设置对象头</span></span><br><span class="line">            <span class="keyword">if</span> (UseBiasedLocking) &#123;<span class="comment">//根据是否启用偏向锁来设置Mark Word</span></span><br><span class="line">              result-&gt;<span class="built_in">set_mark</span>(ik-&gt;<span class="built_in">prototype_header</span>());</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">              result-&gt;<span class="built_in">set_mark</span>(markOopDesc::<span class="built_in">prototype</span>());</span><br><span class="line">            &#125;</span><br><span class="line">            result-&gt;<span class="built_in">set_klass_gap</span>(<span class="number">0</span>);</span><br><span class="line">            result-&gt;<span class="built_in">set_klass</span>(k_entry);<span class="comment">//设置类信息</span></span><br><span class="line">            <span class="built_in">SET_STACK_OBJECT</span>(result, <span class="number">0</span>);<span class="comment">//将result指针如虚拟机栈中，保存在局部变量表中；</span></span><br><span class="line">            <span class="built_in">UPDATE_PC_AND_TOS_AND_CONTINUE</span>(<span class="number">3</span>, <span class="number">1</span>);<span class="comment">//更新程序计数器，继续下一个操作；</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  	<span class="comment">//如果类没有被解析；则会进行一系列复杂的类加载、内存分配等操作；这是一种较慢的情况；</span></span><br><span class="line">      <span class="comment">// Slow case allocation</span></span><br><span class="line">      <span class="built_in">CALL_VM</span>(InterpreterRuntime::_new(THREAD, METHOD-&gt;<span class="built_in">constants</span>(), index),</span><br><span class="line">              handle_exception);</span><br><span class="line">      <span class="built_in">SET_STACK_OBJECT</span>(THREAD-&gt;<span class="built_in">vm_result</span>(), <span class="number">0</span>);</span><br><span class="line">      THREAD-&gt;<span class="built_in">set_vm_result</span>(<span class="literal">NULL</span>);</span><br><span class="line">      <span class="built_in">UPDATE_PC_AND_TOS_AND_CONTINUE</span>(<span class="number">3</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="2-对象的内存布局"><a href="#2-对象的内存布局" class="headerlink" title="2. 对象的内存布局"></a>2. 对象的内存布局</h3><p>在<code>HotSpot</code>虚拟机中，对象在内存中存储的布局可以分为3个区域，对象头（Header）、实例数据(Instance Data)和对齐填充(Padding)。</p>
+<p><strong>对象头</strong>包含两种信息：</p>
+<ul>
+<li><p>第一部分用于存储对象本身的运行时数据。如哈希码、<code>GC</code>分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等；这部分数据的长度在32bit(32位虚拟机)或者64bit(64位虚拟机)，被称为”Mark Word”。根据对象所处的状态不同，Mark Word存储的内容也不同；</p>
+</li>
+<li><p>第二部分是类型指针，即对象指向它的类元数据的指针，虚拟机可以通过这个来确定对象是那个类的实例。（并不是所有的虚拟机实现都必须在对象数据上保留类型指针，也就是查找对象的类元数据并非一定要经过对象本身，第3节介绍的基于句柄方式的对象定位，就不要通过对象而可以找到对应的类元数据） ​</p>
+</li>
+</ul>
+<p>另外如果对象是一个<code>Java</code>数组的话，还需要在对象头必须有一块用于记录数组长度的数据，因为虚拟机需要通过对象的元数据信息确定对象的大小，而从类元数据中却无法确定数组的大小。</p>
+<p><strong>实例数据</strong>存放了对象真正意义上的有效信息，也就是程序中定义的各类型的字段内容。无论是从父类继承下来的，还是在子类中定义的，都需要记录下来。</p>
+<p><strong>对齐填充</strong>并不是必然存在的，由于<code>HotSpot</code>的自动内存管理系统要求对象的起始地址必须是8字节的整数倍，也就是说对象的大小必须是8字节的整数倍，因此当对象实例数据部分没有对齐的时候，就需要对其填充来补全。</p>
+<h3 id="3-对象的访问定位"><a href="#3-对象的访问定位" class="headerlink" title="3. 对象的访问定位"></a>3. 对象的访问定位</h3><p>在<code>java</code>语言规范中，<code>java</code>需要通过虚拟机栈上的<code>reference</code>数据来操作堆上的具体对象。在虚拟机规范中，由于<code>reference</code>类型只是一个指向对象的引用，并没有定义如何通过这种引用去定位、方位堆上的对象的具体位置。目前主流的访问方式有使用<strong>句柄</strong>和<strong>直接指针</strong>两种</p>
+<ul>
+<li>句柄方式；堆上会划分一块内存作为句柄池，引用存储的是对象在句柄池中的句柄地址，而句柄中包含了对象和其对应的类型数据各具体信息的地址信息；</li>
+<li>直接地址；引用存储的直接就是对象的堆内存地址，而采用这种方式的话，对象中必须要设置如何访问对应的类型数据的相关信息；</li>
+</ul>
+<p>各自的优缺点如下：</p>
+<p>句柄方式</p>
+<ul>
+<li>优点：句柄方式在对象被移动时（GC时移动对象是非常普遍的）只改变句柄中的实例数据指针，而引用本身不用改变</li>
+<li>缺点：中间加了一层，访问变慢；</li>
+</ul>
+<p>直接指针：</p>
+<ul>
+<li>优点：访问速度快</li>
+<li>缺点：对象频繁移动，对引用的修改</li>
+</ul>
+<hr>
+<p>参考：《深入理解Java虚拟机》</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java-Memory-Model/" rel="tag"># Java Memory Model</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/12/01/JVM%20Memory%20Area%20I/" rel="prev" title="JVM 内存区域（一）">
+                  <i class="fa fa-angle-left"></i> JVM 内存区域（一）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/12/16/Java%20Array%20to%20Collection%20and%20Vise%20Verse/" rel="next" title="Java Array、List、Set互相转化">
+                  Java Array、List、Set互相转化 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

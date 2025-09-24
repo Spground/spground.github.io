@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="排序及常见排序算法 排序是计算机内经常进行的一种操作，其目的是将一组“无序”的记录序列调整为“有序”的记录序列。分内部排序和外部排序。若整个排序过程不需要访问外存便能完成，则称此类排序问题为内部排序。反之，若参加排序的记录数量很大，整个序列的排序过程不可能在内存中完成，则称此类排序问题为外部排序。内部排序的过程是一个逐步扩大记录的有序序列长度的过程。  上面是关于排序的一些介绍，排序按是否使用外在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用排序算法--冒泡排序及改进和插入排序时间复杂度分析">
+<meta property="og:url" content="https://spground.github.io/2016/09/23/Common%20Sort%20Algorithm%20improvement%20of%20bubble%20sort%20and%20time%20complexity%20analysis%20of%20insertion%20sort%20/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="排序及常见排序算法 排序是计算机内经常进行的一种操作，其目的是将一组“无序”的记录序列调整为“有序”的记录序列。分内部排序和外部排序。若整个排序过程不需要访问外存便能完成，则称此类排序问题为内部排序。反之，若参加排序的记录数量很大，整个序列的排序过程不可能在内存中完成，则称此类排序问题为外部排序。内部排序的过程是一个逐步扩大记录的有序序列长度的过程。  上面是关于排序的一些介绍，排序按是否使用外在">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-09-23T11:27:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.564Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="冒泡排序">
+<meta property="article:tag" content="插入排序">
+<meta property="article:tag" content="时间复杂度">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://spground.github.io/2016/09/23/Common%20Sort%20Algorithm%20improvement%20of%20bubble%20sort%20and%20time%20complexity%20analysis%20of%20insertion%20sort%20/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2016/09/23/Common%20Sort%20Algorithm%20improvement%20of%20bubble%20sort%20and%20time%20complexity%20analysis%20of%20insertion%20sort%20/","path":"2016/09/23/Common Sort Algorithm improvement of bubble sort and time complexity analysis of insertion sort /","title":"常用排序算法--冒泡排序及改进和插入排序时间复杂度分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>常用排序算法--冒泡排序及改进和插入排序时间复杂度分析 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">排序及常见排序算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">插入排序时间复杂度分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F"><span class="nav-number">3.</span> <span class="nav-text">冒泡排序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="nav-number">4.</span> <span class="nav-text">冒泡排序的改进</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%E7%89%88%E6%9C%AC1"><span class="nav-number">4.1.</span> <span class="nav-text">改进版本1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%E7%89%88%E6%9C%AC2"><span class="nav-number">4.2.</span> <span class="nav-text">改进版本2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2016/09/23/Common%20Sort%20Algorithm%20improvement%20of%20bubble%20sort%20and%20time%20complexity%20analysis%20of%20insertion%20sort%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="常用排序算法--冒泡排序及改进和插入排序时间复杂度分析 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          常用排序算法--冒泡排序及改进和插入排序时间复杂度分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-09-23 19:27:00" itemprop="dateCreated datePublished" datetime="2016-09-23T19:27:00+08:00">2016-09-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="排序及常见排序算法"><a href="#排序及常见排序算法" class="headerlink" title="排序及常见排序算法"></a>排序及常见排序算法</h1><blockquote>
+<p>排序是计算机内经常进行的一种操作，其目的是将一组“无序”的记录序列调整为“有序”的记录序列。分内部排序和外部排序。若整个排序过程不需要访问外存便能完成，则称此类排序问题为内部排序。反之，若参加排序的记录数量很大，整个序列的排序过程不可能在内存中完成，则称此类排序问题为外部排序。内部排序的过程是一个逐步扩大记录的有序序列长度的过程。</p>
+</blockquote>
+<p>上面是关于排序的一些介绍，排序按是否使用外在存储来分分为<strong>内部排序（locally sort）<strong>和</strong>外部排序（external sort）</strong>。下文分析的是内部排序的两种常见的、简单易实现的排序算法，虽然两者的排序算法的时间复杂度在众多内部排序算法中属于下等，但是对于理解内部排序（特别是采用比较排序）的一些机制是十分有用的。  </p>
+<p>常见的内部排序算法及其时间复杂度主要如下：</p>
+<ul>
+<li><strong>冒泡排序</strong>  冒泡排序通过两两相邻元素比较，每一趟将本趟中最大的元素放在数组尾部合适的位置。由于每一趟只正确放置一个元素，因此时间复杂度为<code>O(n*n)</code>  </li>
+<li><strong>插入排序</strong> 插入排序是通过将当前第<code>i</code>个待排元素<code>i</code>与数组中前<code>i-1</code>个已经有序的元素<code>j</code> 进行两两比较，如果元素 <code>i</code> 小于 <code>j</code>，便交换。直到遇到比<code>i</code>小的元素或者到达数组头。由于每一个元素的插入都会最多比较<code>i - 1</code>次，因此最坏的时间复杂度为 <code>1 + 2 + 3 + ... + n - 1 = n * (n - 1) / 2</code> ， 因此时间复杂度也为<code>O(n*n)</code>。  </li>
+<li><strong>希尔排序</strong> 插入排序的一种改进，具有优良的时间复杂度，时间复杂度为<code>O(n*n)</code></li>
+<li><strong>快速排序</strong> 基于分治的策略排序，时间复杂度为<code>O(nlgn)</code>，由于待排数据如果是逆序，其时间复杂度会变为<code>O(n*n)</code>，因此常用的方法是在排序前先随机化待排数据。</li>
+<li><strong>归并排序</strong> 基于分治的策略排序，时间复杂度为<code>O(nlgn)</code>，需要额外的存储空间</li>
+<li><strong>堆排序</strong> 采用二叉树的性质进行排序，不需要额外的内存空间，时间复杂度为<code>O(nlgn)</code></li>
+<li><strong>计数排序</strong> 非比较排序，要求输入的数据的范围为<code>0 ~ K</code>，时间复杂度为<code>O(n)</code></li>
+<li><strong>基数排序</strong> 非比较排序，是计算排序的一种变种，对输入数据的要求降低到了数据的的位数为<code>d</code>，每一位的范围为<code>0~k</code>。</li>
+</ul>
+<h1 id="插入排序时间复杂度分析"><a href="#插入排序时间复杂度分析" class="headerlink" title="插入排序时间复杂度分析"></a>插入排序时间复杂度分析</h1><p>上文中介绍的除了计数排序和基数排序外，其余均为内排序中的比较排序，即通过两元素的比较，来确定元素正确放置的位置。  </p>
+<p><strong>插入排序算是一种比较经典的比较类排序算法</strong>，可以分析其时间复杂度，然后确定其<strong>最坏和平均时间复杂度</strong>，从而来确定时间复杂度的最低边界。  </p>
+<p>由于没有比较，就不会有元素的交换，因此元素的交换次数是小于等于</p>
+<ol>
+<li>最坏时间复杂度分析：若输入的<code>n</code>个数据是逆序的，那么对第<code>i</code>个元素的插入，需要比较<code>i-1</code>次，因此总的时间复杂度为为<code>n*(n - 1) / 2</code></li>
+<li>平均时间复杂度分析：对于第<code>i</code>个元素的插入，该元素有<code>i + 1</code>个位置可以插入，平均来看，插入每一个位置的概率都相同为<code>1 / (i + 1)</code>；对于每一个位置比较的次数分别为<code>1, 2, 3, 4, 5 ... i, i</code>，因为当<code>i</code>元素为最小和次小的时候，比较次数都为<code>i</code>次，（当比较<code>i</code>次后，便可以知道该元素是最小还是次小了），所以插入第<code>i</code>个元素的比较次数为<code>1 / (i + 1) * (1 + 2 +3 + ... + i) + i / (1 + i)</code>，那么对于<code>n</code>各元素的<code>n-1</code>次插入来看，总的比较次数近似于<code>n * n / 4</code>。所以插入排序的时间复杂度为<code>n * n / 4</code></li>
+</ol>
+<p>对于一个待排序列S，S(i)元素表示位置应该在i的元素。那么如果S(i) &lt; S(j)，i &gt; j，称（S(i)，S(j))为逆序对（inversion），对于每一个n个元素的输入，最多有<code>n * (n - 1) / 2</code>个逆序对，如果比较排序算法每一次比较最多消除一个逆序对，那么比较排序算法的最坏时间复杂度至少为 <strong><code>n * (n - 1) / 2</code></strong>。</p>
+<p>考虑待排序列的转置(transpose) 序列T，转置序列T和序列S的元素顺序是颠倒的。显然一个逆序对(inversion)不是在序列S中，就是在其转置序列T中，因此两个序列的逆序对数量之后等于<code>n * (n - 1) / 2</code>，每个序列逆序对数量平均为<code>n * (n - 1) / 4</code> 约为<code>n*n/4</code>。</p>
+<p>以上分析可以得出下面的理论</p>
+<blockquote>
+<p>对于含有<code>n</code>个元素的待排输入，任何通过比较来排序的算法，若其每一次比较至多消除一个逆序对的话，其在最坏情况下至少得比较<code>n(n-1)/2</code>次，在平均情况下至少得比较<code>n(n-1)/4</code></p>
+</blockquote>
+<p>由于插入排序的最坏和平均情况下比较的次数都接近上述分析给出的数值，考虑那些只比较交换相邻元素的算法，插入排序可以算是最好的算法了。如果想要显著的改善此类排序算法的性能，我们必须在一次将元素移动超过一个位置。（或是一次消除多个逆序对）。这种想法给性能较好的快速排序和希尔排序等带来新的思路。</p>
+<p>下面是插入排序的代码示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">insertSort</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>,j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt; n; i++)</span><br><span class="line">        <span class="keyword">for</span>(j = i; j &gt; <span class="number">0</span>; j--) &#123;</span><br><span class="line">            <span class="keyword">if</span>(a[j] &lt; a[j<span class="number">-1</span>])</span><br><span class="line">                swap(&amp;a[j], &amp;a[j<span class="number">-1</span>]);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h1><p>冒泡排序得名于其简单，易用的排序风格。冒泡排序通过每一趟相邻元素的的两两比较确定某一个元素的正确的位置，这样进行<code>n</code>趟就确定了<code>n</code>个元素的位置了。冒泡排序的代码示例如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">bubbleSort</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= n; i++)</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; n - i; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(a[j] &gt; a[j+<span class="number">1</span>])</span><br><span class="line">                swap(&amp;a[j], &amp;a[j+<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最常见的冒泡排序如上所示。</p>
+<h1 id="冒泡排序的改进"><a href="#冒泡排序的改进" class="headerlink" title="冒泡排序的改进"></a>冒泡排序的改进</h1><h2 id="改进版本1"><a href="#改进版本1" class="headerlink" title="改进版本1"></a>改进版本1</h2><p>如果输入的待排序列的尾部是部分有序的，那么内部循环的<code>j</code>就没有必要增加到<code>n-i</code>了，直接在上一趟最后发生元素交换的位置<code>lastSwapIndex</code>，这样就可以减少没有必要的的比较了。例如序列<code>7,8,5,6,9,10,11</code>，第一趟比较，<code>7,5,6,8,9,10,11</code> 后的结果为最后交换的位置为元素<code>6</code>的位置（<code>8</code>与<code>6</code>交换)，因此下一趟比较的时候，<code>j</code>就没有必要增加到元素<code>10</code>的位置了，因为上一趟最后发生交换的位置<code>lastSwapIndex</code>代表了此位置以后的元素都已经完排序了，不需进行没必要的比较了。</p>
+<p>因此改进后的冒泡排序如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">bubbleSort1</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> lastSwapIndex = n - i;</span><br><span class="line">    <span class="type">int</span> q = n - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">//n趟</span></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; q; j++)</span><br><span class="line">            <span class="keyword">if</span>(a[j] &gt; a[j+<span class="number">1</span>]) &#123;</span><br><span class="line">                swap(&amp;a[j], &amp;a[j+<span class="number">1</span>]);</span><br><span class="line">                lastSwapIndex = j;<span class="comment">//记录每一趟最后交换的位置</span></span><br><span class="line">            &#125;</span><br><span class="line">        q = lastSwapIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过记录上一趟待排序列尾部中最后一次进行元素交换的位置，为下一趟省去了不必要的比较次数，从而改进了冒泡排序。  </p>
+<h2 id="改进版本2"><a href="#改进版本2" class="headerlink" title="改进版本2"></a>改进版本2</h2><p>同样的思路，如果待排序列的开始已经是部分有序了，那么内部循环的<code>j</code>也没有必要每一趟都从<code>0</code>开始了。例如待排序列<code>1,2,3,4,9,7,8,6</code>第一趟首次发生交换的位置为元素<code>9</code>的位置，那么下一趟<code>j</code>就没有必要从<code>0</code>开始了，而是从元素<code>9</code>的位置<code>beginSwapIndex</code>的前一个位置（记为<code>beginSwapIndex - 1</code>）开始，进行比较。因为上一趟的首次发生交换的位置<code>beginSwapIndex</code>表明此位置<code>beginSwapIndex - 1</code>的元素都是有序的了，下一趟的比较就从位置<code>eginSwapIndex - 1</code>开始，为什么是<code>beginSwapIndex - 1</code>? 而不是<code>beginSwapIndex</code>呢？是因为上一趟首次发生交换后，被交换到位置<code>beginSwapIndex</code>元素无法确定是否大于位置<code>beginSwapIndex - 1</code>的元素，因此需要从<code>beginSwapIndex - 1</code>的元素继续开始比较。</p>
+<p>下面是改进版本2的代码示例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//改进版1</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bubbleSort1</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> lastSwapIndex = n - i;</span><br><span class="line">    <span class="type">int</span> q = n - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">//n趟</span></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; q; j++)</span><br><span class="line">            <span class="keyword">if</span>(a[j] &gt; a[j+<span class="number">1</span>]) &#123;</span><br><span class="line">                swap(&amp;a[j], &amp;a[j+<span class="number">1</span>]);</span><br><span class="line">                lastSwapIndex = j;<span class="comment">//记录每一趟最后交换的位置</span></span><br><span class="line">            &#125;</span><br><span class="line">        q = lastSwapIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//改进版2</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bubbleSort2</span><span class="params">(<span class="type">int</span> *a, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> lastSwapIndex = n - i;</span><br><span class="line">    <span class="type">int</span> beginSwapIndex = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> q = n - <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> p = beginSwapIndex;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> firstFlag = <span class="number">1</span>;<span class="comment">//是否为首次发生交换的flag</span></span><br><span class="line">    <span class="comment">//n趟</span></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span>(j = p; j &lt; q; j++)</span><br><span class="line">            <span class="keyword">if</span>(a[j] &gt; a[j+<span class="number">1</span>]) &#123;</span><br><span class="line">                swap(&amp;a[j], &amp;a[j+<span class="number">1</span>]);</span><br><span class="line">                lastSwapIndex = j;<span class="comment">//记录每一趟最后交换的位置</span></span><br><span class="line">                <span class="keyword">if</span>(firstFlag) &#123;<span class="comment">//记录每一趟开始交换的位置</span></span><br><span class="line">                    beginSwapIndex = j == <span class="number">0</span> ? <span class="number">0</span> : j - <span class="number">1</span>;</span><br><span class="line">                    firstFlag = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        q = lastSwapIndex;</span><br><span class="line">        firstFlag = <span class="number">1</span>;</span><br><span class="line">        p = beginSwapIndex;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过分析比较排序中经典的插入排序，引入了<strong>逆序对</strong>和<strong>转置</strong>的概念，对所有比较排序的算法的平均和最坏时间复杂度进行了最坏的边界分析，从而得到了对于每一次比较最多消除一个逆序对的算法平均时间复杂度的边界上边界，和最坏的时间复杂度的上边界。这些分析给如何改良排序算法提供了途径。通过每一次比较，将元素移动<strong>超过不止</strong>一个位置（这样就可以消除不止一个逆序对），这样就可以将比较类排序算法显著的改善。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F/" rel="tag"># 冒泡排序</a>
+              <a href="/tags/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/" rel="tag"># 插入排序</a>
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" rel="tag"># 时间复杂度</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/09/16/Common%20Data%20Structure%20Graph's%20Application%20TopSort/" rel="prev" title="常用数据结构图--拓扑排序">
+                  <i class="fa fa-angle-left"></i> 常用数据结构图--拓扑排序
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/09/30/Common%20Sort%20Algorithm%20merge%20sort%20and%20quick%20sort/" rel="next" title="常用排序算法——合并排序和快速排序">
+                  常用排序算法——合并排序和快速排序 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

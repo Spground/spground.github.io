@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1. 简介LCS通常是指Longest Common Subsequence, 但是也可代指Longest Common Substring。子串是一种特殊的子序列，子串和子序列的区别就是字串要求是组成子串的各字符是连续的，而子序列仅仅要求各字符的下标是递增的即可。举个例子，如helloworld， world是子串(也是子序列)， hw不是子串是子序列。 LCS问题就是在若干(这里是两个)字符串">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LCS问题">
+<meta property="og:url" content="https://spground.github.io/2017/06/20/LCS%20problem/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1. 简介LCS通常是指Longest Common Subsequence, 但是也可代指Longest Common Substring。子串是一种特殊的子序列，子串和子序列的区别就是字串要求是组成子串的各字符是连续的，而子序列仅仅要求各字符的下标是递增的即可。举个例子，如helloworld， world是子串(也是子序列)， hw不是子串是子序列。 LCS问题就是在若干(这里是两个)字符串">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img.blog.csdn.net/20171120120813271?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="article:published_time" content="2017-06-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.567Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="最长公共子串">
+<meta property="article:tag" content="最长公共子序列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20171120120813271?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+
+
+<link rel="canonical" href="https://spground.github.io/2017/06/20/LCS%20problem/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2017/06/20/LCS%20problem/","path":"2017/06/20/LCS problem/","title":"LCS问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LCS问题 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">1. 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E4%B8%B2%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">2. 最长公共子串问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">3. 最长公共子序列问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-References"><span class="nav-number">4.</span> <span class="nav-text">4. References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2017/06/20/LCS%20problem/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LCS问题 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LCS问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-06-20 00:00:00" itemprop="dateCreated datePublished" datetime="2017-06-20T00:00:00+08:00">2017-06-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h2><p><a href="https://en.wikipedia.org/wiki/Longest_common_subsequence_problem">LCS</a>通常是指Longest Common Subsequence, 但是也可代指Longest Common Substring。子串是一种特殊的子序列，子串和子序列的区别就是字串要求是组成子串的<br>各字符是连续的，而子序列仅仅要求各字符的下标是递增的即可。举个例子，如<code>helloworld</code>， <code>world</code>是子串(也是子序列)， <code>hw</code>不是子串是子序列。</p>
+<p>LCS问题就是在若干(这里是两个)字符串中，找到最长的一个字符串p, 这个p是那些字符串的子串(子序列)。LCS问题的意义之一就是去衡量若干字符串的相似度，例如在生物信息学<br>中有DNA序列的问题，比如序列<code>a = &quot;ATGATAGATAGATAG&quot;</code>， 序列<code>b=&quot;TGGGCCGAGAAGCGAGA&quot;</code>，需要一种去衡量<code>a</code>、<code>b</code>相似度的方法，那么最长公共子序列就可以作为一种衡量方法。<br>除此之外，在软件开发领域中的版本控制系统（典型的就是<code>Git</code>），比较同一个文件不同时刻的差异的时候，就需要利用到这个方法。</p>
+<p>例如下图就是<code>Git</code>上面的两次不同时刻对同一个文件的快照的对比图，我们可以看到，系统把两次的差异标示出来了。而原来位置、内容相同的部分没有标示。这个就可以通过<br><code>LCS</code>问题的解决，来找到最长的公共子序列部分，就是作为公共的、未发生改变部分；剩下的就是改变的部分，应该标示出来。</p>
+<p><img src="http://img.blog.csdn.net/20171120120813271?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDUzMjkwMQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>同理基于这个，我们还可以简单的比较两篇文章的相似度来检查雷同、抄袭的情况，这么看来，LCS问题的还是和我们日常比较相关的。</p>
+<p>解决LCS问题依靠暴力(brute force)的求解时间复杂度是指数级别的，因此不太现实，由于问题的本身的最优解具有<strong>最优子结构</strong>特征，因此原问题的求解可以化为多个子问题的求解；另外子问题的求解存在重叠的情况，这恰好是适合动态规划求解的问题的第二个特征：<strong>存在重叠的子问题求解过程</strong>，因此适合利用动态规划来求解，这个也是较常见的解决LCS问题的方法,时间复杂度为<code>O(n*m)</code>，动态规划易于编写，但是时间复杂度较高；另外更高级的还存在一种线性复杂度的<code>O(n+m)</code>的解法，就是<a href="https://en.wikipedia.org/wiki/Suffix_tree"><code>Suffix Tree</code></a>，不过这种方法的缺点是程序难以编制。因此在日常的编码中，动态规划已经够用了。</p>
+<h2 id="2-最长公共子串问题"><a href="#2-最长公共子串问题" class="headerlink" title="2. 最长公共子串问题"></a>2. 最长公共子串问题</h2><p>设dp[i][j]表示s[0<del>i]和t[0</del>j]的最长公共子串的长度，对于两个字符串的最长公共子串问题的最优解，最优解存在如下结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dp[i][j] = 1 (i == 0 || j == 0)</span><br><span class="line">dp[i][j] = dp[i-1][j-1] + 1;(s[i] == t[j] &amp;&amp; i &gt; 0 &amp;&amp; j &gt; 0);</span><br><span class="line">dp[i][j] = 0;(s[i] != t[j])</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>上述等式建立了原问题和子问题的关系（此类证明可用反证法），剩下的就是编码了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;String&gt; <span class="title function_">findLongestLCS</span><span class="params">(String s, String t)</span> &#123;</span><br><span class="line">   <span class="type">char</span>[] schs = s.toCharArray();</span><br><span class="line">   <span class="type">char</span>[] tchs = t.toCharArray();</span><br><span class="line">   <span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> s.length(), n = t.length();</span><br><span class="line">   <span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m][n];</span><br><span class="line">   <span class="type">int</span> <span class="variable">maxSize</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">   List&lt;Integer&gt; indexs = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();<span class="comment">//存储最长公共子串的在原始串中结束位置</span></span><br><span class="line"></span><br><span class="line">   <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; m; i++)</span><br><span class="line">     <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">       <span class="keyword">if</span> (schs[i] == tchs[j]) &#123;</span><br><span class="line">         <span class="keyword">if</span> (i == <span class="number">0</span> || j == <span class="number">0</span>)</span><br><span class="line">           dp[i][j] = <span class="number">1</span>;</span><br><span class="line">         <span class="keyword">else</span></span><br><span class="line">           dp[i][j] = dp[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">if</span> (dp[i][j] &gt; maxSize) &#123;</span><br><span class="line">           maxSize = dp[i][j];</span><br><span class="line">           indexs.clear();<span class="comment">//找到更优的解，前面存储的下标值全部作废</span></span><br><span class="line">           indexs.add(i);</span><br><span class="line">         &#125; <span class="keyword">else</span> <span class="keyword">if</span> (dp[i][j] == maxSize)</span><br><span class="line">           indexs.add(i);</span><br><span class="line">        &#125; <span class="keyword">else</span></span><br><span class="line">          dp[i][j] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">   List&lt;String&gt; ret = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">   <span class="keyword">for</span> (Integer i : indexs)</span><br><span class="line">     ret.add(s.substring(i + <span class="number">1</span> - maxSize, i + <span class="number">1</span>));</span><br><span class="line">   <span class="keyword">return</span> ret;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>改进：上面的版本时间复杂度是<code>O(n*m)</code>,空间复杂度也是<code>O(n*m)</code>;但是观察dp二维数组发现，发现有优化的余地。由于在计算dp[i][j]的时候只使用到了dp[i-1][j-1]，因此dp二维数组可以使用一个一位数组和两个临时变量即可完成，这样就把空间复杂度降低到<code>O(min(n, m))</code>。</p>
+<p><strong>改进版本</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 内存改进版本, 只存储one row,新增两个临时变量空间复杂度O(min(m, n))</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> List&lt;String&gt; <span class="title function_">findLongestLCS0</span><span class="params">(String s, String t)</span> &#123;</span><br><span class="line">		<span class="type">String</span> <span class="variable">tmp</span> <span class="operator">=</span> s;</span><br><span class="line">		<span class="keyword">if</span> (s.length() &gt; t.length()) &#123;</span><br><span class="line">			s = t;</span><br><span class="line">			t = tmp;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="type">char</span>[] schs = s.toCharArray();</span><br><span class="line">		<span class="type">char</span>[] tchs = t.toCharArray();</span><br><span class="line">		<span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> s.length(), n = t.length();</span><br><span class="line"></span><br><span class="line">		<span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m];</span><br><span class="line">  <span class="comment">//prev存储dp[i-1][j-1]，cur存储dp[i][j]</span></span><br><span class="line">		<span class="type">int</span> <span class="variable">prev</span> <span class="operator">=</span> <span class="number">0</span>, cur = <span class="number">0</span>;</span><br><span class="line">		<span class="type">int</span> <span class="variable">maxSize</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">		List&lt;Integer&gt; indexs = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; m; j++)</span><br><span class="line">				<span class="keyword">if</span> (schs[j] == tchs[i]) &#123;</span><br><span class="line">					<span class="keyword">if</span> (i == <span class="number">0</span> || j == <span class="number">0</span>)</span><br><span class="line">						dp[j] = <span class="number">1</span>;</span><br><span class="line">					<span class="keyword">else</span> &#123;</span><br><span class="line">						cur = dp[j];</span><br><span class="line">						dp[j] = prev + <span class="number">1</span>;</span><br><span class="line">						prev = cur;</span><br><span class="line">					&#125;</span><br><span class="line"></span><br><span class="line">					<span class="keyword">if</span> (dp[j] &gt; maxSize) &#123;</span><br><span class="line">						maxSize = dp[j];</span><br><span class="line">						indexs.clear();</span><br><span class="line">						indexs.add(j);</span><br><span class="line">					&#125; <span class="keyword">else</span> <span class="keyword">if</span> (dp[j] == maxSize)</span><br><span class="line">						indexs.add(j);</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					cur = dp[j];</span><br><span class="line">					dp[j] = <span class="number">0</span>;</span><br><span class="line">					prev = cur;</span><br><span class="line">				&#125;</span><br><span class="line">		List&lt;String&gt; ret = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (Integer j : indexs)</span><br><span class="line">			ret.add(s.substring(j + <span class="number">1</span> - maxSize, j + <span class="number">1</span>));</span><br><span class="line">		<span class="keyword">return</span> ret;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>如果上面的dp数组很稀疏(0值很多)，当字符串很大时，也还可以继续优化，采用<code>hashmap</code>的方式存储非0值，这样在字符串大且dp数组稀疏的时候，可以进一步优化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 内存改进版1 用hashtable存储每一行dp的非0值</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> List&lt;String&gt; <span class="title function_">findLongestLCS1</span><span class="params">(String s, String t)</span> &#123;</span><br><span class="line">		<span class="type">String</span> <span class="variable">tmp</span> <span class="operator">=</span> s;</span><br><span class="line">		<span class="keyword">if</span> (s.length() &gt; t.length()) &#123;</span><br><span class="line">			s = t;</span><br><span class="line">			t = tmp;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="type">char</span>[] schs = s.toCharArray();</span><br><span class="line">		<span class="type">char</span>[] tchs = t.toCharArray();</span><br><span class="line">		<span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> s.length(), n = t.length();</span><br><span class="line"></span><br><span class="line">		Map&lt;Integer, Integer&gt; dp = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">		<span class="type">int</span> <span class="variable">prev</span> <span class="operator">=</span> <span class="number">0</span>, cur = <span class="number">0</span>;</span><br><span class="line">		<span class="type">int</span> <span class="variable">maxSize</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">		List&lt;Integer&gt; indexs = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; m; j++) &#123;</span><br><span class="line">				<span class="type">Integer</span> <span class="variable">tmpj</span> <span class="operator">=</span> dp.get(j);</span><br><span class="line">				<span class="keyword">if</span> (schs[j] == tchs[i]) &#123;</span><br><span class="line">					<span class="keyword">if</span> (i == <span class="number">0</span> || j == <span class="number">0</span>)</span><br><span class="line">						dp.put(j, <span class="number">1</span>);</span><br><span class="line">					<span class="keyword">else</span> &#123;</span><br><span class="line">						cur = tmpj == <span class="literal">null</span> ? <span class="number">0</span> : tmpj;</span><br><span class="line">						dp.put(j, prev + <span class="number">1</span>);</span><br><span class="line">						prev = cur;</span><br><span class="line">					&#125;</span><br><span class="line"></span><br><span class="line">					tmpj = dp.get(j);</span><br><span class="line">					<span class="keyword">if</span> (tmpj &gt; maxSize) &#123;</span><br><span class="line">						maxSize = tmpj;</span><br><span class="line">						indexs.clear();</span><br><span class="line">						indexs.add(j);</span><br><span class="line">					&#125; <span class="keyword">else</span> <span class="keyword">if</span> (tmpj == maxSize)</span><br><span class="line">						indexs.add(j);</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="comment">//非0值不存储， 优化稀疏情况。</span></span><br><span class="line">					cur = tmpj == <span class="literal">null</span> ? <span class="number">0</span> : tmpj;</span><br><span class="line">					dp.remove(j);</span><br><span class="line">					prev = cur;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		System.out.println(indexs);</span><br><span class="line">		List&lt;String&gt; ret = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (Integer j : indexs)</span><br><span class="line">			ret.add(s.substring(j + <span class="number">1</span> - maxSize, j + <span class="number">1</span>));</span><br><span class="line">		<span class="keyword">return</span> ret;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="3-最长公共子序列问题"><a href="#3-最长公共子序列问题" class="headerlink" title="3. 最长公共子序列问题"></a>3. 最长公共子序列问题</h2><p>同样的最长公共子序列也可以利用刻画最优解的结构来利用DP求解。<br>对于字符串s和t，和上面一样dp[i][j]存储的值依然是s[0<del>i]和t[0</del>j]的最长公共子序列的长度。</p>
+<p>最优解的结构</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dp[i][j] = 1 (i == 0 || j == 0 &amp;&amp; s[i] == t[j])</span><br><span class="line">dp[i][j] = 0 (i == 0 || j == 0 &amp;&amp; s[i] != t[j])</span><br><span class="line">dp[i][j] = dp[i-1][j-1] + 1(i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; s[i] == t[j])</span><br><span class="line">dp[i][j] = max(dp[i-1][j], dp[i][j-1])(i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; s[i] != t[j])</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>具体证明参见《算法讨导论》,也是利用反证法。</p>
+<p>由于计算的时候只使用到了dp[i-1][j-1]、dp[i-1][j]和dp[i][j-1]，则可以运用上上文中的思路，进行空间优化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//只需要求解长度，可以进行空间优化</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">longestLCS</span><span class="params">(String s, String t)</span> &#123;</span><br><span class="line">		<span class="type">String</span> <span class="variable">tmp</span> <span class="operator">=</span> s;</span><br><span class="line">		<span class="keyword">if</span> (s.length() &gt; t.length()) &#123;</span><br><span class="line">			s = t;</span><br><span class="line">			t = tmp;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="type">char</span>[] schs = s.toCharArray();</span><br><span class="line">		<span class="type">char</span>[] tchs = t.toCharArray();</span><br><span class="line">		<span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> s.length(), n = t.length(), prev = <span class="number">0</span>, cur;</span><br><span class="line">		<span class="type">int</span>[] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m];</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; n; j++)</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">				<span class="keyword">if</span> (schs[i] == tchs[j]) &#123;</span><br><span class="line">					<span class="keyword">if</span> (i == <span class="number">0</span> || j == <span class="number">0</span>) </span><br><span class="line">						dp[i] = <span class="number">1</span>;</span><br><span class="line">					<span class="keyword">else</span> &#123;</span><br><span class="line">						cur = dp[i];</span><br><span class="line">						dp[i] = prev + <span class="number">1</span>;<span class="comment">//prev ---&gt; dp[i-1][j-1]</span></span><br><span class="line">						prev = cur;</span><br><span class="line">					&#125;	</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					cur = dp[i];</span><br><span class="line">					<span class="type">int</span> <span class="variable">aa</span> <span class="operator">=</span> i == <span class="number">0</span> ? <span class="number">0</span> : dp[i-<span class="number">1</span>], bb = j == <span class="number">0</span> ? <span class="number">0</span> : dp[i];</span><br><span class="line">					dp[i] = Math.max(aa, bb);</span><br><span class="line">					prev = cur;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;	</span><br><span class="line">		<span class="keyword">return</span> dp[m-<span class="number">1</span>];</span><br><span class="line">	&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>但是由于有些时候，我们需要知道这些最长公共子序列，因此我们还需要在求解的过程保存额外的信息(上文中保存的是下标值)。为了得到最长公共子序列，我们可以<br>沿着求解反方向去得到最长公共子序列。具体的做法就是，给定一个dp[i][j]我们可以判断出，它是由dp[i][j-1]还是dp[i-1][j]还是dp[i-1][j-1]得来的，知道了这个以后我们就知道了求解方向了，这样可以逆着回退到起点dp[0][0]。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">longestLCSWithReconstructionLCS</span><span class="params">(String a, String b)</span> &#123;</span><br><span class="line">	<span class="type">char</span>[] achs = a.toCharArray();</span><br><span class="line">	<span class="type">char</span>[] bchs = b.toCharArray();</span><br><span class="line">	<span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> a.length(), n = b.length();</span><br><span class="line">	<span class="type">int</span>[][] dp = <span class="keyword">new</span> <span class="title class_">int</span>[m][n];</span><br><span class="line">	<span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; m; i++)</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">			<span class="keyword">if</span> (achs[i] == bchs[j]) &#123;</span><br><span class="line">				<span class="keyword">if</span> (i == <span class="number">0</span> || j == <span class="number">0</span>)</span><br><span class="line">					dp[i][j] = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">else</span></span><br><span class="line">					dp[i][j] = dp[i - <span class="number">1</span>][j - <span class="number">1</span>] + <span class="number">1</span>;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="type">int</span> <span class="variable">aa</span> <span class="operator">=</span> i == <span class="number">0</span> ? <span class="number">0</span> : dp[i - <span class="number">1</span>][j], bb = j == <span class="number">0</span> ? <span class="number">0</span> : dp[i][j - <span class="number">1</span>];</span><br><span class="line">				dp[i][j] = Math.max(aa, bb);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;	</span><br><span class="line">	<span class="comment">// 重构最长公共子序列</span></span><br><span class="line">	<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> m - <span class="number">1</span>, j = n - <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (i &gt;= <span class="number">0</span> &amp;&amp; j &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="comment">//判断方向</span></span><br><span class="line">		<span class="keyword">if</span> (achs[i] == bchs[j]) &#123;<span class="comment">//如果相等，必然是子序列的一部分</span></span><br><span class="line">			sb.append(achs[i]);</span><br><span class="line">			i--;j--;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;<span class="comment">//如果不相等，则需要判断求解方向，然后逆行。</span></span><br><span class="line">			<span class="keyword">if</span> (dp[i - <span class="number">1</span>][j] &gt;= dp[i][j - <span class="number">1</span>])</span><br><span class="line">				i--;</span><br><span class="line">			<span class="keyword">else</span></span><br><span class="line">				j--;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> sb.reverse().toString();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>我们可以在<code>O(n)</code>的时间重构得到最长公共子序列,由于我们需要在最后逆行构造最长公共子序列，因此是不能将二维数组dp优化成一位数组dp,因为优化以后我们是没法<br>在<code>O(1)</code>的时间判断出由dp[i][j-1]还是dp[i-1][j]还是dp[i-1][j-1]得来的，重构最长公共子序列也就无从谈起了。</p>
+<h2 id="4-References"><a href="#4-References" class="headerlink" title="4. References"></a>4. References</h2><p>[1] <a href="https://en.wikipedia.org/wiki/Longest_common_subsequence_problem">Longest_common_subsequence_problem</a></p>
+<p>[2] <a href="https://en.wikipedia.org/wiki/Suffix_tree">Suffix Tree</a></p>
+<p>[3] Thomas H.Cormen, Charles E.Leiserson, Ronald L.Rivest, Clifford Stein.算法导论[M].北京:机械工业出版社,2015:222-226</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97/" rel="tag"># 最长公共子序列</a>
+              <a href="/tags/%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E4%B8%B2/" rel="tag"># 最长公共子串</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/04/16/introduction%20to%20Java%20dynamic%20proxy/" rel="prev" title="Java动态代理简述">
+                  <i class="fa fa-angle-left"></i> Java动态代理简述
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/07/07/Heap%20and%20Heap's%20Application-Heap%20Sort%20and%20Priority%20Queue/" rel="next" title="堆和堆的应用：堆排序和优先队列">
+                  堆和堆的应用：堆排序和优先队列 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

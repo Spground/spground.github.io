@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.回溯法简介回溯法，又称试探法，是常用的，基本的优选搜索方法。常用于解决这一类问题：给定一定约束条件F（该约束条件常用于后面的剪枝）下求问题的一个解或者所有解。 回溯法其实是暴力枚举的一种改进，因为其会聪明的filter掉不合适的分支，大大减少了无谓的枚举。若某问题的枚举都是可行解得话，也就是没有剪枝发生，那么回溯法和暴力枚举并无二异。 该回溯法先从解空间中选取任意一个可能满足约束条件F的点x1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用算法策略之回溯法">
+<meta property="og:url" content="https://spground.github.io/2017/03/12/Common%20Algorithm%20Strategy%20Backtracking/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1.回溯法简介回溯法，又称试探法，是常用的，基本的优选搜索方法。常用于解决这一类问题：给定一定约束条件F（该约束条件常用于后面的剪枝）下求问题的一个解或者所有解。 回溯法其实是暴力枚举的一种改进，因为其会聪明的filter掉不合适的分支，大大减少了无谓的枚举。若某问题的枚举都是可行解得话，也就是没有剪枝发生，那么回溯法和暴力枚举并无二异。 该回溯法先从解空间中选取任意一个可能满足约束条件F的点x1">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-03-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.564Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="回溯法">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://spground.github.io/2017/03/12/Common%20Algorithm%20Strategy%20Backtracking/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2017/03/12/Common%20Algorithm%20Strategy%20Backtracking/","path":"2017/03/12/Common Algorithm Strategy Backtracking/","title":"常用算法策略之回溯法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>常用算法策略之回溯法 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%9B%9E%E6%BA%AF%E6%B3%95%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">1.回溯法简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%9B%9E%E6%BA%AF%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.</span> <span class="nav-text">2.回溯法的基本步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%9B%9E%E6%BA%AF%E6%B3%95%E4%B9%8B%E7%BB%8F%E5%85%B8%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">3.回溯法之经典问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%9B%9E%E6%BA%AF%E6%B3%95%E4%B9%8B%E7%BB%8F%E5%85%B8%E9%97%AE%E9%A2%98%EF%BC%9ASudoku%EF%BC%88%E6%95%B0%E7%8B%AC%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">4.回溯法之经典问题：Sudoku（数独）</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2017/03/12/Common%20Algorithm%20Strategy%20Backtracking/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="常用算法策略之回溯法 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          常用算法策略之回溯法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-03-12 00:00:00" itemprop="dateCreated datePublished" datetime="2017-03-12T00:00:00+08:00">2017-03-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-回溯法简介"><a href="#1-回溯法简介" class="headerlink" title="1.回溯法简介"></a>1.回溯法简介</h2><p><a href="https://en.wikipedia.org/wiki/Backtracking">回溯法</a>，又称试探法，是常用的，基本的优选搜索方法。常用于解决这一类问题：给定一定约束条件F（该约束条件常用于后面的剪枝）下求问题的一个解或者所有解。</p>
+<p><strong>回溯法其实是暴力枚举的一种改进，因为其会聪明的filter掉不合适的分支，大大减少了无谓的枚举。若某问题的枚举都是可行解得话，也就是没有剪枝发生，那么回溯法和暴力枚举并无二异。</strong></p>
+<p>该回溯法先从解空间中选取任意一个可能满足约束条件<code>F</code>的点<code>x1</code>,然后从满足<code>F</code>的解空间中继续选择一个点<code>x2</code>，直到所找到的点构成一个解<code>S</code>或者找不到满足约束条件<code>F</code>的点时，开始回溯。回溯到上一层节点f，再另选满足<code>F</code>的解空间中的一点，继续试探。</p>
+<p>整个过程类似于一个递归树，因此回溯法常常采用<code>DFS</code>的方法来实现。不考虑约束条件<code>F</code>，整个递归树的任一根节点<code>root</code>到叶子节点<code>leaf</code>的路径<code>path</code>都是无约束条件<code>F</code>的原问题的一个解。</p>
+<p>现在考虑约束条件<code>F</code>，实际就是在每次向下深入的时候，利用约束条件<code>F</code>来判断当前遍历的节点是否有必要继续搜索下去,若无必要则马上回溯；有必要则继续深入，这一个过程类似于约束条件<code>F</code>剪去了多余的递归分支。</p>
+<p>回溯法解决的问题的<strong>一般特征</strong>：能够利用约束条件<code>F</code>去<strong>快速</strong>判断构成一个完整解的一些局部候选信息<code>partial candidates</code>是否可能最终构成一个正确的、完整的解。</p>
+<h2 id="2-回溯法的基本步骤"><a href="#2-回溯法的基本步骤" class="headerlink" title="2.回溯法的基本步骤"></a>2.回溯法的基本步骤</h2><ol>
+<li>明确问题的解空间<code>S</code>和约束条件<code>F</code>.</li>
+<li>利用深度优先搜索，试探可能构成一个完整解的候选节点，利用约束条件<code>F</code>进行剪枝<br>  2.1. 找到递归的<code>base case</code><br>  2.2. 利用约束条件<code>F</code>判断是否剪枝，一旦剪枝，则开始回溯（返回）</li>
+<li>当递归到叶节点的时候，即得到原问题在约束条件<code>F</code>下的一个解，若要得到所有的可行解，则还需要考察根节点的其他分支。</li>
+</ol>
+<p>回溯法注意事项：</p>
+<ol>
+<li>递归状态的存储和更新</li>
+<li>回溯点的处理（是否应该清除该回溯点之前对递归状态产生的<code>side effect</code>）</li>
+<li>解的搜集</li>
+</ol>
+<h2 id="3-回溯法之经典问题"><a href="#3-回溯法之经典问题" class="headerlink" title="3.回溯法之经典问题"></a>3.回溯法之经典问题</h2><p>回溯法之经典问题：N皇后问题</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NQueensDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		<span class="type">NQueensDemo</span> <span class="variable">demo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NQueensDemo</span>();</span><br><span class="line">		demo.solution(<span class="number">8</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">solution</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">		List&lt;<span class="type">int</span>[]&gt; collector = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; n; j++)</span><br><span class="line">			dfs(<span class="number">0</span>, j, <span class="keyword">new</span> <span class="title class_">int</span>[n], <span class="keyword">new</span> <span class="title class_">int</span>[n], <span class="keyword">new</span> <span class="title class_">int</span>[n], <span class="keyword">new</span> <span class="title class_">int</span>[n * <span class="number">2</span> - <span class="number">1</span>], <span class="keyword">new</span> <span class="title class_">int</span>[n * <span class="number">2</span> - <span class="number">1</span>], collector, n);</span><br><span class="line">		System.out.println(<span class="string">&quot;numbers of solution &quot;</span> + collector.size());</span><br><span class="line">		print(collector, n);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> i, <span class="type">int</span> j, <span class="type">int</span>[] solution, <span class="type">int</span>[] occupiedRow, <span class="type">int</span>[] occupiedCol, <span class="type">int</span>[] occupiedTopBottom,</span></span><br><span class="line"><span class="params">			<span class="type">int</span>[] occupiedBottomTop, List&lt;<span class="type">int</span>[]&gt; collector, <span class="type">int</span> size)</span> &#123;</span><br><span class="line">		solution[i] = j;</span><br><span class="line">		<span class="keyword">if</span> (i &gt;= size - <span class="number">1</span>) &#123;</span><br><span class="line">			collector.add(solution.clone());</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 8个方向</span></span><br><span class="line">		occupiedRow[i] = <span class="number">1</span>;</span><br><span class="line">		occupiedCol[j] = <span class="number">1</span>;</span><br><span class="line">		occupiedTopBottom[size - <span class="number">1</span> + (i - j)] = <span class="number">1</span>;<span class="comment">// 左上到右下的斜线 (i+d, j+d) 关系为i-j,</span></span><br><span class="line">													<span class="comment">// 范围为 -size + 1 ~ size - 1,</span></span><br><span class="line">													<span class="comment">// 所以左右各加size - 1归到区间</span></span><br><span class="line">													<span class="comment">// 0~2size - 2, 关系为 size - 1</span></span><br><span class="line">													<span class="comment">// + (i - j), 分配的数组大小为 2size</span></span><br><span class="line">													<span class="comment">// - 1</span></span><br><span class="line">		occupiedBottomTop[i + j] = <span class="number">1</span>;<span class="comment">// 左下到右上的斜线(i-d, j+d)和(i+d, j-d) 关系为 i+j</span></span><br><span class="line">										<span class="comment">// 分配的数组大小为 2size - 1</span></span><br><span class="line"></span><br><span class="line">		<span class="comment">// 寻找下一个皇后放置的位置</span></span><br><span class="line">		i = i + <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> <span class="number">0</span>; n &lt; size; n++) &#123;</span><br><span class="line">			<span class="keyword">if</span> (occupiedRow[i] == <span class="number">0</span> &amp;&amp; occupiedCol[n] == <span class="number">0</span> &amp;&amp; occupiedTopBottom[size - <span class="number">1</span> + (i - n)] == <span class="number">0</span></span><br><span class="line">					&amp;&amp; occupiedBottomTop[i + n] == <span class="number">0</span>)</span><br><span class="line">				dfs(i, n, solution, occupiedRow, occupiedCol, occupiedTopBottom, occupiedBottomTop, collector, size);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 回溯后, clear flag，恢复原状</span></span><br><span class="line">		i = i - <span class="number">1</span>;</span><br><span class="line">		occupiedRow[i] = <span class="number">0</span>;</span><br><span class="line">		occupiedCol[j] = <span class="number">0</span>;</span><br><span class="line">		occupiedTopBottom[size - <span class="number">1</span> + (i - j)] = <span class="number">0</span>;</span><br><span class="line">		occupiedBottomTop[i + j] = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">print</span><span class="params">(List&lt;<span class="type">int</span>[]&gt; collector, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span>[] s : collector) &#123;</span><br><span class="line">			System.out.println();</span><br><span class="line">			<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">				System.out.println();</span><br><span class="line">				<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">					<span class="keyword">if</span> (j == s[i])</span><br><span class="line">						System.out.print(<span class="number">1</span> + <span class="string">&quot;  &quot;</span>);</span><br><span class="line">					<span class="keyword">else</span></span><br><span class="line">						System.out.print(<span class="number">0</span> + <span class="string">&quot;  &quot;</span>);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-回溯法之经典问题：Sudoku（数独）"><a href="#4-回溯法之经典问题：Sudoku（数独）" class="headerlink" title="4.回溯法之经典问题：Sudoku（数独）"></a>4.回溯法之经典问题：Sudoku（数独）</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">final</span> <span class="type">char</span> <span class="variable">base</span> <span class="operator">=</span> <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">solveSudoku</span><span class="params">(<span class="type">char</span>[][] board)</span> &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">filledNum</span> <span class="operator">=</span> <span class="number">0</span>;<span class="comment">// 统计已填的数目，作为DFS搜索结束的条件</span></span><br><span class="line">		<span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> <span class="number">0</span>, n = <span class="number">0</span>;</span><br><span class="line">		<span class="type">int</span>[][] rowCount = <span class="keyword">new</span> <span class="title class_">int</span>[<span class="number">9</span>][<span class="number">9</span>], colCount = <span class="keyword">new</span> <span class="title class_">int</span>[<span class="number">9</span>][<span class="number">9</span>], subBoxCount = <span class="keyword">new</span> <span class="title class_">int</span>[<span class="number">9</span>][<span class="number">9</span>];</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (m = <span class="number">0</span>; m &lt; <span class="number">9</span>; m++)</span><br><span class="line">			<span class="keyword">for</span> (n = <span class="number">0</span>; n &lt; <span class="number">9</span>; n++)</span><br><span class="line">				<span class="keyword">if</span> (board[m][n] != <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">					rowCount[m][board[m][n] - base] += <span class="number">1</span>;</span><br><span class="line">					colCount[n][board[m][n] - base] += <span class="number">1</span>;</span><br><span class="line">					subBoxCount[m / <span class="number">3</span> * <span class="number">3</span> + n / <span class="number">3</span>][board[m][n] - base] += <span class="number">1</span>;</span><br><span class="line">					filledNum++;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">		<span class="type">boolean</span> <span class="variable">found</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">		<span class="keyword">for</span> (m = <span class="number">0</span>; m &lt; <span class="number">9</span>; m++) &#123;<span class="comment">// 找到第一个待填的方格</span></span><br><span class="line">			<span class="keyword">for</span> (n = <span class="number">0</span>; n &lt; <span class="number">9</span>; n++)</span><br><span class="line">				<span class="keyword">if</span> (board[m][n] == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">					found = <span class="literal">true</span>;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			<span class="keyword">if</span> (found)</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">num</span> <span class="operator">=</span> <span class="number">0</span>; num &lt; <span class="number">9</span>; num++)</span><br><span class="line">			<span class="keyword">if</span> (rowCount[m][num] == <span class="number">0</span> &amp;&amp; colCount[n][num] == <span class="number">0</span> &amp;&amp; subBoxCount[m / <span class="number">3</span> * <span class="number">3</span> + n / <span class="number">3</span>][num] == <span class="number">0</span>)</span><br><span class="line">				<span class="keyword">if</span> (dfs(m, n, (<span class="type">char</span>) (num + base), board, rowCount, colCount, subBoxCount, filledNum))</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> i, <span class="type">int</span> j, <span class="type">char</span> c, <span class="type">char</span>[][] board, <span class="type">int</span>[][] rowCount, <span class="type">int</span>[][] colCount, <span class="type">int</span>[][] subBoxCount,</span></span><br><span class="line"><span class="params">			<span class="type">int</span> filledNum)</span> &#123;</span><br><span class="line"></span><br><span class="line">		<span class="type">int</span> <span class="variable">number</span> <span class="operator">=</span> c - base;<span class="comment">// 0~8代表1~9</span></span><br><span class="line">		board[i][j] = c;</span><br><span class="line">		rowCount[i][number] += <span class="number">1</span>;</span><br><span class="line">		colCount[j][number] += <span class="number">1</span>;</span><br><span class="line">		subBoxCount[i / <span class="number">3</span> * <span class="number">3</span> + j / <span class="number">3</span>][number] += <span class="number">1</span>;</span><br><span class="line">		filledNum += <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// bas case</span></span><br><span class="line">		<span class="keyword">if</span> (filledNum &gt;= <span class="number">81</span>)</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">		<span class="type">int</span> <span class="variable">m</span> <span class="operator">=</span> i, n = j;</span><br><span class="line">		<span class="type">boolean</span> <span class="variable">found</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">		<span class="comment">// 找到下一个待填方格</span></span><br><span class="line">		<span class="keyword">for</span> (; m &lt; <span class="number">9</span>; m++) &#123;</span><br><span class="line">			<span class="keyword">for</span> (; n &lt; <span class="number">9</span>; n++) &#123;</span><br><span class="line">				<span class="keyword">if</span> (board[m][n] == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">					found = <span class="literal">true</span>;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (found)</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">else</span></span><br><span class="line">				n = <span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> <span class="variable">num</span> <span class="operator">=</span> <span class="number">0</span>; num &lt; <span class="number">9</span>; num++) &#123;</span><br><span class="line">			<span class="keyword">if</span> (rowCount[m][num] == <span class="number">0</span> &amp;&amp; colCount[n][num] == <span class="number">0</span> &amp;&amp; subBoxCount[m / <span class="number">3</span> * <span class="number">3</span> + n / <span class="number">3</span>][num] == <span class="number">0</span>) &#123;</span><br><span class="line">				<span class="keyword">if</span> (dfs(m, n, (<span class="type">char</span>) (num + base), board, rowCount, colCount, subBoxCount, filledNum))</span><br><span class="line">					<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// failed 该格子无论填啥都无解,所以clear所做的更改</span></span><br><span class="line">		board[i][j] = <span class="string">&#x27;.&#x27;</span>;</span><br><span class="line">		rowCount[i][number] -= <span class="number">1</span>;</span><br><span class="line">		colCount[j][number] -= <span class="number">1</span>;</span><br><span class="line">		subBoxCount[i / <span class="number">3</span> * <span class="number">3</span> + j / <span class="number">3</span>][number] -= <span class="number">1</span>;</span><br><span class="line">		filledNum -= <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%9E%E6%BA%AF%E6%B3%95/" rel="tag"># 回溯法</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/12/31/NO_DELAY%20option%20in%20TCP%20protocal/" rel="prev" title="TCP中的NO_DELAY">
+                  <i class="fa fa-angle-left"></i> TCP中的NO_DELAY
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/03/31/HashMap%20and%20LinkedHashMap/" rel="next" title="HashMap与LinkedHashMap">
+                  HashMap与LinkedHashMap <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Notes：Temporal Relational Reasoning in VideosNotes：Temporal Relational Reasoning in Videos Abstract：时序关系推理能够关联物体随时间的变化，而时序关系推理是完成一些重要的视频识别任务的关键。该文提出了一个被称为Temporal Relation Network（TRN）的网络模块，可以用来在多时间尺度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Notes：Temporal Relational Reasoning in Videos">
+<meta property="og:url" content="https://spground.github.io/2019/01/14/Notes%EF%BC%9ATemporal%20Relational%20Reasoning%20in%20Videos/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="Notes：Temporal Relational Reasoning in VideosNotes：Temporal Relational Reasoning in Videos Abstract：时序关系推理能够关联物体随时间的变化，而时序关系推理是完成一些重要的视频识别任务的关键。该文提出了一个被称为Temporal Relation Network（TRN）的网络模块，可以用来在多时间尺度">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547450333881-c4b46004-da02-41f9-986b-2fac4712e89f.png#align=left&display=inline&height=316&linkTarget=_blank&name=image.png&originHeight=632&originWidth=1392&size=654365&width=696">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547452677104-fcfd5a64-292b-4113-9d3d-9878019f834d.png#align=left&display=inline&height=352&linkTarget=_blank&name=image.png&originHeight=704&originWidth=1428&size=513012&width=714">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547452848395-e0460887-b3be-4aff-9c64-f6236e982a19.png#align=left&display=inline&height=64&linkTarget=_blank&name=image.png&originHeight=128&originWidth=1446&size=19940&width=723">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/ba0a51925da61fe95a29b0e5d1cc5503.svg#card=math&code=V%20%3D%20%5C%7Bf_1%2Cf_2%2C...%2Cf_n%5C%7D&height=24&width=148">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/a67984081d583fd61448b307f11b87a9.svg#card=math&code=h_%5Cphi&height=24&width=19">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/c90100d47c5c29dd569044c82af79abb.svg#card=math&code=g_%5Ctheta&height=24&width=16">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/8ce4b16b22b58894aa86c421e8759df3.svg#card=math&code=k&height=24&width=9">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547464334500-e1ba2a0b-1051-452d-9dbc-2cfec0921366.png#align=left&display=inline&height=67&linkTarget=_blank&name=image.png&originHeight=134&originWidth=1374&size=22654&width=687">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547464448424-4008bc97-d459-4042-b484-12c5bccdebb4.png#align=left&display=inline&height=49&linkTarget=_blank&name=image.png&originHeight=98&originWidth=1384&size=12610&width=692">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/6c30b387200ac188eef7192b5bd15eeb.svg#card=math&code=T_d%28V%29&height=24&width=44">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/6c30b387200ac188eef7192b5bd15eeb.svg#card=math&code=T_d%28V%29&height=24&width=44">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/c0992f072c25ce1f1b6c199fb4a35dc2.svg#card=math&code=h%5E%7B%28d%29%7D_%7B%5Cphi%7D&height=29&width=27">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/1c7b7902483a78c63a356cea2e3b09a0.svg#card=math&code=g%5E%7B%28d%29%7D_%7B%5Ctheta%7D&height=27&width=26">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/8bfe79b323657f98ed9cecf63b5e1651.svg#card=math&code=d%20%3D%20N&height=24&width=47">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/3d6d5a9edaef60b4c04cdc5666619466.svg#card=math&code=T_N%28V%29&height=24&width=49">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/6ce174e00354bef2513bb189bf6af7c3.svg#card=math&code=d%20%3C%20N&height=24&width=47">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/8ce4b16b22b58894aa86c421e8759df3.svg#card=math&code=k&height=24&width=9">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/8d9c307cb7f3c4a32822a51922d1ceaa.svg#card=math&code=N&height=24&width=15">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/ec521827e2328e4fa094b3d78032181c.svg#card=math&code=1%20%2B%EF%BC%88N-2%EF%BC%89%2A%20k&height=26&width=131">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/c90100d47c5c29dd569044c82af79abb.svg#card=math&code=g_%5Ctheta&height=24&width=16">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/__latex/a67984081d583fd61448b307f11b87a9.svg#card=math&code=h_%5Cphi&height=24&width=19">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547466536656-d99c8f0e-eb52-4a96-bf7f-fdda29310078.png#align=left&display=inline&height=324&linkTarget=_blank&name=image.png&originHeight=648&originWidth=1444&size=156727&width=722">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547466676029-e83c73c8-eeeb-4b8f-b04d-98d68cfaace0.png#align=left&display=inline&height=265&linkTarget=_blank&name=image.png&originHeight=530&originWidth=1404&size=107405&width=702">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547466777022-f64ce276-8c96-4dfa-83a6-0bb4ca2e7aec.png#align=left&display=inline&height=86&linkTarget=_blank&name=image.png&originHeight=172&originWidth=1148&size=41266&width=574">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547467489189-c50e93ee-0151-4758-a32a-7fb03161c8f3.png#align=left&display=inline&height=457&linkTarget=_blank&name=image.png&originHeight=914&originWidth=1758&size=982124&width=879">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547467710082-32cc3cbe-a51f-469d-b790-582a383ca3ed.png#align=left&display=inline&height=568&linkTarget=_blank&name=image.png&originHeight=1136&originWidth=1744&size=1713335&width=872">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547468093076-bfec8d4f-51cd-497c-ae89-5f0e8a36f17a.png#align=left&display=inline&height=225&linkTarget=_blank&name=image.png&originHeight=450&originWidth=1030&size=51935&width=515">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547469065209-04481775-b6c6-4a0d-b112-47b64070a759.png#align=left&display=inline&height=269&linkTarget=_blank&name=image.png&originHeight=538&originWidth=1788&size=128390&width=894">
+<meta property="article:published_time" content="2019-01-14T12:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.567Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="Activity Recognition">
+<meta property="article:tag" content="TRN">
+<meta property="article:tag" content="Video">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2019/png/168795/1547450333881-c4b46004-da02-41f9-986b-2fac4712e89f.png#align=left&display=inline&height=316&linkTarget=_blank&name=image.png&originHeight=632&originWidth=1392&size=654365&width=696">
+
+
+<link rel="canonical" href="https://spground.github.io/2019/01/14/Notes%EF%BC%9ATemporal%20Relational%20Reasoning%20in%20Videos/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2019/01/14/Notes%EF%BC%9ATemporal%20Relational%20Reasoning%20in%20Videos/","path":"2019/01/14/Notes：Temporal Relational Reasoning in Videos/","title":"Notes：Temporal Relational Reasoning in Videos"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Notes：Temporal Relational Reasoning in Videos | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Notes%EF%BC%9ATemporal-Relational-Reasoning-in-Videos"><span class="nav-number">1.</span> <span class="nav-text">Notes：Temporal Relational Reasoning in Videos</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Abstract%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">Abstract：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Introduction"><span class="nav-number">3.</span> <span class="nav-text">1. Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-Related-Work"><span class="nav-number">3.1.</span> <span class="nav-text">1.1 Related Work</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Temporal-Relation-Network"><span class="nav-number">4.</span> <span class="nav-text">2. Temporal Relation Network</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E6%97%B6%E5%BA%8F%E5%85%B3%E7%B3%BB%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">2.1 时序关系定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E5%A4%9A%E5%B0%BA%E5%BA%A6%E6%97%B6%E5%BA%8F%E5%85%B3%E7%B3%BB"><span class="nav-number">4.2.</span> <span class="nav-text">2.2 多尺度时序关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E9%87%87%E6%A0%B7%E8%A7%84%E5%88%99"><span class="nav-number">4.3.</span> <span class="nav-text">2.3 采样规则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%AE%9E%E9%AA%8C"><span class="nav-number">5.</span> <span class="nav-text">3. 实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TRN%E4%B8%AD%E7%9A%84%E5%8F%AF%E8%A7%A3%E9%87%8A%E7%9A%84%E8%A7%86%E8%A7%89%E5%B8%B8%E8%AF%86"><span class="nav-number">5.1.</span> <span class="nav-text">TRN中的可解释的视觉常识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TRN%E6%A8%A1%E5%9D%97%E9%80%89%E6%8B%A9%E6%9C%80%E8%83%BD%E8%A1%A8%E7%A4%BA%E8%A7%86%E9%A2%91%E7%9A%84%E5%B8%A7%EF%BC%88Representative-Frame%EF%BC%89"><span class="nav-number">5.1.1.</span> <span class="nav-text">TRN模块选择最能表示视频的帧（Representative Frame）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E7%9A%84%E6%97%B6%E5%BA%8F%E5%AF%B9%E9%BD%90"><span class="nav-number">5.1.2.</span> <span class="nav-text">视频的时序对齐</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E5%BA%8F%E5%AF%B9%E4%BA%8E%E8%A1%8C%E4%B8%BA%E8%AF%86%E5%88%AB%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-number">5.1.3.</span> <span class="nav-text">时序对于行为识别的重要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A9%E6%9C%9F%E8%A1%8C%E4%B8%BA%E8%AF%86%E5%88%AB"><span class="nav-number">5.1.4.</span> <span class="nav-text">早期行为识别</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E7%BB%93%E8%AE%BA"><span class="nav-number">6.</span> <span class="nav-text">4. 结论</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2019/01/14/Notes%EF%BC%9ATemporal%20Relational%20Reasoning%20in%20Videos/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Notes：Temporal Relational Reasoning in Videos | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Notes：Temporal Relational Reasoning in Videos
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-01-14 20:00:00" itemprop="dateCreated datePublished" datetime="2019-01-14T20:00:00+08:00">2019-01-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/deep-learning/" itemprop="url" rel="index"><span itemprop="name">deep learning</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Notes：Temporal-Relational-Reasoning-in-Videos"><a href="#Notes：Temporal-Relational-Reasoning-in-Videos" class="headerlink" title="Notes：Temporal Relational Reasoning in Videos"></a>Notes：Temporal Relational Reasoning in Videos</h1><p>Notes：Temporal Relational Reasoning in Videos</p>
+<h1 id="Abstract："><a href="#Abstract：" class="headerlink" title="Abstract："></a>Abstract：</h1><p>时序关系推理能够关联物体随时间的变化，而时序关系推理是完成一些重要的视频识别任务的关键。<br />该文提出了一个被称为Temporal Relation Network（TRN）的网络模块，可以用来在多时间尺度上学习和推理时序关系。该文在Something-Something，Jester和Charades三个数据集做了实验，得到了SOTA的结果。TRN模块是一个可插拔的模块，可以基于常见的CNN架构，在Charades数据集上，采用TRN模块的网络比双流、3D卷积取得了更好的结果。</p>
+<h1 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h1><p>该文一开始突出介绍了时序推理能力是智能决策的关键能力，具有时序推理的物种能够结合当下情形对过去和未来作出推理和预测。文章举了一个简单的例子说明人类具有这种时序推理能力，而常见的模型似乎很难学会。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547450333881-c4b46004-da02-41f9-986b-2fac4712e89f.png#align=left&display=inline&height=316&linkTarget=_blank&name=image.png&originHeight=632&originWidth=1392&size=654365&width=696" alt="image.png"></p>
+<p>人类很容易通过观察一件事情的始末状态，可以推理中间发生的过程，而对于普通的神经网络模型却有点困难。在CV领域视频的行为识别是一个核心的研究领域，一些常见的数据集例如UCF101，Sport1M和THUMOS等，包含许多人类行为，这些行为不需要通过长范围的时序推理就能够被识别出来（基于外观和光流等特征），例如常见的双流卷积网络和I3D等网络。</p>
+<p>然而，当视频的长度有限以及某些需要通过物体的变换和时序关系而非外观来刻画的视频，这时候上述的那些网络往往不能够很好的工作。例如上面的图片的例子，每一组的两张图片在apperance差距不大，也很难仅仅根据外观来判断发生了什么，因此需要网络能够基于光流和图像里面物体的外观等因素，去发现一种<strong>视觉常识</strong>。</p>
+<p>TRN模块描述了视频采样的数帧之间的时序关系，且TRN能够学习和发现多尺度的时序关系。TRN是一个很容易被结合到现有的成熟的网络结构上，因此在使用上也是低成本的。</p>
+<h2 id="1-1-Related-Work"><a href="#1-1-Related-Work" class="headerlink" title="1.1 Related Work"></a>1.1 Related Work</h2><p>该文回顾总结了常见用于行为识别的方案，双流卷积、CNN+LSTM、3D卷积以及最近的I3D网络。然后该文基本上指出了这些网络结构常见的问题：</p>
+<ul>
+<li>双流网络基本就是光流的计算耗时，效率低下；</li>
+<li>3D卷积计算复杂度高，3D卷积在连续的图像帧上做卷积有些冗余；</li>
+<li>这些网络的输入通常是20到30帧，因此很难学习到长范围的时序关系；</li>
+</ul>
+<p>为了解决这些问题，TRN稀疏采样帧，然后学习他们之间的因果关系，这相比于密集采样然后对他们做卷积运算要有效率得多。</p>
+<p>下图是TRN对一个video的表示。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547452677104-fcfd5a64-292b-4113-9d3d-9878019f834d.png#align=left&display=inline&height=352&linkTarget=_blank&name=image.png&originHeight=704&originWidth=1428&size=513012&width=714" alt="image.png"></p>
+<h1 id="2-Temporal-Relation-Network"><a href="#2-Temporal-Relation-Network" class="headerlink" title="2. Temporal Relation Network"></a>2. Temporal Relation Network</h1><p>该文后续的实验表明：装配有TRN模块的网络能够发现可解释的视觉常识。</p>
+<h2 id="2-1-时序关系定义"><a href="#2-1-时序关系定义" class="headerlink" title="2.1 时序关系定义"></a>2.1 时序关系定义</h2><p>pair-wise的时序关系定义如下：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547452848395-e0460887-b3be-4aff-9c64-f6236e982a19.png#align=left&display=inline&height=64&linkTarget=_blank&name=image.png&originHeight=128&originWidth=1446&size=19940&width=723" alt="image.png"><br />其中输入<img src="https://cdn.nlark.com/yuque/__latex/ba0a51925da61fe95a29b0e5d1cc5503.svg#card=math&code=V%20%3D%20%5C%7Bf_1%2Cf_2%2C...%2Cf_n%5C%7D&height=24&width=148">是原始视频采样的有序帧的特征表示，例如一些CNN架构的某层的activation。函数<img src="https://cdn.nlark.com/yuque/__latex/a67984081d583fd61448b307f11b87a9.svg#card=math&code=h_%5Cphi&height=24&width=19">和函数<img src="https://cdn.nlark.com/yuque/__latex/c90100d47c5c29dd569044c82af79abb.svg#card=math&code=g_%5Ctheta&height=24&width=16">融合不同的pair-wise帧的时序关系，文章中提出的TRN仅仅使用了MLP来表示两个函数。另外，为了计算的有效性，文章中并没有全部计算采样的n个帧特征的pair-wise时序关系，而是随机选择（均匀采样）了<img src="https://cdn.nlark.com/yuque/__latex/8ce4b16b22b58894aa86c421e8759df3.svg#card=math&code=k&height=24&width=9">个pair-wise关系来计算。<br /><br /><br />上面考虑的是2-frame的关系，其中还有3-frame，4-frame，……，n-frame的时序关系。<br />对于3-frame的时序关系：<br /><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547464334500-e1ba2a0b-1051-452d-9dbc-2cfec0921366.png#align=left&display=inline&height=67&linkTarget=_blank&name=image.png&originHeight=134&originWidth=1374&size=22654&width=687" alt="image.png"><br />以此类推计算其他d-frame的时序关系。</p>
+<h2 id="2-2-多尺度时序关系"><a href="#2-2-多尺度时序关系" class="headerlink" title="2.2 多尺度时序关系"></a>2.2 多尺度时序关系</h2><p>为了捕获多尺度的时序关系，文章将上诉的d-frame的时序关系简单的组合起来。<br /><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547464448424-4008bc97-d459-4042-b484-12c5bccdebb4.png#align=left&display=inline&height=49&linkTarget=_blank&name=image.png&originHeight=98&originWidth=1384&size=12610&width=692" alt="image.png"><br />每个时序关系项<img src="https://cdn.nlark.com/yuque/__latex/6c30b387200ac188eef7192b5bd15eeb.svg#card=math&code=T_d%28V%29&height=24&width=44">都表示了d张有序的frame的时序关系，其中每一个时序关系项<img src="https://cdn.nlark.com/yuque/__latex/6c30b387200ac188eef7192b5bd15eeb.svg#card=math&code=T_d%28V%29&height=24&width=44">都对应两个函数<img src="https://cdn.nlark.com/yuque/__latex/c0992f072c25ce1f1b6c199fb4a35dc2.svg#card=math&code=h%5E%7B%28d%29%7D_%7B%5Cphi%7D&height=29&width=27">和<img src="https://cdn.nlark.com/yuque/__latex/1c7b7902483a78c63a356cea2e3b09a0.svg#card=math&code=g%5E%7B%28d%29%7D_%7B%5Ctheta%7D&height=27&width=26">。<br /><br /></p>
+<h2 id="2-3-采样规则"><a href="#2-3-采样规则" class="headerlink" title="2.3 采样规则"></a>2.3 采样规则</h2><p>为了有效的训练，降低计算复杂度，文章提出了一个有效的采样策略。给定均匀采样的N帧，对于d-frame关系的计算，当<img src="https://cdn.nlark.com/yuque/__latex/8bfe79b323657f98ed9cecf63b5e1651.svg#card=math&code=d%20%3D%20N&height=24&width=47">时，直接计算<img src="https://cdn.nlark.com/yuque/__latex/3d6d5a9edaef60b4c04cdc5666619466.svg#card=math&code=T_N%28V%29&height=24&width=49">。当<img src="https://cdn.nlark.com/yuque/__latex/6ce174e00354bef2513bb189bf6af7c3.svg#card=math&code=d%20%3C%20N&height=24&width=47">时，则在所有可能的d-frame的排列中均匀选择<img src="https://cdn.nlark.com/yuque/__latex/8ce4b16b22b58894aa86c421e8759df3.svg#card=math&code=k&height=24&width=9">个排列，按照公式计算，将其表示d-frame的时序关系。这样在给定<img src="https://cdn.nlark.com/yuque/__latex/8d9c307cb7f3c4a32822a51922d1ceaa.svg#card=math&code=N&height=24&width=15">张frame的情况下，可以计算<img src="https://cdn.nlark.com/yuque/__latex/ec521827e2328e4fa094b3d78032181c.svg#card=math&code=1%20%2B%EF%BC%88N-2%EF%BC%89%2A%20k&height=26&width=131">个多尺度的时序关系。</p>
+<h1 id="3-实验"><a href="#3-实验" class="headerlink" title="3. 实验"></a>3. 实验</h1><p>因为文章想说明TRN模块的有效性，因此文章所有用来对比的模型均采用BN-Inception作为基础的CNN网络结构，唯一不同的就是是否使用TRN模块。文章的<img src="https://cdn.nlark.com/yuque/__latex/c90100d47c5c29dd569044c82af79abb.svg#card=math&code=g_%5Ctheta&height=24&width=16">函数是一个每层256神经元的两层MLP，而<img src="https://cdn.nlark.com/yuque/__latex/a67984081d583fd61448b307f11b87a9.svg#card=math&code=h_%5Cphi&height=24&width=19">则是一层MLP。文章设置k&#x3D;3，d&#x3D;8。文章和TSN模型在Something-V1和Something-V2数据集上做了对比，结果如下：<br /><br /><br /><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547466536656-d99c8f0e-eb52-4a96-bf7f-fdda29310078.png#align=left&display=inline&height=324&linkTarget=_blank&name=image.png&originHeight=648&originWidth=1444&size=156727&width=722" alt="image.png"><br /><br /><br />可以看出TRN模型确实outperform TSN模型，但是用single-frame作为base-line来对比说明TRN模型的有效性有点难以服众，毕竟base-line只利用了single frame的信息。</p>
+<p>另外文章还在Jester和Charades上做了实验：</p>
+<ul>
+<li>Jester数据集</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547466676029-e83c73c8-eeeb-4b8f-b04d-98d68cfaace0.png#align=left&display=inline&height=265&linkTarget=_blank&name=image.png&originHeight=530&originWidth=1404&size=107405&width=702" alt="image.png"></p>
+<ul>
+<li>Charades数据集</li>
+</ul>
+<p>在该数据集上，TRN模型打败了2-stream卷积网络和C3D网络，以及最近的Asyn-chronous Temporal Field方法。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547466777022-f64ce276-8c96-4dfa-83a6-0bb4ca2e7aec.png#align=left&display=inline&height=86&linkTarget=_blank&name=image.png&originHeight=172&originWidth=1148&size=41266&width=574" alt="image.png"></p>
+<h2 id="TRN中的可解释的视觉常识"><a href="#TRN中的可解释的视觉常识" class="headerlink" title="TRN中的可解释的视觉常识"></a>TRN中的可解释的视觉常识</h2><h3 id="TRN模块选择最能表示视频的帧（Representative-Frame）"><a href="#TRN模块选择最能表示视频的帧（Representative-Frame）" class="headerlink" title="TRN模块选择最能表示视频的帧（Representative Frame）"></a>TRN模块选择最能表示视频的帧（Representative Frame）</h3><p>首先计算不同的视频帧排列的经过TRN模块的时序关系response，然后将这些response排序，选择最高response的视频帧排列。这些视频帧在TRN模块下，是该视频的表示帧。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547467489189-c50e93ee-0151-4758-a32a-7fb03161c8f3.png#align=left&display=inline&height=457&linkTarget=_blank&name=image.png&originHeight=914&originWidth=1758&size=982124&width=879" alt="image.png"></p>
+<h3 id="视频的时序对齐"><a href="#视频的时序对齐" class="headerlink" title="视频的时序对齐"></a>视频的时序对齐</h3><p>基于上面的representative frame，TRN可以用于对于同一个action类别的不同视频进行时序对齐。首先利用TRN找出这些representative frame的index作为该视频时序上的landmark，然后调整采样率，使得每一个视频同时到达每一个landmark。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547467710082-32cc3cbe-a51f-469d-b790-582a383ca3ed.png#align=left&display=inline&height=568&linkTarget=_blank&name=image.png&originHeight=1136&originWidth=1744&size=1713335&width=872" alt="image.png"></p>
+<h3 id="时序对于行为识别的重要性"><a href="#时序对于行为识别的重要性" class="headerlink" title="时序对于行为识别的重要性"></a>时序对于行为识别的重要性</h3><p>文章为了表明时序的重要性，在Something和UCF101数据集进行了一个对比实验，一组是按原始顺序输入视频帧，一组是shuffle顺序输入视频帧。结果比较有意思：在Something数据集上来看，原始顺序输入的实验结果明显好于shuffle顺序输入，而对于UCF101，视频帧的输入顺序对结果影响不大。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547468093076-bfec8d4f-51cd-497c-ae89-5f0e8a36f17a.png#align=left&display=inline&height=225&linkTarget=_blank&name=image.png&originHeight=450&originWidth=1030&size=51935&width=515" alt="image.png"></p>
+<p>文章给出的解释是对于视频中持续的行为过程，时序关系对于UCF-101数据集的行为识别用处不大。为了进一步分析这种差异，文章画出了两种顺序输入后准确度有显著差异和没有显著差异的活动分类。</p>
+<p>对于一些有很强的方向性的、大的动作，保留时序顺序对于准确识别行为类别是重要的，这也和我们的直觉相符，而对于一些看起来似乎静止的活动，例如“将一个不会滚动的球放在桌上”这个行为准确的识别不太需要motion，而是需要一些物品的co-occurence信息即可。</p>
+<h3 id="早期行为识别"><a href="#早期行为识别" class="headerlink" title="早期行为识别"></a>早期行为识别</h3><p>文章认为TRN模块可以在给定少量的帧的情况下，利用帧之间的关系可以预测出该活动的类别。<br />这样在训练好模型后，在实际预测的时候，就可以在早期就给出行为类别的预测。<br /><img src="https://cdn.nlark.com/yuque/0/2019/png/168795/1547469065209-04481775-b6c6-4a0d-b112-47b64070a759.png#align=left&display=inline&height=269&linkTarget=_blank&name=image.png&originHeight=538&originWidth=1788&size=128390&width=894" alt="image.png"></p>
+<h1 id="4-结论"><a href="#4-结论" class="headerlink" title="4. 结论"></a>4. 结论</h1><p>文章认为TRN可以让神经网络对视频的时序关系进行推理，并且在几个数据集上取得了competitive的效果。同时，通过一系列的分析，文章认为TRN发现了视频中的一些可解释的视觉常识。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/TRN/" rel="tag"># TRN</a>
+              <a href="/tags/Video/" rel="tag"># Video</a>
+              <a href="/tags/Activity-Recognition/" rel="tag"># Activity Recognition</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/12/04/Notes-Learning%20Spatiotemporal%20Features%20with%203D%20Convolutional%20Networks/" rel="prev" title="Notes：Learning Spatiotemporal Features with 3D Convolutional Networks">
+                  <i class="fa fa-angle-left"></i> Notes：Learning Spatiotemporal Features with 3D Convolutional Networks
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/01/24/awk/" rel="next" title="awk">
+                  awk <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

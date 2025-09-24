@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="1.数据库事务 事务是用户定义的一个数据库操作系列，这些操作要么全做要么全不做，是一个不可分割的工作单位。  事务是数据库中重要的概念，通常以BEGIN TRANSACTION开始，以COMMIT或者ROLLBACK结束。数据库事务具有四个著名的特性：ACID。  Automatic 原子性：即事务中的操作要么都做，要么都不做。  Consistency 一致性：事务的执行的结果必须是使数据库从一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库事务隔离级别">
+<meta property="og:url" content="https://spground.github.io/2018/01/04/Isolation%20level%20in%20MySQL%20transactions/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="1.数据库事务 事务是用户定义的一个数据库操作系列，这些操作要么全做要么全不做，是一个不可分割的工作单位。  事务是数据库中重要的概念，通常以BEGIN TRANSACTION开始，以COMMIT或者ROLLBACK结束。数据库事务具有四个著名的特性：ACID。  Automatic 原子性：即事务中的操作要么都做，要么都不做。  Consistency 一致性：事务的执行的结果必须是使数据库从一">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-01-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.566Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="ACID">
+<meta property="article:tag" content="事务">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="隔离性">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://spground.github.io/2018/01/04/Isolation%20level%20in%20MySQL%20transactions/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2018/01/04/Isolation%20level%20in%20MySQL%20transactions/","path":"2018/01/04/Isolation level in MySQL transactions/","title":"数据库事务隔离级别"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据库事务隔离级别 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1"><span class="nav-number">1.</span> <span class="nav-text">1.数据库事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6"><span class="nav-number">2.</span> <span class="nav-text">2. 数据库并发控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 数据不一致性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%B0%81%E9%94%81%E5%92%8C%E5%B9%B6%E5%8F%91%E5%BA%A6"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 封锁和并发度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">3. 事务隔离级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-References"><span class="nav-number">4.</span> <span class="nav-text">4. References</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2018/01/04/Isolation%20level%20in%20MySQL%20transactions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据库事务隔离级别 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据库事务隔离级别
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-01-04 00:00:00" itemprop="dateCreated datePublished" datetime="2018-01-04T00:00:00+08:00">2018-01-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1-数据库事务"><a href="#1-数据库事务" class="headerlink" title="1.数据库事务"></a>1.数据库事务</h2><blockquote>
+<p>事务是用户定义的一个数据库操作系列，这些操作要么全做要么全不做，是一个不可分割的工作单位。</p>
+</blockquote>
+<p>事务是数据库中重要的概念，通常以<code>BEGIN TRANSACTION</code>开始，以<code>COMMIT</code>或者<code>ROLLBACK</code>结束。数据库事务具有四个著名的特性：<code>ACID</code>。</p>
+<ul>
+<li><p>Automatic</p>
+<p>原子性：即事务中的操作要么都做，要么都不做。</p>
+</li>
+<li><p>Consistency</p>
+<p>一致性：事务的执行的结果必须是使数据库从一个<code>一致性状态</code>到另一个<code>一致性状态</code>。这里的一致性状态指的是物理和逻辑上的数据库一致性状态。</p>
+<p>比如一个银行系统内部各个用户直接互相转账，无论如何转账，系统内部的金额的总数总是恒定不变的。</p>
+</li>
+<li><p>Isolation</p>
+<p>隔离性：一个事务的执行不能被其他事务干扰。即一个事务内部的操作及使用的数据对其他并发事务是隔离的，并发执行的各个事务之间不能相互干扰。</p>
+</li>
+<li><p>Duration</p>
+<p>持久性：一个事务一旦提交，它对数据库中数据的改变就该是永久性的。</p>
+<p>事务的<code>ACID</code>特性需要数据库管理系统保证，同时事务也是数据库管理系统<strong>恢复</strong>和<strong>并发控制</strong>的基本单位。</p>
+</li>
+</ul>
+<h2 id="2-数据库并发控制"><a href="#2-数据库并发控制" class="headerlink" title="2. 数据库并发控制"></a>2. 数据库并发控制</h2><h3 id="2-1-数据不一致性"><a href="#2-1-数据不一致性" class="headerlink" title="2.1 数据不一致性"></a>2.1 数据不一致性</h3><p>第1节提到了事务是并发控制的基本单位，由于并发控制可能会导致事务的<code>ACID</code>特性遭到破坏，从而带来了数据库的数据不一致性。具体来讲，由于并发操作，多个事务的并发执行会带来如下四个典型的数据不一致性问题，而这几种问题主要是由于并发操作破坏了事务的<strong>隔离性</strong>（<code>Isolation</code>）导致的，第3节会介绍<code>MySQL</code>数据库中并发控制机制下不同的事务隔离级别。</p>
+<ol>
+<li><p><strong>丢失修改</strong></p>
+<p>这种问题是最直观，最不应该发生的，例如两个事务<code>T1</code>和<code>T2</code>都读入同一数据进行修改，这样<code>T1</code>提交修改结果后，随即<code>T2</code>也提交了结果。这样，<code>T2</code>便将<code>T1</code>对数据的修改给覆盖了，这样就出现了丢失修改的问题了。</p>
+<p>这种问题发生的最主要原因是：<strong>两个或多个事务都在对同一数据项进行写操作</strong>。</p>
+</li>
+<li><p><strong>不可重复读</strong></p>
+<p>不可重复读指的是：事务<code>T1</code>读取了某个数据项<code>A</code>，在事务<code>T1</code>运行期间又有其他事务例如<code>T2</code>对数据项<code>A</code>进行了修改并提交了，这样事务<code>T1</code>再次读取数据项<code>A</code>的时候，发现结果不一致了。</p>
+<p>这种问题发生的最主要原因是：<strong>一个事务在对某一个数据项进行读操作，而另外的其他事务对该数据项进行了写操作。</strong></p>
+</li>
+<li><p><strong>读脏数据</strong></p>
+<p>读脏数据指的是：事务<code>T1</code>正在修改某个数据项<code>A</code>，事务还未提交，而事务<code>T2</code>读取了数据项<code>A</code>，但是随后事务<code>T1</code>由于某种原因回滚了事务（并未提交事务），此时事务<code>T2</code>读取到的数据项<code>A</code>的值和数据库中的值是不一致的，称事务<code>T2</code>读了脏数据（<code>Read Dirty</code>）。</p>
+<p>这种问题发生的最主要原因是：<strong>一个事务在对某一个数据项进行写操作，而另外的其他事务对该数据项进行了读操作。</strong></p>
+</li>
+<li><p><strong>幻读</strong></p>
+<p>幻读指的是：事务<code>T1</code>按照某些条件从数据库中查询了一些数据记录，但是在事务<code>T1</code>执行过程中，事务<code>T2</code>插入或者删除了某些数据记录，这样当事务<code>T1</code>再一次按照同样的条件从数据库查询的时候，发现多了或者少了某些记录。<strong>幻读本质上属于不可重复读</strong>，这里为了和第3节的隔离级别作对照，所以将其单独划出来作为幻读。</p>
+<p>产生的原因同不可重复读类似：<strong>由于事务<code>T1</code>按条件对数据表中的很多数据项查询的时候，这时候其他事务<code>T2</code>对数据表进行了其他数据项的写操作（插入、修改或者删除）。</strong></p>
+<p>为解决并发带来的一系列问题，主要有<strong>封锁、时间戳和乐观控制法</strong>来进行并发机制的设计。而<strong>封锁</strong>是最常用的数据库管理系统并发机制采用的方法。</p>
+</li>
+</ol>
+<h3 id="2-2-封锁和并发度"><a href="#2-2-封锁和并发度" class="headerlink" title="2.2 封锁和并发度"></a>2.2 封锁和并发度</h3><p>   封锁是实现并发控制的一个非常重要的技术。所谓封锁就是在事务对某个数据对象例如表、记录等进行操作的时候（读或写），先向系统请求对其加锁，成功加锁后，该事务才可以继续对其进行操作；否则，只能等待直到加锁成功。</p>
+<p>   具体来说：基本的锁分为两种：</p>
+<ul>
+<li>排他锁（Exclusive Locks）又称写锁，X锁；</li>
+<li>共享锁（Share Locks）又称读锁，S锁；</li>
+</ul>
+<p>   采用封锁确实能来保证并发下的数据库事务的特性，但是封锁带来了额外的系统开销，进而影响到系统的并发度。</p>
+<p>   例如1：当事务<code>T1</code>对某个数据项<code>A</code>进行写操作的时候，为避免<strong>读脏数据</strong>， 那么所有的其他向对数据项<code>A</code>进行读取的事务都得进行等待，那么系统此刻的并发度就大大降低了。</p>
+<p>   例如2：为避免<strong>幻读</strong>的产生，当事务<code>T1</code>对某一表<code>Table</code>中的某几行记录进项查询的时候，由于封锁了整个表<code>Table</code>，此时所有其他想对该表<code>Table</code>进项增加删除记录的事务都得进行等待，由于封锁的<strong>数据对象粒度太大</strong>，导致并发度大大降低。</p>
+<p>   综上可以看出：<strong>封锁和并发度本来就是一种矛盾，一方面我们想要尽可能的保证事务的隔离性进而避免2.1节中的问题；另一方面我们有希望系统的并发度不要下降。</strong></p>
+<p>   既然是矛盾，那就只能妥协，为了充分满足不同的应用场景，<code>MySQL</code>数据库<code>InnoDB</code>支持4种不同的事务隔离级别。</p>
+<p>   第3节将结合两种不同的封锁类型来理解这四种不同的事务隔离级别。</p>
+<h2 id="3-事务隔离级别"><a href="#3-事务隔离级别" class="headerlink" title="3. 事务隔离级别"></a>3. 事务隔离级别</h2><p>考虑到封锁和并发度的权衡，<code>MySQL</code>为用户提供了四种不同的事务隔离性级别。并发度从低到高（数据一致性强度从高到低）分别是：</p>
+<ul>
+<li>SERIALIZABLE（可串行化）可避免脏读、不可重复读、幻读情况的发生。</li>
+<li>REPEATABLE READ（可重复读）可避免脏读、不可重复读情况的发生。</li>
+<li>READ COMMITTED（读已提交）可避免脏读情况发生。</li>
+<li>READ UNCOMMITTED（读未提交）最低级别，以上情况均无法保证。</li>
+</ul>
+<p>通过2.1节我们知道了几种数据不一致产生的主要原因，即写写和读写同时发生在多个事务对同一数据对象的情况下，另外还介绍了两种锁类型：X锁和S锁。</p>
+<p>两个事务的X锁和S锁可以构成一个相容矩阵：如下：</p>
+<table>
+<thead>
+<tr>
+<th><strong>T1 &#x2F;  T2</strong></th>
+<th><strong>X锁</strong></th>
+<th><strong>S锁</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>X锁</strong></td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>S锁</strong></td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+<p>含义就是：<code>T1</code>对数据项加了<code>X</code>锁，则<code>T2</code>不能对其加<code>S</code>和<code>X</code>锁，<code>T2</code>对数据项加了<code>S</code>锁，则<code>T1</code>可以对其加<code>S</code>锁而不能加<code>X</code>锁。（<strong>相容矩阵的加锁顺序都是是T1先加锁，T2后加锁</strong>）</p>
+<ul>
+<li>**READ UNCOMMITTED（读未提交）**最低级别，以上情况均无法保证。</li>
+</ul>
+<p>官网给出建议：该隔离级别仅仅能做查询</p>
+<blockquote>
+<p>The <strong>isolation level</strong> that provides the least amount of protection between transactions. Queries employ a <strong>locking</strong> strategy that allows them to proceed in situations where they would normally wait for another transaction. However, this extra performance comes at the cost of less reliable results, including data that has been changed by other transactions and not committed yet (known as <strong>dirty read</strong>). Use this isolation level with great caution, and be aware that the results might not be consistent or reproducible, depending on what other transactions are doing at the same time. Typically, transactions with this isolation level only do queries, not insert, update, or delete operations.</p>
+</blockquote>
+<p>由于其不能保证<strong>读脏数据</strong>，因此S锁和X是相容的；因此可能如下：</p>
+<table>
+<thead>
+<tr>
+<th>T1 &#x2F; T2</th>
+<th>X锁</th>
+<th>S锁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>X锁</strong></td>
+<td>No(?待考证)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>S锁</strong></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+<ul>
+<li>**READ COMMITTED（读已提交）**可避免脏读情况发生。</li>
+</ul>
+<p>读已提交，避免脏读，但是不能保证可重复读；说明<code>T1</code>的<code>X</code>锁和<code>T2</code>的<code>S</code>锁不相容；而<code>S</code>锁和<code>X</code>锁相容的。<strong>也就是保证了某个事务在写数据项的时候，其他事务是不能读写该数据项的。</strong></p>
+<table>
+<thead>
+<tr>
+<th>T1 &#x2F; T2</th>
+<th>X锁</th>
+<th>S锁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>X锁</strong></td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>S锁</strong></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+<ul>
+<li>**REPEATABLE READ（可重复读）**可避免脏读、不可重复读情况的发生。</li>
+</ul>
+<p>可重复读，避免了脏读和不可重复读；说明<code>T1</code>的<code>X</code>锁和<code>T2</code>的<code>S</code>锁、<code>T1</code>的<code>S</code>锁和<code>T2</code>的<code>X</code>锁都不相容。<strong>也就是保证了某个事务在写某个数据项的时候，其他事务不能读写该数据项；且在读某个数据项时，其他事务只能读该数据项。</strong></p>
+<table>
+<thead>
+<tr>
+<th>T1 &#x2F;  T2</th>
+<th>X锁</th>
+<th>S锁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>X锁</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>S锁</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+<ul>
+<li>**SERIALIZABLE（可串行化）**可避免脏读、不可重复读、幻读情况的发生。</li>
+</ul>
+<p>为了避免幻读、不可重复读、脏读、丢失修改等产生，将并发事务的<strong>事务调度策略</strong>设置为为<strong>可串行化调度</strong>，这能保证该事务调度策略的运行结果同<strong>某一种串行调度</strong>结果一致，但是这会极大的降低并发度；同时，这也是<code>MySQL</code>的<code>InnoDB</code>提供的最高的事务隔离级别，这里的相容矩阵同3。</p>
+<blockquote>
+<p>The <strong>isolation level</strong> that uses the most conservative locking strategy, to prevent any other <strong>transactions</strong> from inserting or changing data that was read by this transaction, until it is finished. This way, the same query can be run over and over within a transaction, and be certain to retrieve the same set of results each time. Any attempt to change data that was committed by another transaction since the start of the current transaction, cause the current transaction to wait.</p>
+<p>This is the default isolation level specified by the SQL standard. In practice, this degree of strictness is rarely needed, so the default isolation level for <code>InnoDB</code> is the next most strict, <strong>REPEATABLE READ</strong>.</p>
+</blockquote>
+<h2 id="4-References"><a href="#4-References" class="headerlink" title="4. References"></a>4. References</h2><p><a href="https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_isolation_level">https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_isolation_level</a></p>
+<p><a href="http://www.cnblogs.com/xdp-gacl/p/3984001.html">http://www.cnblogs.com/xdp-gacl/p/3984001.html</a></p>
+<p><a href="">《数据库系统概论》王珊，萨师煊</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag"># 事务</a>
+              <a href="/tags/ACID/" rel="tag"># ACID</a>
+              <a href="/tags/%E9%9A%94%E7%A6%BB%E6%80%A7/" rel="tag"># 隔离性</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/12/30/HashMap/" rel="prev" title="HashMap工作原理和扩容机制">
+                  <i class="fa fa-angle-left"></i> HashMap工作原理和扩容机制
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/01/09/Index%20in%20Database/" rel="next" title="数据库索引">
+                  数据库索引 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"spground.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="分治分治(Divide and Conquer)是一场常见的算法策略。分治策略的基本思想就是对于一个问题规模为N的问题，将其划分为规模足够小的K个子问题，子问题由于规模足够小可以直接求解，最后将规模足够小的K的问题的解合并得出原问题的解。分治策略的问题的求解过程的一般套路就是：    判断问题规模，足够小进入步骤2，否者进入步骤3 直接对问题进行求解，返回问题的解。 将问题拆分成K个小规模的问题，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用排序算法——合并排序和快速排序">
+<meta property="og:url" content="https://spground.github.io/2016/09/30/Common%20Sort%20Algorithm%20merge%20sort%20and%20quick%20sort/index.html">
+<meta property="og:site_name" content="Spground Blog">
+<meta property="og:description" content="分治分治(Divide and Conquer)是一场常见的算法策略。分治策略的基本思想就是对于一个问题规模为N的问题，将其划分为规模足够小的K个子问题，子问题由于规模足够小可以直接求解，最后将规模足够小的K的问题的解合并得出原问题的解。分治策略的问题的求解过程的一般套路就是：    判断问题规模，足够小进入步骤2，否者进入步骤3 直接对问题进行求解，返回问题的解。 将问题拆分成K个小规模的问题，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-09-30T08:42:00.000Z">
+<meta property="article:modified_time" content="2025-09-24T14:30:21.565Z">
+<meta property="article:author" content="Spground">
+<meta property="article:tag" content="合并排序">
+<meta property="article:tag" content="快速排序">
+<meta property="article:tag" content="时间复杂度">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://spground.github.io/2016/09/30/Common%20Sort%20Algorithm%20merge%20sort%20and%20quick%20sort/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://spground.github.io/2016/09/30/Common%20Sort%20Algorithm%20merge%20sort%20and%20quick%20sort/","path":"2016/09/30/Common Sort Algorithm merge sort and quick sort/","title":"常用排序算法——合并排序和快速排序"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>常用排序算法——合并排序和快速排序 | Spground Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Spground Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">77</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">41</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%B2%BB"><span class="nav-number">1.</span> <span class="nav-text">分治</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%92%8C%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F"><span class="nav-number">2.</span> <span class="nav-text">合并排序和快速排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E7%9A%84%E9%80%92%E5%BD%92%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">快速排序的递归实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E6%8E%92%E5%BA%8F%E7%9A%84%E9%80%92%E5%BD%92%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">合并排序的递归实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E6%8E%92%E5%BA%8F%E7%9A%84%E9%9D%9E%E9%80%92%E5%BD%92%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">合并排序的非递归实现</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Spground</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://spground.github.io/2016/09/30/Common%20Sort%20Algorithm%20merge%20sort%20and%20quick%20sort/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Spground">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="常用排序算法——合并排序和快速排序 | Spground Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          常用排序算法——合并排序和快速排序
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-09-30 16:42:00" itemprop="dateCreated datePublished" datetime="2016-09-30T16:42:00+08:00">2016-09-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-24 22:30:21" itemprop="dateModified" datetime="2025-09-24T22:30:21+08:00">2025-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="分治"><a href="#分治" class="headerlink" title="分治"></a>分治</h2><p><strong>分治</strong><code>(Divide and Conquer)</code>是一场常见的算法策略。分治策略的基本思想就是对于一个问题规模为<code>N</code>的问题，将其划分为规模足够小的<code>K</code>个子问题，子问题由于规模足够小可以直接求解，最后将规模足够小的<code>K</code>的问题的解合并得出原问题的解。<br>分治策略的问题的求解过程的一般套路就是：  </p>
+<ol>
+<li>判断问题规模，足够小进入步骤2，否者进入步骤3</li>
+<li>直接对问题进行求解，返回问题的解。</li>
+<li>将问题拆分成<code>K</code>个小规模的问题，进入步骤2。并将解合并，得到原问题的解。</li>
+</ol>
+<p>由于分治策略的步骤描述自带递归属性，因此分治策略的算法实现常采用递归来实现。递归的算法通常会含有三部分，第一部分是个基准情况<code>(Base Case)</code>，第二部分是问题拆分，并调用自身，第三部分是合并并返回结果。</p>
+<p>分治策略中主要有两个关键过程：</p>
+<ul>
+<li>将原问题拆分<code>Division</code></li>
+<li>将各子问题合并<code>Combination</code></li>
+</ul>
+<p>分治策略的主要时间开销发生在这两个过程，通常分治策略有两类  </p>
+<ol>
+<li>拆分容易，合并困难</li>
+<li>拆分困难，合并简单</li>
+</ol>
+<p>下文中的<strong>合并排序</strong>和<strong>快速排序</strong>分别属于上面的第1和第2类。</p>
+<h2 id="合并排序和快速排序"><a href="#合并排序和快速排序" class="headerlink" title="合并排序和快速排序"></a>合并排序和快速排序</h2><p>在常见排序算法中，合并排序和快速排序是<strong>典型的分治算法</strong>，其时间复杂度的平均性能均为<code>nlgn</code>。合并排序的最坏时间复杂度也能保持<code>nlgn</code>，而快速排序的最坏时间复杂度却为<code>n*n</code>。<strong>合并排序是稳定的，而快速排序不是稳定的。</strong></p>
+<p><strong>另外合并排序是拆分容易，合并困难，而快速排序则是拆分困难，合并容易。</strong></p>
+<ol>
+<li><p><strong>合并排序又称归并排序，主要的思想是：将待排序列拆分至数个足够小的子序列，然后将相邻子序列合并为一个有序子序列，重复合并相邻有序子序列直到整个序列有序。</strong></p>
+</li>
+<li><p><strong>快速排序的主要思想则是，选取一个枢纽（<code>pivot</code>）， 将待排序列拆分为左右两个子序列A,B，使得子序列A的元素都不大于<code>pivot</code>， 子序列B的元素都大于<code>pivot</code>。这样使得子序列A的元素都不大于子序列B，然后对子序列A，B递归进行这种拆分，直到待拆分的序列足够小，最后整个序列变成有序。</strong></p>
+</li>
+</ol>
+<p>由于合并排序和快速排序每次元素的移动都不只移动了一个位置，因此每次元素的比较都<strong>不只消除了一个逆序对</strong>，因此对于插入排序这种每次比较只移动一个位置的算法，时间复杂度会得到改善。</p>
+<h2 id="快速排序的递归实现"><a href="#快速排序的递归实现" class="headerlink" title="快速排序的递归实现"></a>快速排序的递归实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">partition</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> l, <span class="type">int</span> h)</span> &#123;</span><br><span class="line">    <span class="type">int</span> pivot = a[l];</span><br><span class="line">    <span class="type">int</span> i,j;</span><br><span class="line">    i = l - <span class="number">1</span>;</span><br><span class="line">    j = h + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">while</span>(a[--j] &gt; pivot);</span><br><span class="line">        <span class="keyword">while</span>(a[++i] &lt; pivot)</span><br><span class="line">            <span class="keyword">if</span>(i &gt;= h)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        <span class="comment">//i 、j cross</span></span><br><span class="line">        <span class="keyword">if</span>(i &gt;= j)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> tmp = a[i];</span><br><span class="line">        a[i] = a[j];</span><br><span class="line">        a[j] = tmp;</span><br><span class="line">    &#125;</span><br><span class="line">    a[j] = pivot;</span><br><span class="line">    <span class="keyword">return</span> j;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">quickSort</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> l, <span class="type">int</span> h)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(l &gt;= h)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="type">int</span> p = partition(a, l, h);</span><br><span class="line">    quickSort(a, l, p);</span><br><span class="line">    quickSort(a, p+<span class="number">1</span>, h);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="合并排序的递归实现"><a href="#合并排序的递归实现" class="headerlink" title="合并排序的递归实现"></a>合并排序的递归实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">merge</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> l, <span class="type">int</span> m, <span class="type">int</span> h)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(l == h)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span>* b = (<span class="type">int</span>*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">int</span>) * (h - l + <span class="number">1</span>));</span><br><span class="line">    <span class="type">int</span> i = l, j = m + <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> k = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(i &lt;= m &amp;&amp; j &lt;= h)</span><br><span class="line">        b[k++] = a[i] &gt; a[j] ? a[j++] : a[i++];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(i &lt;= m)</span><br><span class="line">        <span class="keyword">while</span>(i &lt;= m)</span><br><span class="line">            b[k++] = a[i++];</span><br><span class="line">    <span class="keyword">if</span>(j &lt;= h)</span><br><span class="line">        <span class="keyword">while</span>(j &lt;= h)</span><br><span class="line">            b[k++] = a[j++];</span><br><span class="line">    <span class="comment">//回写</span></span><br><span class="line">    i = l;</span><br><span class="line">    k = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(; i &lt;= h;)</span><br><span class="line">        a[i++] = b[k++];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">mergeSort</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> l, <span class="type">int</span> h)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(l &gt;= h)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="type">int</span> m = (h + l) / <span class="number">2</span>;</span><br><span class="line">    mergeSort(a, l, m);</span><br><span class="line">    mergeSort(a, m+<span class="number">1</span>, h);</span><br><span class="line">    merge(a, l, m, h);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="合并排序的非递归实现"><a href="#合并排序的非递归实现" class="headerlink" title="合并排序的非递归实现"></a>合并排序的非递归实现</h2><p>由于递归会导致函数调用栈的暴增，会引入额外的时间开销，例如现场保护和恢复之类的。通递归版本的算法都可以改写为迭代版本的算法。递归算法的优点是实现简单直观，易于理解，缺点是如果有时候调用深度过深，会带来栈内存溢出和额外的运行时间开销。迭代算法的有点是不会有额外的函数调用栈的增长， 缺点是难于理解且难于实现。</p>
+<p>合并排序的迭代版本的实现相对来讲是比较简单直观的，大致思路就是：第1轮，待排序列S中相邻的长度为1的子序列进行合并，第2轮，序列S中相邻的长度为2的子序列进行合并，第<code>i</code>轮，待排序列S中相邻的长度为<code>2的i-1次方</code>的子序列进行合并。直到待合并的子序列数为1。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">merge</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> l, <span class="type">int</span> m, <span class="type">int</span> h)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(l == h)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span>* b = (<span class="type">int</span>*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">int</span>) * (h - l + <span class="number">1</span>));</span><br><span class="line">    <span class="type">int</span> i = l, j = m + <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> k = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(i &lt;= m &amp;&amp; j &lt;= h)</span><br><span class="line">        b[k++] = a[i] &gt; a[j] ? a[j++] : a[i++];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(i &lt;= m)</span><br><span class="line">        <span class="keyword">while</span>(i &lt;= m)</span><br><span class="line">            b[k++] = a[i++];</span><br><span class="line">    <span class="keyword">if</span>(j &lt;= h)</span><br><span class="line">        <span class="keyword">while</span>(j &lt;= h)</span><br><span class="line">            b[k++] = a[j++];</span><br><span class="line">    <span class="comment">//回写</span></span><br><span class="line">    i = l;</span><br><span class="line">    k = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(; i &lt;= h;)</span><br><span class="line">        a[i++] = b[k++];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//非递归版本</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">mergeIteation</span><span class="params">(<span class="type">int</span>* a, <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> offset = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(offset &lt;= n) &#123;</span><br><span class="line">        <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(;i &lt; n;) &#123;</span><br><span class="line">            merge(a,i, i+offset<span class="number">-1</span>,i+offset*<span class="number">2</span> - <span class="number">1</span>);</span><br><span class="line">            i = i + offset * <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span>(n - <span class="number">1</span> - i &lt; offset)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        offset *= <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" rel="tag"># 时间复杂度</a>
+              <a href="/tags/%E5%90%88%E5%B9%B6%E6%8E%92%E5%BA%8F/" rel="tag"># 合并排序</a>
+              <a href="/tags/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/" rel="tag"># 快速排序</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/09/23/Common%20Sort%20Algorithm%20improvement%20of%20bubble%20sort%20and%20time%20complexity%20analysis%20of%20insertion%20sort%20/" rel="prev" title="常用排序算法--冒泡排序及改进和插入排序时间复杂度分析">
+                  <i class="fa fa-angle-left"></i> 常用排序算法--冒泡排序及改进和插入排序时间复杂度分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/10/23/Collections%20Rotate/" rel="next" title="Collections类中常用算法之Rotate">
+                  Collections类中常用算法之Rotate <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Spground</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
